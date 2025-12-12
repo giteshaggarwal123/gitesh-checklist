@@ -514,9 +514,18 @@
         }
 
         .sync-status.synced { background: #d1fae5; color: #065f46; }
-        .sync-status.syncing { background: #e0e7ff; color: var(--primary-dark); }
+        .sync-status.syncing {
+            background: #e0e7ff;
+            color: var(--primary-dark);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
         .sync-status.offline { background: #fef3c7; color: #92400e; }
         .sync-status.error { background: #fee2e2; color: #991b1b; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
 
         @media (max-width: 768px) {
             body {
@@ -1226,6 +1235,16 @@
                     e.preventDefault();
                     undo();
                 }
+                // Close modals with Escape key
+                if (e.key === 'Escape') {
+                    const statsModal = document.getElementById('stats-modal');
+                    const helpModal = document.getElementById('help-modal');
+                    if (statsModal && statsModal.style.display === 'flex') {
+                        closeStats();
+                    } else if (helpModal && helpModal.style.display === 'flex') {
+                        closeHelp();
+                    }
+                }
             });
         };
 
@@ -1260,11 +1279,36 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
+
+                    // Validate data structure
+                    if (!data || typeof data !== 'object') {
+                        alert('Invalid file format: Not a valid JSON object');
+                        return;
+                    }
+
+                    // Validate goals arrays
+                    const validateGoals = (goals) => {
+                        if (!Array.isArray(goals)) return false;
+                        return goals.every(g => g && typeof g === 'object' &&
+                            typeof g.text === 'string' &&
+                            typeof g.completed === 'boolean' &&
+                            (typeof g.id === 'number' || typeof g.id === 'string'));
+                    };
+
+                    if (data.personal && !validateGoals(data.personal)) {
+                        alert('Invalid file format: Personal goals are corrupted');
+                        return;
+                    }
+                    if (data.professional && !validateGoals(data.professional)) {
+                        alert('Invalid file format: Professional goals are corrupted');
+                        return;
+                    }
+
                     if (confirm('This will replace your current goals, habits, and sync to cloud. Continue?')) {
                         saveUndoState(); // Allow undo
                         personalGoals = data.personal || [];
                         professionalGoals = data.professional || [];
-                        if (data.dailyHabits) {
+                        if (data.dailyHabits && typeof data.dailyHabits === 'object') {
                             dailyHabits = data.dailyHabits;
                             localStorage.setItem('dailyHabits', JSON.stringify(dailyHabits));
                             saveHabitsToCloud();
@@ -1278,7 +1322,7 @@
                         alert('Goals and habits imported and synced to cloud successfully!');
                     }
                 } catch (error) {
-                    alert('Error importing file. Please check the file format.');
+                    alert('Error importing file: ' + error.message);
                 }
             };
             reader.readAsText(file);
@@ -1532,7 +1576,7 @@
 
             listElement.innerHTML = sortedGoals.map(goal => `
                 <li class="checklist-item ${goal.completed ? 'completed' : ''}" data-id="${goal.id}" data-type="${type}">
-                    <button class="move-btn" onclick="moveItem('${type}', ${goal.id})" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">→</button>
+                    <button class="move-btn" onclick="moveItem('${type}', ${goal.id})" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
                     <input type="checkbox" ${goal.completed ? 'checked' : ''}
                            onchange="toggleItem('${type}', ${goal.id})">
                     <span class="item-text" ondblclick="editItem('${type}', ${goal.id}, this)" title="Double-click to edit">${escapeHtml(goal.text)}</span>
