@@ -521,6 +521,7 @@
             <div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Undo last action (Ctrl+Z)">Undo</button>
                 <button onclick="manualSync()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Refresh from cloud">Sync</button>
+                <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Clear all completed goals">Clear Done</button>
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;">Stats</button>
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Download backup JSON">Export</button>
                 <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Upload backup JSON">Import</button>
@@ -551,8 +552,11 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')">
+                    <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')" oninput="updateCharCount('personal')" maxlength="250">
                     <button class="add-btn" onclick="addItem('personal')">Add</button>
+                </div>
+                <div style="text-align: right; font-size: 10px; color: #999; margin-top: 4px;">
+                    <span id="personal-char-count">0/200</span>
                 </div>
 
                 <ul class="checklist" id="personal-list">
@@ -589,8 +593,11 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="professional-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')">
+                    <input type="text" id="professional-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')" oninput="updateCharCount('professional')" maxlength="250">
                     <button class="add-btn" onclick="addItem('professional')">Add</button>
+                </div>
+                <div style="text-align: right; font-size: 10px; color: #999; margin-top: 4px;">
+                    <span id="professional-char-count">0/200</span>
                 </div>
 
                 <ul class="checklist" id="professional-list">
@@ -645,34 +652,46 @@
 
     <!-- Firebase SDK -->
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        try {
+            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+            const { getFirestore, doc, setDoc, getDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCZcEWiJSDKkwVCgDeFfdoI1z3_Bc3FxEE",
-            authDomain: "gitesh-checklist.firebaseapp.com",
-            projectId: "gitesh-checklist",
-            storageBucket: "gitesh-checklist.firebasestorage.app",
-            messagingSenderId: "867346897634",
-            appId: "1:867346897634:web:6c6bdaa2e42cc2190b5cbb",
-            measurementId: "G-3TFN5FZZMH"
-        };
+            // Firebase configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyCZcEWiJSDKkwVCgDeFfdoI1z3_Bc3FxEE",
+                authDomain: "gitesh-checklist.firebaseapp.com",
+                projectId: "gitesh-checklist",
+                storageBucket: "gitesh-checklist.firebasestorage.app",
+                messagingSenderId: "867346897634",
+                appId: "1:867346897634:web:6c6bdaa2e42cc2190b5cbb",
+                measurementId: "G-3TFN5FZZMH"
+            };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
 
-        // Make Firebase available globally
-        window.db = db;
-        window.firestoreDoc = doc;
-        window.firestoreSetDoc = setDoc;
-        window.firestoreGetDoc = getDoc;
-        window.firestoreOnSnapshot = onSnapshot;
-        window.firebaseReady = true;
+            // Make Firebase available globally
+            window.db = db;
+            window.firestoreDoc = doc;
+            window.firestoreSetDoc = setDoc;
+            window.firestoreGetDoc = getDoc;
+            window.firestoreOnSnapshot = onSnapshot;
+            window.firebaseReady = true;
 
-        // Trigger load once Firebase is ready
-        if (window.onFirebaseReady) window.onFirebaseReady();
+            // Trigger load once Firebase is ready
+            if (window.onFirebaseReady) window.onFirebaseReady();
+        } catch (error) {
+            console.error('Firebase initialization failed:', error);
+            window.firebaseReady = false;
+
+            // Update status to show offline mode
+            const statusEl = document.getElementById('sync-status');
+            if (statusEl) {
+                statusEl.className = 'sync-status offline';
+                statusEl.textContent = 'Local Mode Only';
+            }
+        }
     </script>
 
     <script>
@@ -715,6 +734,28 @@
                 document.title = `(${completed}/${total}) Gitesh Goals`;
             } else {
                 document.title = 'Gitesh Goal Recommendation System';
+            }
+        }
+
+        // Update character count for input
+        function updateCharCount(type) {
+            const input = document.getElementById(`${type}-input`);
+            const counter = document.getElementById(`${type}-char-count`);
+            if (input && counter) {
+                const length = input.value.length;
+                counter.textContent = `${length}/200`;
+
+                // Change color if approaching limit
+                if (length > 180) {
+                    counter.style.color = '#EF4444';
+                    counter.style.fontWeight = '600';
+                } else if (length > 150) {
+                    counter.style.color = '#F59E0B';
+                    counter.style.fontWeight = '500';
+                } else {
+                    counter.style.color = '#999';
+                    counter.style.fontWeight = 'normal';
+                }
             }
         }
 
@@ -1033,7 +1074,14 @@
             const input = document.getElementById(`${type}-input`);
             const text = input.value.trim().toLowerCase();
 
-            if (text === '') return;
+            // Check for empty or whitespace-only
+            if (text === '' || text.replace(/\s/g, '') === '') {
+                if (input.value.trim() !== '') {
+                    alert('Goal cannot be only whitespace.');
+                }
+                input.value = '';
+                return;
+            }
 
             // Validate text length
             if (text.length > 200) {
@@ -1042,6 +1090,15 @@
             }
 
             const goals = type === 'personal' ? personalGoals : professionalGoals;
+
+            // Check for duplicates
+            const duplicate = goals.find(g => g.text === text);
+            if (duplicate) {
+                alert('This goal already exists! Please enter a different goal.');
+                input.value = '';
+                return;
+            }
+
             goals.push({
                 id: generateId(),
                 text: text,
@@ -1243,6 +1300,29 @@
             }
             saveData(type);
             renderList(type);
+            updatePageTitle();
+        }
+
+        function clearAllCompleted() {
+            const personalCompleted = personalGoals.filter(g => g.completed).length;
+            const professionalCompleted = professionalGoals.filter(g => g.completed).length;
+            const totalCompleted = personalCompleted + professionalCompleted;
+
+            if (totalCompleted === 0) {
+                alert('No completed goals to clear.');
+                return;
+            }
+
+            if (!confirm(`Clear ${totalCompleted} completed goal(s) from both lists?`)) return;
+
+            saveUndoState();
+            personalGoals = personalGoals.filter(g => !g.completed);
+            professionalGoals = professionalGoals.filter(g => !g.completed);
+            saveData('personal');
+            saveData('professional');
+            renderList('personal');
+            renderList('professional');
+            updatePageTitle();
         }
 
         function handleKeyPress(event, type) {
@@ -1274,11 +1354,14 @@
             const goals = type === 'personal' ? personalGoals : professionalGoals;
 
             let skipped = 0;
+            let duplicates = 0;
             lines.forEach(line => {
                 const text = line.trim().toLowerCase();
-                if (text) {
+                if (text && text.replace(/\s/g, '') !== '') {
                     if (text.length > 200) {
                         skipped++;
+                    } else if (goals.find(g => g.text === text)) {
+                        duplicates++;
                     } else {
                         goals.push({
                             id: generateId(),
@@ -1289,8 +1372,15 @@
                 }
             });
 
+            let message = '';
             if (skipped > 0) {
-                alert(`${skipped} goal(s) were too long and skipped. Max 200 characters per goal.`);
+                message += `${skipped} goal(s) too long (max 200 chars). `;
+            }
+            if (duplicates > 0) {
+                message += `${duplicates} duplicate(s) skipped.`;
+            }
+            if (message) {
+                alert(message.trim());
             }
 
             saveData(type);
