@@ -383,6 +383,25 @@
             right: 3px;
         }
 
+        /* Tablet/Medium screens */
+        @media (max-width: 1024px) and (min-width: 769px) {
+            .habits-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .habit-btn {
+                padding: 9px 5px;
+                font-size: 10px;
+                min-height: 46px;
+            }
+
+            .habit-text {
+                font-size: 9.5px;
+            }
+        }
+
+        /* Mobile */
         @media (max-width: 768px) {
             .daily-habits {
                 padding: 10px;
@@ -666,41 +685,41 @@
                 <h3 class="daily-habits-title">Daily Habits <span id="habits-progress" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0/9</span></h3>
                 <span class="daily-habits-date" id="habits-date">Today</span>
             </div>
-            <div class="habits-grid">
-                <button class="habit-btn" onclick="toggleHabit('water')" id="habit-water">
-                    <span class="habit-check">✓</span>
+            <div class="habits-grid" role="group" aria-label="Daily habits tracker">
+                <button class="habit-btn" onclick="toggleHabit('water')" id="habit-water" aria-label="3L Water daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">3L Water</span>
                 </button>
-                <button class="habit-btn" onclick="toggleHabit('workout')" id="habit-workout">
-                    <span class="habit-check">✓</span>
+                <button class="habit-btn" onclick="toggleHabit('workout')" id="habit-workout" aria-label="Workout or steps daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">Workout / Steps</span>
                 </button>
-                <button class="habit-btn" onclick="toggleHabit('temple')" id="habit-temple">
-                    <span class="habit-check">✓</span>
+                <button class="habit-btn" onclick="toggleHabit('temple')" id="habit-temple" aria-label="Temple or mindset daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">Temple / Mindset</span>
                 </button>
-                <button class="habit-btn" onclick="toggleHabit('meditation')" id="habit-meditation">
-                    <span class="habit-check">✓</span>
+                <button class="habit-btn" onclick="toggleHabit('meditation')" id="habit-meditation" aria-label="Meditation daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">Meditation</span>
                 </button>
-                <button class="habit-btn" onclick="toggleHabit('noBadHabits')" id="habit-noBadHabits">
-                    <span class="habit-check">✓</span>
+                <button class="habit-btn" onclick="toggleHabit('noBadHabits')" id="habit-noBadHabits" aria-label="No bad habits daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">No Bad Habits</span>
                 </button>
-                <button class="habit-btn" onclick="toggleHabit('learning')" id="habit-learning">
-                    <span class="habit-check">✓</span>
+                <button class="habit-btn" onclick="toggleHabit('learning')" id="habit-learning" aria-label="Audiobook or learning daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">Audiobook / Learning</span>
                 </button>
-                <button class="habit-btn" onclick="toggleHabit('protein')" id="habit-protein">
-                    <span class="habit-check">✓</span>
+                <button class="habit-btn" onclick="toggleHabit('protein')" id="habit-protein" aria-label="High-protein diet daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">High-Protein Diet</span>
                 </button>
-                <button class="habit-btn" onclick="toggleHabit('skincare')" id="habit-skincare">
-                    <span class="habit-check">✓</span>
+                <button class="habit-btn" onclick="toggleHabit('skincare')" id="habit-skincare" aria-label="Skincare daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">Skincare</span>
                 </button>
-                <button class="habit-btn" onclick="toggleHabit('supplements')" id="habit-supplements">
-                    <span class="habit-check">✓</span>
+                <button class="habit-btn" onclick="toggleHabit('supplements')" id="habit-supplements" aria-label="Supplements daily habit">
+                    <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">Supplements</span>
                 </button>
             </div>
@@ -906,8 +925,14 @@
         function updatePageTitle() {
             const total = personalGoals.length + professionalGoals.length;
             const completed = personalGoals.filter(g => g.completed).length + professionalGoals.filter(g => g.completed).length;
-            if (total > 0) {
-                document.title = `(${completed}/${total}) Gitesh Goals`;
+
+            // Get today's habits
+            const today = getTodayDate();
+            const todayHabits = dailyHabits[today] || {};
+            const completedHabits = HABITS.filter(h => todayHabits[h] === true).length;
+
+            if (total > 0 || completedHabits > 0) {
+                document.title = `(${completed}/${total} goals, ${completedHabits}/9 habits) Gitesh`;
             } else {
                 document.title = 'Gitesh Goal Recommendation System';
             }
@@ -1652,6 +1677,12 @@
             const personalRate = totalPersonal > 0 ? Math.round((completedPersonal / totalPersonal) * 100) : 0;
             const professionalRate = totalProfessional > 0 ? Math.round((completedProfessional / totalProfessional) * 100) : 0;
 
+            // Get today's habits progress
+            const today = getTodayDate();
+            const todayHabits = dailyHabits[today] || {};
+            const completedHabits = HABITS.filter(h => todayHabits[h] === true).length;
+            const habitsRate = Math.round((completedHabits / 9) * 100);
+
             const statsHtml = `
                 <div style="margin-bottom: 24px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
@@ -1695,6 +1726,16 @@
                         </div>
                         <div style="height: 6px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
                             <div style="height: 100%; width: ${professionalRate}%; background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%); transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 13px; color: #666; font-weight: 500;">Daily Habits (Today)</span>
+                            <span style="font-size: 12px; color: #999;">${completedHabits}/9</span>
+                        </div>
+                        <div style="height: 6px; background: #f0f0f0; border-radius: 10px; overflow: hidden;">
+                            <div style="height: 100%; width: ${habitsRate}%; background: linear-gradient(90deg, var(--success) 0%, #34d399 100%); transition: width 0.3s;"></div>
                         </div>
                     </div>
                 </div>
@@ -1921,6 +1962,9 @@
                 const options = { weekday: 'short', month: 'short', day: 'numeric' };
                 dateEl.textContent = todayObj.toLocaleDateString('en-US', options);
             }
+
+            // Update page title to reflect habit changes
+            updatePageTitle();
         }
 
         // Initialize habits on page load
