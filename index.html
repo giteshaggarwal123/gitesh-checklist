@@ -416,7 +416,7 @@
 <body>
     <div class="container">
         <h1>Gitesh Goal Recommendation System</h1>
-        <p class="subtitle">Double-click goals to edit • Use → button to move between lists</p>
+        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" style="color: #28a745;">☁️ Cloud Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
             <input type="text" id="search-input" placeholder="🔍 Search goals..." style="width: 100%; max-width: 400px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 10px;" oninput="handleSearch()">
@@ -506,8 +506,44 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZcEWiJSDKkwVCgDeFfdoI1z3_Bc3FxEE",
+            authDomain: "gitesh-checklist.firebaseapp.com",
+            projectId: "gitesh-checklist",
+            storageBucket: "gitesh-checklist.firebasestorage.app",
+            messagingSenderId: "867346897634",
+            appId: "1:867346897634:web:6c6bdaa2e42cc2190b5cbb",
+            measurementId: "G-3TFN5FZZMH"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.db = db;
+        window.firestoreDoc = doc;
+        window.firestoreSetDoc = setDoc;
+        window.firestoreGetDoc = getDoc;
+        window.firestoreOnSnapshot = onSnapshot;
+        window.firebaseReady = true;
+
+        // Trigger load once Firebase is ready
+        if (window.onFirebaseReady) window.onFirebaseReady();
+    </script>
+
     <script>
-        // Load data from localStorage
+        // Cloud sync with Firestore - single shared document for all users
+        const CLOUD_DOC_ID = 'shared-goals';
+        let isLoadingFromCloud = false;
+
+        // Load data from localStorage first (fallback)
         let personalGoals = JSON.parse(localStorage.getItem('personalGoals')) || [];
         let professionalGoals = JSON.parse(localStorage.getItem('professionalGoals')) || [];
         let idCounter = Date.now();
@@ -573,10 +609,88 @@
             renderList(type);
         }
 
+        // Cloud sync functions
+        async function loadFromCloud() {
+            if (!window.firebaseReady || !window.db) {
+                console.log('Firebase not ready yet');
+                return;
+            }
+
+            try {
+                const docRef = window.firestoreDoc(window.db, 'goals', CLOUD_DOC_ID);
+                const docSnap = await window.firestoreGetDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    isLoadingFromCloud = true;
+                    personalGoals = data.personal || [];
+                    professionalGoals = data.professional || [];
+
+                    // Also save to localStorage as backup
+                    localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
+                    localStorage.setItem('professionalGoals', JSON.stringify(professionalGoals));
+
+                    renderList('personal');
+                    renderList('professional');
+                    isLoadingFromCloud = false;
+                    console.log('✅ Loaded from cloud');
+                } else {
+                    // No cloud data, upload current local data
+                    await saveToCloud();
+                }
+
+                // Listen for real-time updates
+                window.firestoreOnSnapshot(docRef, (doc) => {
+                    if (doc.exists() && !isLoadingFromCloud) {
+                        const data = doc.data();
+                        personalGoals = data.personal || [];
+                        professionalGoals = data.professional || [];
+                        renderList('personal');
+                        renderList('professional');
+                        console.log('🔄 Synced from cloud');
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading from cloud:', error);
+            }
+        }
+
+        async function saveToCloud() {
+            if (!window.firebaseReady || !window.db) return;
+
+            try {
+                const statusEl = document.getElementById('sync-status');
+                if (statusEl) statusEl.innerHTML = '<span style="color: #ffc107;">⏳ Syncing...</span>';
+
+                const docRef = window.firestoreDoc(window.db, 'goals', CLOUD_DOC_ID);
+                await window.firestoreSetDoc(docRef, {
+                    personal: personalGoals,
+                    professional: professionalGoals,
+                    lastUpdated: new Date().toISOString()
+                });
+
+                if (statusEl) statusEl.innerHTML = '<span style="color: #28a745;">☁️ Cloud Synced</span>';
+                console.log('☁️ Saved to cloud');
+            } catch (error) {
+                console.error('Error saving to cloud:', error);
+                const statusEl = document.getElementById('sync-status');
+                if (statusEl) statusEl.innerHTML = '<span style="color: #dc3545;">❌ Sync Error</span>';
+            }
+        }
+
         // Initialize on page load
+        window.onFirebaseReady = function() {
+            loadFromCloud();
+        };
+
         window.onload = function() {
             renderList('personal');
             renderList('professional');
+
+            // If Firebase is already ready, load from cloud
+            if (window.firebaseReady) {
+                loadFromCloud();
+            }
 
             // Keyboard shortcuts
             document.addEventListener('keydown', function(e) {
@@ -833,6 +947,8 @@
             } else {
                 localStorage.setItem('professionalGoals', JSON.stringify(professionalGoals));
             }
+            // Also save to cloud
+            saveToCloud();
         }
 
         function clearCompleted(type) {
