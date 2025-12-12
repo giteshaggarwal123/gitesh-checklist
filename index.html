@@ -1739,19 +1739,28 @@
         function loadHabits() {
             const stored = localStorage.getItem('dailyHabits');
             if (stored) {
-                dailyHabits = JSON.parse(stored);
+                try {
+                    dailyHabits = JSON.parse(stored);
+                } catch (error) {
+                    console.error('Error parsing stored habits:', error);
+                    dailyHabits = {};
+                }
             }
 
             // Check if we need to reset for new day
             const today = getTodayDate();
             if (!dailyHabits[today]) {
                 dailyHabits[today] = {};
-                HABITS.forEach(habit => {
-                    dailyHabits[today][habit] = false;
-                });
-                saveHabitsLocal();
             }
 
+            // Ensure all habits are initialized for today
+            HABITS.forEach(habit => {
+                if (dailyHabits[today][habit] === undefined) {
+                    dailyHabits[today][habit] = false;
+                }
+            });
+
+            saveHabitsLocal();
             renderHabits();
         }
 
@@ -1791,14 +1800,18 @@
                     const data = docSnap.data();
                     dailyHabits = data.habits || {};
 
-                    // Ensure today exists
+                    // Ensure today exists and all habits are initialized
                     const today = getTodayDate();
                     if (!dailyHabits[today]) {
                         dailyHabits[today] = {};
-                        HABITS.forEach(habit => {
-                            dailyHabits[today][habit] = false;
-                        });
                     }
+
+                    // Initialize any missing habits (handles new habits added)
+                    HABITS.forEach(habit => {
+                        if (dailyHabits[today][habit] === undefined) {
+                            dailyHabits[today][habit] = false;
+                        }
+                    });
 
                     saveHabitsLocal();
                     renderHabits();
@@ -1816,10 +1829,13 @@
                         const today = getTodayDate();
                         if (!dailyHabits[today]) {
                             dailyHabits[today] = {};
-                            HABITS.forEach(habit => {
-                                dailyHabits[today][habit] = false;
-                            });
                         }
+                        // Initialize any missing habits (handles new habits added)
+                        HABITS.forEach(habit => {
+                            if (dailyHabits[today][habit] === undefined) {
+                                dailyHabits[today][habit] = false;
+                            }
+                        });
                         renderHabits();
                         console.log('🔄 Habits synced from cloud');
                     }
@@ -1840,6 +1856,9 @@
                 });
             }
 
+            // Check if we're marking as complete (was false, now true)
+            const wasCompleted = dailyHabits[today][habitName];
+
             // Toggle the habit
             dailyHabits[today][habitName] = !dailyHabits[today][habitName];
 
@@ -1850,10 +1869,12 @@
             // Re-render
             renderHabits();
 
-            // Show celebration if all 9 habits completed
-            const completed = HABITS.filter(h => dailyHabits[today][h]).length;
-            if (completed === 9) {
-                showCompletionAnimation();
+            // Show celebration ONLY if we just marked it complete AND all 9 are now complete
+            if (!wasCompleted && dailyHabits[today][habitName]) {
+                const completed = HABITS.filter(h => dailyHabits[today][h]).length;
+                if (completed === 9) {
+                    showCompletionAnimation();
+                }
             }
         }
 
@@ -1861,19 +1882,23 @@
         function renderHabits() {
             const today = getTodayDate();
 
-            // Ensure today's data exists
+            // Ensure today's data exists and all habits are initialized
             if (!dailyHabits[today]) {
                 dailyHabits[today] = {};
-                HABITS.forEach(habit => {
-                    dailyHabits[today][habit] = false;
-                });
             }
+
+            // Ensure all current habits exist in today's data (handles new habits added)
+            HABITS.forEach(habit => {
+                if (dailyHabits[today][habit] === undefined) {
+                    dailyHabits[today][habit] = false;
+                }
+            });
 
             // Update each habit button
             HABITS.forEach(habitName => {
                 const btn = document.getElementById(`habit-${habitName}`);
                 if (btn) {
-                    const isCompleted = dailyHabits[today][habitName];
+                    const isCompleted = dailyHabits[today][habitName] === true;
                     if (isCompleted) {
                         btn.classList.add('completed');
                     } else {
@@ -1883,7 +1908,7 @@
             });
 
             // Update progress counter
-            const completed = HABITS.filter(h => dailyHabits[today][h]).length;
+            const completed = HABITS.filter(h => dailyHabits[today][h] === true).length;
             const progressEl = document.getElementById('habits-progress');
             if (progressEl) {
                 progressEl.textContent = `${completed}/9`;
