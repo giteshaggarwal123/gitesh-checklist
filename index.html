@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gitesh Goal Recommendation System</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>✓</text></svg>">
     <style>
         * {
             margin: 0;
@@ -309,6 +310,23 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 5px;
             }
+        }
+
+        /* Very small screens - stack vertically */
+        @media (max-width: 480px) {
+            .lists-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            .subtitle {
+                font-size: 11px;
+            }
+        }
 
             .list-section {
                 padding: 8px;
@@ -420,12 +438,12 @@
 
         <div style="text-align: center; margin-bottom: 20px;">
             <input type="text" id="search-input" placeholder="🔍 Search goals..." style="width: 100%; max-width: 400px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 10px;" oninput="handleSearch()">
-            <div>
-                <button onclick="undo()" style="background: #ffc107; color: #333; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin: 0 5px;">↶ Undo</button>
-                <button onclick="showStats()" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin: 0 5px;">📊 Stats</button>
-                <button onclick="convertAllToLowercase()" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin: 0 5px;">Lowercase All</button>
-                <button onclick="exportData()" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin: 0 5px;">Export</button>
-                <button onclick="document.getElementById('import-file').click()" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin: 0 5px;">Import</button>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; align-items: center;">
+                <button onclick="undo()" style="background: #ffc107; color: #333; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Undo last action (Ctrl+Z)">↶ Undo</button>
+                <button onclick="manualSync()" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Refresh from cloud">🔄 Sync</button>
+                <button onclick="showStats()" style="background: #6f42c1; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">📊 Stats</button>
+                <button onclick="exportData()" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Download backup JSON">💾 Export</button>
+                <button onclick="document.getElementById('import-file').click()" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Upload backup JSON">📁 Import</button>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
             </div>
         </div>
@@ -434,7 +452,7 @@
             <!-- Personal List -->
             <div class="list-section" data-list-type="personal">
                 <div class="list-header">
-                    <h2>Personal</h2>
+                    <h2>Personal <span id="personal-badge" style="background: #e7f3ff; color: #007bff; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: normal;">0</span></h2>
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('personal')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
                         <button class="recommend-btn" onclick="recommendGoal('personal')">Recommend</button>
@@ -466,7 +484,7 @@
             <!-- Professional List -->
             <div class="list-section" data-list-type="professional">
                 <div class="list-header">
-                    <h2>Professional</h2>
+                    <h2>Professional <span id="professional-badge" style="background: #e7f3ff; color: #007bff; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: normal;">0</span></h2>
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('professional')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
                         <button class="recommend-btn" onclick="recommendGoal('professional')">Recommend</button>
@@ -539,9 +557,19 @@
     </script>
 
     <script>
-        // Cloud sync with Firestore - single shared document for all users
-        const CLOUD_DOC_ID = 'shared-goals';
+        // Cloud sync with Firestore - unique user ID per device
+        function getUserId() {
+            let userId = localStorage.getItem('userId');
+            if (!userId) {
+                userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('userId', userId);
+            }
+            return userId;
+        }
+
+        const CLOUD_DOC_ID = getUserId();
         let isLoadingFromCloud = false;
+        let isOnline = navigator.onLine;
 
         // Load data from localStorage first (fallback)
         let personalGoals = JSON.parse(localStorage.getItem('personalGoals')) || [];
@@ -589,19 +617,6 @@
             saveData('professional');
             renderList('personal');
             renderList('professional');
-        }
-
-        function convertAllToLowercase() {
-            if (!confirm('Convert all existing goals to lowercase?')) return;
-
-            saveUndoState();
-            personalGoals.forEach(g => g.text = g.text.toLowerCase());
-            professionalGoals.forEach(g => g.text = g.text.toLowerCase());
-            saveData('personal');
-            saveData('professional');
-            renderList('personal');
-            renderList('professional');
-            alert('All goals converted to lowercase!');
         }
 
         function toggleSort(type) {
@@ -678,6 +693,45 @@
             }
         }
 
+        // Manual sync function
+        async function manualSync() {
+            if (!navigator.onLine) {
+                alert('You are offline. Please check your internet connection.');
+                return;
+            }
+            if (!window.firebaseReady) {
+                alert('Firebase not initialized. Please refresh the page.');
+                return;
+            }
+
+            const statusEl = document.getElementById('sync-status');
+            if (statusEl) statusEl.innerHTML = '<span style="color: #ffc107;">🔄 Syncing...</span>';
+
+            try {
+                await loadFromCloud();
+                if (statusEl) statusEl.innerHTML = '<span style="color: #28a745;">✅ Synced!</span>';
+                setTimeout(() => {
+                    if (statusEl) statusEl.innerHTML = '<span style="color: #28a745;">☁️ Cloud Synced</span>';
+                }, 2000);
+            } catch (error) {
+                if (statusEl) statusEl.innerHTML = '<span style="color: #dc3545;">❌ Sync Failed</span>';
+                alert('Sync failed. Please try again.');
+            }
+        }
+
+        // Online/Offline detection
+        function updateOnlineStatus() {
+            isOnline = navigator.onLine;
+            const statusEl = document.getElementById('sync-status');
+            if (!statusEl) return;
+
+            if (!isOnline) {
+                statusEl.innerHTML = '<span style="color: #ffc107;">📴 Offline Mode</span>';
+            } else if (window.firebaseReady) {
+                statusEl.innerHTML = '<span style="color: #28a745;">☁️ Cloud Synced</span>';
+            }
+        }
+
         // Initialize on page load
         window.onFirebaseReady = function() {
             loadFromCloud();
@@ -691,6 +745,15 @@
             if (window.firebaseReady) {
                 loadFromCloud();
             }
+
+            // Online/Offline listeners
+            window.addEventListener('online', () => {
+                updateOnlineStatus();
+                if (window.firebaseReady) {
+                    loadFromCloud(); // Sync when coming back online
+                }
+            });
+            window.addEventListener('offline', updateOnlineStatus);
 
             // Keyboard shortcuts
             document.addEventListener('keydown', function(e) {
@@ -731,14 +794,16 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (confirm('This will replace your current goals. Continue?')) {
+                    if (confirm('This will replace your current goals and sync to cloud. Continue?')) {
+                        saveUndoState(); // Allow undo
                         personalGoals = data.personal || [];
                         professionalGoals = data.professional || [];
                         saveData('personal');
                         saveData('professional');
                         renderList('personal');
                         renderList('professional');
-                        alert('Goals imported successfully!');
+                        // Cloud sync happens automatically via saveData
+                        alert('Goals imported and synced to cloud successfully!');
                     }
                 } catch (error) {
                     alert('Error importing file. Please check the file format.');
@@ -890,6 +955,12 @@
             const completed = goals.filter(g => g.completed).length;
             const total = goals.length;
             const counterElement = document.getElementById(`${type}-counter`);
+
+            // Update badge count
+            const badgeElement = document.getElementById(`${type}-badge`);
+            if (badgeElement) {
+                badgeElement.textContent = total;
+            }
 
             if (total === 0) {
                 counterElement.textContent = 'No goals yet';
