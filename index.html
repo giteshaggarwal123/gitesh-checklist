@@ -14,7 +14,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f5f5;
+            background: #fafafa;
             padding: 20px;
             line-height: 1.6;
         }
@@ -26,17 +26,19 @@
 
         h1 {
             text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 24px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            font-size: 26px;
             font-weight: 600;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
             text-align: center;
             color: #666;
             font-size: 13px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
+            font-weight: 400;
         }
 
         .lists-container {
@@ -48,70 +50,86 @@
 
         .list-section {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 24px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s;
+        }
+
+        .list-section:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .list-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
         h2 {
-            font-size: 18px;
-            color: #333;
+            font-size: 17px;
+            color: #1a1a1a;
             font-weight: 600;
+            letter-spacing: -0.3px;
         }
 
         .recommend-btn {
-            background: #007bff;
-            color: white;
-            border: none;
+            background: #fff;
+            color: #666;
+            border: 1px solid #e0e0e0;
             padding: 6px 12px;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
-            transition: background 0.2s;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
         .recommend-btn:hover {
-            background: #0056b3;
+            background: #f8f9fa;
+            border-color: #999;
+            color: #333;
         }
 
         .recommendation {
-            background: #e7f3ff;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            font-size: 14px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+            margin-bottom: 16px;
+            font-size: 13px;
             color: #333;
-            min-height: 40px;
+            min-height: 44px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: all 0.2s;
         }
 
         .recommendation.empty {
             color: #999;
+            font-style: italic;
         }
 
         .change-btn {
-            background: transparent;
-            border: 1px solid #007bff;
-            color: #007bff;
-            padding: 4px 8px;
-            border-radius: 3px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            color: #666;
+            padding: 5px 10px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 11px;
             margin-left: 10px;
+            font-weight: 500;
+            transition: all 0.15s;
         }
 
         .change-btn:hover {
-            background: #007bff;
-            color: white;
+            background: #f8f9fa;
+            border-color: #999;
+            color: #333;
         }
 
         .input-group {
@@ -122,30 +140,39 @@
 
         input[type="text"] {
             flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.2s;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: #007bff;
+            border-color: #999;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.03);
         }
 
         .add-btn {
-            background: #28a745;
+            background: #1a1a1a;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 10px 18px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background 0.2s;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
 
         .add-btn:hover {
-            background: #218838;
+            background: #333;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
         }
 
         .checklist {
@@ -155,23 +182,26 @@
         .checklist-item {
             display: flex;
             align-items: center;
-            padding: 10px;
-            margin-bottom: 8px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            transition: background 0.2s;
+            padding: 11px 10px;
+            margin-bottom: 6px;
+            background: #fafafa;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: all 0.15s;
         }
 
         .checklist-item:hover {
-            background: #e9ecef;
+            background: #f5f5f5;
+            border-color: #e8e8e8;
         }
 
         .checklist-item.completed {
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         .checklist-item.completed .item-text {
             text-decoration: line-through;
+            color: #999;
         }
 
         input[type="checkbox"] {
@@ -196,31 +226,35 @@
         }
 
         .move-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e0e0e0;
             padding: 4px 8px;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 11px;
-            margin-right: 8px;
-            transition: background 0.2s;
+            font-size: 12px;
+            margin-right: 6px;
+            transition: all 0.15s;
+            font-weight: 500;
         }
 
         .move-btn:hover {
-            background: #5a6268;
+            background: #fff;
+            border-color: #999;
+            color: #333;
         }
 
         .delete-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid transparent;
             padding: 4px 8px;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 10px;
             opacity: 0;
-            transition: opacity 0.2s;
+            transition: all 0.15s;
+            font-weight: 500;
         }
 
         .checklist-item:hover .delete-btn {
@@ -228,7 +262,9 @@
         }
 
         .delete-btn:hover {
-            background: #c82333;
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
         }
 
         .empty-state {
@@ -253,25 +289,71 @@
         }
 
         .clear-completed-btn {
-            background: transparent;
-            border: 1px solid #dc3545;
-            color: #dc3545;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            color: #666;
             padding: 5px 10px;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.15s;
         }
 
-        .clear-completed-btn:hover {
+        .clear-completed-btn:hover:not(:disabled) {
             background: #dc3545;
             color: white;
+            border-color: #dc3545;
         }
 
         .clear-completed-btn:disabled {
-            opacity: 0.3;
+            opacity: 0.4;
             cursor: not-allowed;
         }
+
+        /* Clean minimal button styles */
+        .action-btn {
+            background: #fff;
+            color: #666;
+            border: 1px solid #e0e0e0;
+            padding: 7px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: #999;
+            color: #333;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        #search-input:focus {
+            border-color: #999;
+            outline: none;
+        }
+
+        .sync-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .sync-status.synced { background: #d4edda; color: #155724; }
+        .sync-status.syncing { background: #fff3cd; color: #856404; }
+        .sync-status.offline { background: #fff3cd; color: #856404; }
+        .sync-status.error { background: #f8d7da; color: #721c24; }
 
         @media (max-width: 768px) {
             body {
@@ -309,22 +391,6 @@
             .lists-container {
                 grid-template-columns: 1fr 1fr;
                 gap: 5px;
-            }
-        }
-
-        /* Very small screens - stack vertically */
-        @media (max-width: 480px) {
-            .lists-container {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            h1 {
-                font-size: 18px;
-            }
-
-            .subtitle {
-                font-size: 11px;
             }
         }
 
@@ -434,16 +500,16 @@
 <body>
     <div class="container">
         <h1>Gitesh Goal Recommendation System</h1>
-        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" style="color: #28a745;">☁️ Cloud Synced</span></p>
+        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
-            <input type="text" id="search-input" placeholder="🔍 Search goals..." style="width: 100%; max-width: 400px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; margin-bottom: 10px;" oninput="handleSearch()">
-            <div style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; align-items: center;">
-                <button onclick="undo()" style="background: #ffc107; color: #333; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Undo last action (Ctrl+Z)">↶ Undo</button>
-                <button onclick="manualSync()" style="background: #17a2b8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Refresh from cloud">🔄 Sync</button>
-                <button onclick="showStats()" style="background: #6f42c1; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">📊 Stats</button>
-                <button onclick="exportData()" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Download backup JSON">💾 Export</button>
-                <button onclick="document.getElementById('import-file').click()" style="background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;" title="Upload backup JSON">📁 Import</button>
+            <input type="text" id="search-input" placeholder="Search goals..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center;">
+                <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Undo last action (Ctrl+Z)">Undo</button>
+                <button onclick="manualSync()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Refresh from cloud">Sync</button>
+                <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;">Stats</button>
+                <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Download backup JSON">Export</button>
+                <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Upload backup JSON">Import</button>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
             </div>
         </div>
@@ -452,7 +518,7 @@
             <!-- Personal List -->
             <div class="list-section" data-list-type="personal">
                 <div class="list-header">
-                    <h2>Personal <span id="personal-badge" style="background: #e7f3ff; color: #007bff; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: normal;">0</span></h2>
+                    <h2>Personal <span id="personal-badge" style="background: #f5f5f5; color: #999; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 500;">0</span></h2>
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('personal')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
                         <button class="recommend-btn" onclick="recommendGoal('personal')">Recommend</button>
@@ -484,7 +550,7 @@
             <!-- Professional List -->
             <div class="list-section" data-list-type="professional">
                 <div class="list-header">
-                    <h2>Professional <span id="professional-badge" style="background: #e7f3ff; color: #007bff; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: normal;">0</span></h2>
+                    <h2>Professional <span id="professional-badge" style="background: #f5f5f5; color: #999; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 500;">0</span></h2>
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('professional')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
                         <button class="recommend-btn" onclick="recommendGoal('professional')">Recommend</button>
@@ -675,7 +741,10 @@
 
             try {
                 const statusEl = document.getElementById('sync-status');
-                if (statusEl) statusEl.innerHTML = '<span style="color: #ffc107;">⏳ Syncing...</span>';
+                if (statusEl) {
+                    statusEl.className = 'sync-status syncing';
+                    statusEl.textContent = 'Syncing...';
+                }
 
                 const docRef = window.firestoreDoc(window.db, 'goals', CLOUD_DOC_ID);
                 await window.firestoreSetDoc(docRef, {
@@ -684,12 +753,18 @@
                     lastUpdated: new Date().toISOString()
                 });
 
-                if (statusEl) statusEl.innerHTML = '<span style="color: #28a745;">☁️ Cloud Synced</span>';
-                console.log('☁️ Saved to cloud');
+                if (statusEl) {
+                    statusEl.className = 'sync-status synced';
+                    statusEl.textContent = 'Cloud Synced';
+                }
+                console.log('Saved to cloud');
             } catch (error) {
                 console.error('Error saving to cloud:', error);
                 const statusEl = document.getElementById('sync-status');
-                if (statusEl) statusEl.innerHTML = '<span style="color: #dc3545;">❌ Sync Error</span>';
+                if (statusEl) {
+                    statusEl.className = 'sync-status error';
+                    statusEl.textContent = 'Sync Error';
+                }
             }
         }
 
@@ -705,16 +780,28 @@
             }
 
             const statusEl = document.getElementById('sync-status');
-            if (statusEl) statusEl.innerHTML = '<span style="color: #ffc107;">🔄 Syncing...</span>';
+            if (statusEl) {
+                statusEl.className = 'sync-status syncing';
+                statusEl.textContent = 'Syncing...';
+            }
 
             try {
                 await loadFromCloud();
-                if (statusEl) statusEl.innerHTML = '<span style="color: #28a745;">✅ Synced!</span>';
+                if (statusEl) {
+                    statusEl.className = 'sync-status synced';
+                    statusEl.textContent = 'Synced!';
+                }
                 setTimeout(() => {
-                    if (statusEl) statusEl.innerHTML = '<span style="color: #28a745;">☁️ Cloud Synced</span>';
+                    if (statusEl) {
+                        statusEl.className = 'sync-status synced';
+                        statusEl.textContent = 'Cloud Synced';
+                    }
                 }, 2000);
             } catch (error) {
-                if (statusEl) statusEl.innerHTML = '<span style="color: #dc3545;">❌ Sync Failed</span>';
+                if (statusEl) {
+                    statusEl.className = 'sync-status error';
+                    statusEl.textContent = 'Sync Failed';
+                }
                 alert('Sync failed. Please try again.');
             }
         }
@@ -726,9 +813,11 @@
             if (!statusEl) return;
 
             if (!isOnline) {
-                statusEl.innerHTML = '<span style="color: #ffc107;">📴 Offline Mode</span>';
+                statusEl.className = 'sync-status offline';
+                statusEl.textContent = 'Offline Mode';
             } else if (window.firebaseReady) {
-                statusEl.innerHTML = '<span style="color: #28a745;">☁️ Cloud Synced</span>';
+                statusEl.className = 'sync-status synced';
+                statusEl.textContent = 'Cloud Synced';
             }
         }
 
