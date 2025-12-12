@@ -518,14 +518,14 @@
 
         <div style="text-align: center; margin-bottom: 20px;">
             <input type="text" id="search-input" placeholder="Search goals..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
-            <div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center;">
-                <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Undo last action (Ctrl+Z)">Undo</button>
-                <button onclick="manualSync()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Refresh from cloud">Sync</button>
-                <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Clear all completed goals">Clear Done</button>
-                <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;">Stats</button>
-                <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Download backup JSON">Export</button>
-                <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Upload backup JSON">Import</button>
-                <button onclick="showHelp()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s;" title="Keyboard shortcuts">?</button>
+            <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
+                <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
+                <button onclick="manualSync()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Refresh from cloud">Sync</button>
+                <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Clear all completed goals">Clear Done</button>
+                <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
+                <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
+                <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Upload backup JSON">Import</button>
+                <button onclick="showHelp()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Keyboard shortcuts">?</button>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
             </div>
         </div>
@@ -759,6 +759,33 @@
             }
         }
 
+        // Show completion celebration animation
+        function showCompletionAnimation() {
+            // Create celebration element
+            const celebration = document.createElement('div');
+            celebration.innerHTML = '🎉';
+            celebration.style.position = 'fixed';
+            celebration.style.top = '50%';
+            celebration.style.left = '50%';
+            celebration.style.transform = 'translate(-50%, -50%) scale(0)';
+            celebration.style.fontSize = '80px';
+            celebration.style.zIndex = '10000';
+            celebration.style.pointerEvents = 'none';
+            celebration.style.transition = 'all 0.6s ease-out';
+            document.body.appendChild(celebration);
+
+            // Animate in
+            setTimeout(() => {
+                celebration.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                celebration.style.opacity = '0';
+            }, 10);
+
+            // Remove after animation
+            setTimeout(() => {
+                document.body.removeChild(celebration);
+            }, 650);
+        }
+
         // Search/filter state
         let searchTerm = '';
 
@@ -777,6 +804,7 @@
                 professional: JSON.parse(JSON.stringify(professionalGoals))
             });
             if (undoStack.length > 10) undoStack.shift(); // Keep only last 10 states
+            updateUndoButton();
         }
 
         function undo() {
@@ -791,6 +819,22 @@
             saveData('professional');
             renderList('personal');
             renderList('professional');
+            updatePageTitle();
+            updateUndoButton();
+        }
+
+        function updateUndoButton() {
+            // Update undo button visual state
+            const undoButtons = document.querySelectorAll('[onclick="undo()"]');
+            undoButtons.forEach(btn => {
+                if (undoStack.length === 0) {
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                } else {
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                }
+            });
         }
 
         function toggleSort(type) {
@@ -959,6 +1003,7 @@
             renderList('personal');
             renderList('professional');
             updatePageTitle();
+            updateUndoButton();
 
             // If Firebase is already ready, load from cloud
             if (window.firebaseReady) {
@@ -1065,6 +1110,8 @@
                 goal.completed = true;
                 saveData(type);
                 renderList(type);
+                updatePageTitle();
+                showCompletionAnimation(); // Show celebration
                 // Get a new recommendation
                 recommendGoal(type);
             }
@@ -1109,13 +1156,21 @@
             renderList(type);
             updatePageTitle();
             input.value = '';
+            updateCharCount(type); // Reset character counter
         }
 
         function toggleItem(type, id) {
             const goals = type === 'personal' ? personalGoals : professionalGoals;
             const goal = goals.find(g => g.id === id);
             if (goal) {
+                const wasCompleted = goal.completed;
                 goal.completed = !goal.completed;
+
+                // Show animation if marking as complete
+                if (!wasCompleted && goal.completed) {
+                    showCompletionAnimation();
+                }
+
                 saveData(type);
                 renderList(type);
                 updatePageTitle();
@@ -1171,10 +1226,20 @@
             const saveEdit = () => {
                 const newText = input.value.trim().toLowerCase();
                 if (newText && newText !== currentText) {
+                    // Check length
                     if (newText.length > 200) {
                         alert('Goal is too long! Please keep it under 200 characters.');
                         return;
                     }
+
+                    // Check for duplicates
+                    const goals = type === 'personal' ? personalGoals : professionalGoals;
+                    const duplicate = goals.find(g => g.text === newText && g.id !== goal.id);
+                    if (duplicate) {
+                        alert('This goal already exists! Please use a different text.');
+                        return;
+                    }
+
                     goal.text = newText;
                     saveData(type);
                 }
