@@ -544,6 +544,12 @@
                     <span>Add goals, then click recommend</span>
                 </div>
 
+                <div style="display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <button onclick="setFilter('personal', 'all')" id="personal-filter-all" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; background: var(--primary); color: white; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;">All</button>
+                    <button onclick="setFilter('personal', 'active')" id="personal-filter-active" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; background: #fff; color: #666; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;">Active</button>
+                    <button onclick="setFilter('personal', 'completed')" id="personal-filter-completed" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; background: #fff; color: #666; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;">Done</button>
+                </div>
+
                 <div class="input-group">
                     <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')">
                     <button class="add-btn" onclick="addItem('personal')">Add</button>
@@ -574,6 +580,12 @@
 
                 <div class="recommendation empty" id="professional-recommendation">
                     <span>Add goals, then click recommend</span>
+                </div>
+
+                <div style="display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <button onclick="setFilter('professional', 'all')" id="professional-filter-all" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; background: var(--primary); color: white; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;">All</button>
+                    <button onclick="setFilter('professional', 'active')" id="professional-filter-active" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; background: #fff; color: #666; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;">Active</button>
+                    <button onclick="setFilter('professional', 'completed')" id="professional-filter-completed" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; background: #fff; color: #666; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;">Done</button>
                 </div>
 
                 <div class="input-group">
@@ -695,11 +707,25 @@
             return div.innerHTML;
         }
 
+        // Update page title with goal count
+        function updatePageTitle() {
+            const total = personalGoals.length + professionalGoals.length;
+            const completed = personalGoals.filter(g => g.completed).length + professionalGoals.filter(g => g.completed).length;
+            if (total > 0) {
+                document.title = `(${completed}/${total}) Gitesh Goals`;
+            } else {
+                document.title = 'Gitesh Goal Recommendation System';
+            }
+        }
+
         // Search/filter state
         let searchTerm = '';
 
         // Sort state
         let sortAlphabetically = { personal: false, professional: false };
+
+        // Filter state (all, active, completed)
+        let filterState = { personal: 'all', professional: 'all' };
 
         // Undo state
         let undoStack = [];
@@ -731,6 +757,26 @@
             renderList(type);
         }
 
+        function setFilter(type, filter) {
+            filterState[type] = filter;
+
+            // Update button styles
+            ['all', 'active', 'completed'].forEach(f => {
+                const btn = document.getElementById(`${type}-filter-${f}`);
+                if (btn) {
+                    if (f === filter) {
+                        btn.style.background = 'var(--primary)';
+                        btn.style.color = 'white';
+                    } else {
+                        btn.style.background = '#fff';
+                        btn.style.color = '#666';
+                    }
+                }
+            });
+
+            renderList(type);
+        }
+
         // Cloud sync functions
         async function loadFromCloud() {
             if (!window.firebaseReady || !window.db) {
@@ -754,6 +800,7 @@
 
                     renderList('personal');
                     renderList('professional');
+                    updatePageTitle();
                     isLoadingFromCloud = false;
                     console.log('✅ Loaded from cloud');
                 } else {
@@ -870,6 +917,7 @@
         window.onload = function() {
             renderList('personal');
             renderList('professional');
+            updatePageTitle();
 
             // If Firebase is already ready, load from cloud
             if (window.firebaseReady) {
@@ -987,6 +1035,12 @@
 
             if (text === '') return;
 
+            // Validate text length
+            if (text.length > 200) {
+                alert('Goal is too long! Please keep it under 200 characters.');
+                return;
+            }
+
             const goals = type === 'personal' ? personalGoals : professionalGoals;
             goals.push({
                 id: generateId(),
@@ -996,6 +1050,7 @@
 
             saveData(type);
             renderList(type);
+            updatePageTitle();
             input.value = '';
         }
 
@@ -1006,6 +1061,7 @@
                 goal.completed = !goal.completed;
                 saveData(type);
                 renderList(type);
+                updatePageTitle();
             }
         }
 
@@ -1018,6 +1074,7 @@
             }
             saveData(type);
             renderList(type);
+            updatePageTitle();
         }
 
         function moveItem(sourceType, id) {
@@ -1057,6 +1114,10 @@
             const saveEdit = () => {
                 const newText = input.value.trim().toLowerCase();
                 if (newText && newText !== currentText) {
+                    if (newText.length > 200) {
+                        alert('Goal is too long! Please keep it under 200 characters.');
+                        return;
+                    }
                     goal.text = newText;
                     saveData(type);
                 }
@@ -1113,6 +1174,14 @@
             let filteredGoals = goals;
             if (searchTerm) {
                 filteredGoals = goals.filter(g => g.text.toLowerCase().includes(searchTerm));
+            }
+
+            // Filter by completion status
+            const currentFilter = filterState[type];
+            if (currentFilter === 'active') {
+                filteredGoals = filteredGoals.filter(g => !g.completed);
+            } else if (currentFilter === 'completed') {
+                filteredGoals = filteredGoals.filter(g => g.completed);
             }
 
             // Sort: uncompleted first, completed at bottom, then alphabetically if enabled
@@ -1204,19 +1273,29 @@
             // Multiple lines - add them all as separate goals
             const goals = type === 'personal' ? personalGoals : professionalGoals;
 
+            let skipped = 0;
             lines.forEach(line => {
                 const text = line.trim().toLowerCase();
                 if (text) {
-                    goals.push({
-                        id: generateId(),
-                        text: text,
-                        completed: false
-                    });
+                    if (text.length > 200) {
+                        skipped++;
+                    } else {
+                        goals.push({
+                            id: generateId(),
+                            text: text,
+                            completed: false
+                        });
+                    }
                 }
             });
 
+            if (skipped > 0) {
+                alert(`${skipped} goal(s) were too long and skipped. Max 200 characters per goal.`);
+            }
+
             saveData(type);
             renderList(type);
+            updatePageTitle();
 
             // Clear the input field
             const input = document.getElementById(`${type}-input`);
