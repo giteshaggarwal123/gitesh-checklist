@@ -325,26 +325,28 @@
 
         .habits-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 6px;
         }
 
         .habit-btn {
             background: #fafafa;
             border: 1.5px solid #e0e0e0;
             color: #666;
-            padding: 10px 12px;
-            border-radius: 6px;
+            padding: 8px 6px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 500;
             transition: all 0.2s;
-            text-align: left;
+            text-align: center;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             position: relative;
             overflow: hidden;
+            min-height: 48px;
         }
 
         .habit-btn:hover {
@@ -366,38 +368,45 @@
         }
 
         .habit-text {
-            flex: 1;
-            font-size: 11px;
-            line-height: 1.3;
+            font-size: 9.5px;
+            line-height: 1.2;
+            text-align: center;
+            margin-bottom: 2px;
         }
 
         .habit-check {
             opacity: 0;
-            font-size: 16px;
+            font-size: 14px;
             transition: opacity 0.2s;
+            position: absolute;
+            top: 2px;
+            right: 3px;
         }
 
         @media (max-width: 768px) {
             .daily-habits {
-                padding: 12px;
+                padding: 10px;
             }
 
             .habits-grid {
-                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-                gap: 6px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
             }
 
             .habit-btn {
-                padding: 8px 10px;
-                font-size: 10px;
+                padding: 8px 4px;
+                font-size: 9px;
+                min-height: 44px;
             }
 
             .habit-text {
-                font-size: 10px;
+                font-size: 9px;
             }
 
             .habit-check {
-                font-size: 14px;
+                font-size: 12px;
+                top: 2px;
+                right: 2px;
             }
 
             .daily-habits-title {
@@ -654,37 +663,45 @@
         <!-- Daily Habits Tracker -->
         <div class="daily-habits">
             <div class="daily-habits-header">
-                <h3 class="daily-habits-title">Daily Habits <span id="habits-progress" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0/7</span></h3>
+                <h3 class="daily-habits-title">Daily Habits <span id="habits-progress" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0/9</span></h3>
                 <span class="daily-habits-date" id="habits-date">Today</span>
             </div>
             <div class="habits-grid">
                 <button class="habit-btn" onclick="toggleHabit('water')" id="habit-water">
-                    <span class="habit-text">3L Water</span>
                     <span class="habit-check">✓</span>
+                    <span class="habit-text">3L Water</span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('workout')" id="habit-workout">
-                    <span class="habit-text">Workout / Steps</span>
                     <span class="habit-check">✓</span>
+                    <span class="habit-text">Workout / Steps</span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('temple')" id="habit-temple">
-                    <span class="habit-text">Temple / Mindset</span>
                     <span class="habit-check">✓</span>
+                    <span class="habit-text">Temple / Mindset</span>
+                </button>
+                <button class="habit-btn" onclick="toggleHabit('meditation')" id="habit-meditation">
+                    <span class="habit-check">✓</span>
+                    <span class="habit-text">Meditation</span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('noBadHabits')" id="habit-noBadHabits">
-                    <span class="habit-text">No Bad Habits</span>
                     <span class="habit-check">✓</span>
+                    <span class="habit-text">No Bad Habits</span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('learning')" id="habit-learning">
-                    <span class="habit-text">Audiobook / Learning</span>
                     <span class="habit-check">✓</span>
+                    <span class="habit-text">Audiobook / Learning</span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('protein')" id="habit-protein">
-                    <span class="habit-text">High-Protein Diet</span>
                     <span class="habit-check">✓</span>
+                    <span class="habit-text">High-Protein Diet</span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('skincare')" id="habit-skincare">
-                    <span class="habit-text">Skincare + Supplements</span>
                     <span class="habit-check">✓</span>
+                    <span class="habit-text">Skincare</span>
+                </button>
+                <button class="habit-btn" onclick="toggleHabit('supplements')" id="habit-supplements">
+                    <span class="habit-check">✓</span>
+                    <span class="habit-text">Supplements</span>
                 </button>
             </div>
         </div>
@@ -1709,7 +1726,7 @@
         });
 
         // ============ DAILY HABITS TRACKER ============
-        const HABITS = ['water', 'workout', 'temple', 'noBadHabits', 'learning', 'protein', 'skincare'];
+        const HABITS = ['water', 'workout', 'temple', 'meditation', 'noBadHabits', 'learning', 'protein', 'skincare', 'supplements'];
         let dailyHabits = {};
 
         // Get today's date as string (YYYY-MM-DD)
@@ -1833,9 +1850,9 @@
             // Re-render
             renderHabits();
 
-            // Show celebration if all habits completed
+            // Show celebration if all 9 habits completed
             const completed = HABITS.filter(h => dailyHabits[today][h]).length;
-            if (completed === HABITS.length) {
+            if (completed === 9) {
                 showCompletionAnimation();
             }
         }
@@ -1869,7 +1886,7 @@
             const completed = HABITS.filter(h => dailyHabits[today][h]).length;
             const progressEl = document.getElementById('habits-progress');
             if (progressEl) {
-                progressEl.textContent = `${completed}/7`;
+                progressEl.textContent = `${completed}/9`;
             }
 
             // Update date display
