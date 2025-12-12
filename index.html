@@ -1398,7 +1398,7 @@
                 return;
             }
 
-            goals.push({
+            goals.unshift({
                 id: generateId(),
                 text: text,
                 completed: false
@@ -1680,7 +1680,7 @@
                     } else if (goals.find(g => g.text === text)) {
                         duplicates++;
                     } else {
-                        goals.push({
+                        goals.unshift({
                             id: generateId(),
                             text: text,
                             completed: false
