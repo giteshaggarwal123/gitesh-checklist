@@ -1,0 +1,18 @@
+{
+  "name": "gitesh-checklist",
+  "version": "1.0.0",
+  "description": "Gitesh Goal Recommendation System - Simple, powerful checklist manager",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "checklist",
+    "goals",
+    "productivity",
+    "recommendations"
+  ],
+  "author": "Gitesh",
+  "license": "MIT"
+}
