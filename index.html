@@ -1954,12 +1954,9 @@
             // Re-render
             renderHabits();
 
-            // Show celebration ONLY if we just marked it complete AND all 9 are now complete
+            // Show celebration animation if marking as complete
             if (!wasCompleted && dailyHabits[today][habitName]) {
-                const completed = HABITS.filter(h => dailyHabits[today][h]).length;
-                if (completed === 9) {
-                    showCompletionAnimation();
-                }
+                showCompletionAnimation();
             }
         }
 
