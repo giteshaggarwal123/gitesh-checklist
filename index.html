@@ -288,6 +288,127 @@
             font-size: 14px;
         }
 
+        /* Daily Habits Tracker */
+        .daily-habits {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .daily-habits:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .daily-habits-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .daily-habits-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .daily-habits-date {
+            font-size: 11px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .habits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+        }
+
+        .habit-btn {
+            background: #fafafa;
+            border: 1.5px solid #e0e0e0;
+            color: #666;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .habit-btn:hover {
+            background: #f5f5f5;
+            border-color: #999;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .habit-btn.completed {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-color: #10B981;
+            color: #065f46;
+            font-weight: 600;
+        }
+
+        .habit-btn.completed .habit-check {
+            opacity: 1;
+        }
+
+        .habit-text {
+            flex: 1;
+            font-size: 11px;
+            line-height: 1.3;
+        }
+
+        .habit-check {
+            opacity: 0;
+            font-size: 16px;
+            transition: opacity 0.2s;
+        }
+
+        @media (max-width: 768px) {
+            .daily-habits {
+                padding: 12px;
+            }
+
+            .habits-grid {
+                grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+                gap: 6px;
+            }
+
+            .habit-btn {
+                padding: 8px 10px;
+                font-size: 10px;
+            }
+
+            .habit-text {
+                font-size: 10px;
+            }
+
+            .habit-check {
+                font-size: 14px;
+            }
+
+            .daily-habits-title {
+                font-size: 12px;
+            }
+
+            .daily-habits-date {
+                font-size: 10px;
+            }
+        }
+
         .list-footer {
             display: flex;
             justify-content: space-between;
@@ -527,6 +648,44 @@
                 <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Upload backup JSON">Import</button>
                 <button onclick="showHelp()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Keyboard shortcuts">?</button>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+            </div>
+        </div>
+
+        <!-- Daily Habits Tracker -->
+        <div class="daily-habits">
+            <div class="daily-habits-header">
+                <h3 class="daily-habits-title">Daily Habits <span id="habits-progress" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0/7</span></h3>
+                <span class="daily-habits-date" id="habits-date">Today</span>
+            </div>
+            <div class="habits-grid">
+                <button class="habit-btn" onclick="toggleHabit('water')" id="habit-water">
+                    <span class="habit-text">3L Water</span>
+                    <span class="habit-check">✓</span>
+                </button>
+                <button class="habit-btn" onclick="toggleHabit('workout')" id="habit-workout">
+                    <span class="habit-text">Workout / Steps</span>
+                    <span class="habit-check">✓</span>
+                </button>
+                <button class="habit-btn" onclick="toggleHabit('temple')" id="habit-temple">
+                    <span class="habit-text">Temple / Mindset</span>
+                    <span class="habit-check">✓</span>
+                </button>
+                <button class="habit-btn" onclick="toggleHabit('noBadHabits')" id="habit-noBadHabits">
+                    <span class="habit-text">No Bad Habits</span>
+                    <span class="habit-check">✓</span>
+                </button>
+                <button class="habit-btn" onclick="toggleHabit('learning')" id="habit-learning">
+                    <span class="habit-text">Audiobook / Learning</span>
+                    <span class="habit-check">✓</span>
+                </button>
+                <button class="habit-btn" onclick="toggleHabit('protein')" id="habit-protein">
+                    <span class="habit-text">High-Protein Diet</span>
+                    <span class="habit-check">✓</span>
+                </button>
+                <button class="habit-btn" onclick="toggleHabit('skincare')" id="habit-skincare">
+                    <span class="habit-text">Skincare + Supplements</span>
+                    <span class="habit-check">✓</span>
+                </button>
             </div>
         </div>
 
@@ -1038,6 +1197,7 @@
             const data = {
                 personal: personalGoals,
                 professional: professionalGoals,
+                dailyHabits: dailyHabits,
                 exportDate: new Date().toISOString()
             };
             const jsonStr = JSON.stringify(data, null, 2);
@@ -1058,16 +1218,22 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (confirm('This will replace your current goals and sync to cloud. Continue?')) {
+                    if (confirm('This will replace your current goals, habits, and sync to cloud. Continue?')) {
                         saveUndoState(); // Allow undo
                         personalGoals = data.personal || [];
                         professionalGoals = data.professional || [];
+                        if (data.dailyHabits) {
+                            dailyHabits = data.dailyHabits;
+                            localStorage.setItem('dailyHabits', JSON.stringify(dailyHabits));
+                            saveHabitsToCloud();
+                            renderHabits();
+                        }
                         saveData('personal');
                         saveData('professional');
                         renderList('personal');
                         renderList('professional');
                         // Cloud sync happens automatically via saveData
-                        alert('Goals imported and synced to cloud successfully!');
+                        alert('Goals and habits imported and synced to cloud successfully!');
                     }
                 } catch (error) {
                     alert('Error importing file. Please check the file format.');
@@ -1541,6 +1707,205 @@
         document.getElementById('help-modal')?.addEventListener('click', function(e) {
             if (e.target === this) closeHelp();
         });
+
+        // ============ DAILY HABITS TRACKER ============
+        const HABITS = ['water', 'workout', 'temple', 'noBadHabits', 'learning', 'protein', 'skincare'];
+        let dailyHabits = {};
+
+        // Get today's date as string (YYYY-MM-DD)
+        function getTodayDate() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        // Load habits from localStorage
+        function loadHabits() {
+            const stored = localStorage.getItem('dailyHabits');
+            if (stored) {
+                dailyHabits = JSON.parse(stored);
+            }
+
+            // Check if we need to reset for new day
+            const today = getTodayDate();
+            if (!dailyHabits[today]) {
+                dailyHabits[today] = {};
+                HABITS.forEach(habit => {
+                    dailyHabits[today][habit] = false;
+                });
+                saveHabitsLocal();
+            }
+
+            renderHabits();
+        }
+
+        // Save habits to localStorage
+        function saveHabitsLocal() {
+            localStorage.setItem('dailyHabits', JSON.stringify(dailyHabits));
+        }
+
+        // Save habits to cloud
+        async function saveHabitsToCloud() {
+            if (!window.firebaseReady || !window.db) return;
+
+            try {
+                const docRef = window.firestoreDoc(window.db, 'habits', CLOUD_DOC_ID);
+                await window.firestoreSetDoc(docRef, {
+                    habits: dailyHabits,
+                    lastUpdated: new Date().toISOString()
+                });
+                console.log('Habits synced to cloud');
+            } catch (error) {
+                console.error('Error saving habits to cloud:', error);
+            }
+        }
+
+        // Load habits from cloud
+        async function loadHabitsFromCloud() {
+            if (!window.firebaseReady || !window.db) {
+                console.log('Firebase not ready for habits');
+                return;
+            }
+
+            try {
+                const docRef = window.firestoreDoc(window.db, 'habits', CLOUD_DOC_ID);
+                const docSnap = await window.firestoreGetDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    dailyHabits = data.habits || {};
+
+                    // Ensure today exists
+                    const today = getTodayDate();
+                    if (!dailyHabits[today]) {
+                        dailyHabits[today] = {};
+                        HABITS.forEach(habit => {
+                            dailyHabits[today][habit] = false;
+                        });
+                    }
+
+                    saveHabitsLocal();
+                    renderHabits();
+                    console.log('✅ Loaded habits from cloud');
+                } else {
+                    // No cloud data, upload current local data
+                    await saveHabitsToCloud();
+                }
+
+                // Listen for real-time updates
+                window.firestoreOnSnapshot(docRef, (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        dailyHabits = data.habits || {};
+                        const today = getTodayDate();
+                        if (!dailyHabits[today]) {
+                            dailyHabits[today] = {};
+                            HABITS.forEach(habit => {
+                                dailyHabits[today][habit] = false;
+                            });
+                        }
+                        renderHabits();
+                        console.log('🔄 Habits synced from cloud');
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading habits from cloud:', error);
+            }
+        }
+
+        // Toggle habit completion
+        function toggleHabit(habitName) {
+            const today = getTodayDate();
+
+            if (!dailyHabits[today]) {
+                dailyHabits[today] = {};
+                HABITS.forEach(habit => {
+                    dailyHabits[today][habit] = false;
+                });
+            }
+
+            // Toggle the habit
+            dailyHabits[today][habitName] = !dailyHabits[today][habitName];
+
+            // Save locally and to cloud
+            saveHabitsLocal();
+            saveHabitsToCloud();
+
+            // Re-render
+            renderHabits();
+
+            // Show celebration if all habits completed
+            const completed = HABITS.filter(h => dailyHabits[today][h]).length;
+            if (completed === HABITS.length) {
+                showCompletionAnimation();
+            }
+        }
+
+        // Render habits UI
+        function renderHabits() {
+            const today = getTodayDate();
+
+            // Ensure today's data exists
+            if (!dailyHabits[today]) {
+                dailyHabits[today] = {};
+                HABITS.forEach(habit => {
+                    dailyHabits[today][habit] = false;
+                });
+            }
+
+            // Update each habit button
+            HABITS.forEach(habitName => {
+                const btn = document.getElementById(`habit-${habitName}`);
+                if (btn) {
+                    const isCompleted = dailyHabits[today][habitName];
+                    if (isCompleted) {
+                        btn.classList.add('completed');
+                    } else {
+                        btn.classList.remove('completed');
+                    }
+                }
+            });
+
+            // Update progress counter
+            const completed = HABITS.filter(h => dailyHabits[today][h]).length;
+            const progressEl = document.getElementById('habits-progress');
+            if (progressEl) {
+                progressEl.textContent = `${completed}/7`;
+            }
+
+            // Update date display
+            const dateEl = document.getElementById('habits-date');
+            if (dateEl) {
+                const todayObj = new Date();
+                const options = { weekday: 'short', month: 'short', day: 'numeric' };
+                dateEl.textContent = todayObj.toLocaleDateString('en-US', options);
+            }
+        }
+
+        // Initialize habits on page load
+        window.addEventListener('load', function() {
+            loadHabits();
+
+            // If Firebase is ready, load from cloud
+            if (window.firebaseReady) {
+                loadHabitsFromCloud();
+            }
+        });
+
+        // Load habits when Firebase becomes ready
+        const originalOnFirebaseReady = window.onFirebaseReady;
+        window.onFirebaseReady = function() {
+            if (originalOnFirebaseReady) originalOnFirebaseReady();
+            loadHabitsFromCloud();
+        };
+
+        // Check for day change every minute
+        setInterval(function() {
+            const today = getTodayDate();
+            if (!dailyHabits[today]) {
+                console.log('New day detected! Resetting habits...');
+                loadHabits();
+            }
+        }, 60000); // Check every minute
     </script>
 </body>
 </html>
