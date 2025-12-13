@@ -1017,6 +1017,7 @@
             <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
                 <button onclick="manualSync()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Refresh from cloud">Sync</button>
+                <button onclick="showSyncId()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="View/Set Sync ID for cross-device sync">Sync ID</button>
                 <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Clear all completed goals">Clear Done</button>
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
@@ -1333,14 +1334,36 @@
     </script>
 
     <script>
-        // Cloud sync with Firestore - unique user ID per device
+        // Cloud sync with Firestore - shared user ID across devices
         function getUserId() {
             let userId = localStorage.getItem('userId');
             if (!userId) {
-                userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                // Generate a memorable 6-character sync code
+                userId = Math.random().toString(36).substr(2, 6).toUpperCase();
                 localStorage.setItem('userId', userId);
             }
             return userId;
+        }
+
+        function setSyncId(newId) {
+            if (!newId || newId.length < 4) {
+                alert('Sync ID must be at least 4 characters');
+                return false;
+            }
+            localStorage.setItem('userId', newId.toUpperCase());
+            alert('Sync ID updated! Please reload the page to sync with new ID.');
+            return true;
+        }
+
+        function showSyncId() {
+            const currentId = getUserId();
+            const message = `Your Sync ID: ${currentId}\n\nUse this ID on other devices to sync your data.\n\nTo change your Sync ID, enter a new one (at least 4 characters):`;
+            const newId = prompt(message, currentId);
+            if (newId && newId !== currentId) {
+                if (setSyncId(newId)) {
+                    location.reload();
+                }
+            }
         }
 
         const CLOUD_DOC_ID = getUserId();
