@@ -1149,7 +1149,10 @@
                     </div>
                 </div>
 
-                <canvas id="weight-chart" style="width: 100%; height: 180px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; border: 2px solid #bae6fd; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);"></canvas>
+                <div style="background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #e5e7eb;">
+                    <div style="font-size: 11px; font-weight: 600; color: #6b7280; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Weight Trend</div>
+                    <canvas id="weight-chart" style="width: 100%; height: 200px;"></canvas>
+                </div>
 
                 <div id="weight-log" class="weight-log"></div>
             </div>
@@ -3808,15 +3811,15 @@
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
 
-            // Handle retina displays and responsive width
+            // Handle retina displays
             const dpr = window.devicePixelRatio || 1;
-            const containerWidth = canvas.parentElement.offsetWidth;
-            const displayWidth = Math.min(containerWidth - 40, 800); // Max 800px, responsive
-            const displayHeight = 180;
+            const rect = canvas.getBoundingClientRect();
+            const displayWidth = rect.width;
+            const displayHeight = 200;
 
             canvas.width = displayWidth * dpr;
             canvas.height = displayHeight * dpr;
-            canvas.style.width = '100%';
+            canvas.style.width = displayWidth + 'px';
             canvas.style.height = displayHeight + 'px';
 
             ctx.scale(dpr, dpr);
@@ -3828,82 +3831,85 @@
             ctx.clearRect(0, 0, width, height);
 
             if (weightData.length === 0) {
-                ctx.fillStyle = '#999';
-                ctx.font = '14px -apple-system, sans-serif';
+                ctx.fillStyle = '#9ca3af';
+                ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('No data to display', width / 2, height / 2);
+                ctx.fillText('Log your weight to see the trend', width / 2, height / 2);
                 return;
             }
 
-            // Get last 30 days or all data
-            const chartData = weightData.slice(0, 30).reverse();
+            // Get last 20 entries or all data
+            const chartData = weightData.slice(0, 20).reverse();
             const weights = chartData.map(e => e.weight);
             const minWeight = Math.min(...weights);
             const maxWeight = Math.max(...weights);
-            const range = maxWeight - minWeight || 1;
+            const range = maxWeight - minWeight || 2;
 
-            const padding = 40;
-            const chartWidth = width - padding * 2;
-            const chartHeight = height - padding * 2;
+            // Add 10% padding to range for better visualization
+            const paddedMin = minWeight - range * 0.1;
+            const paddedMax = maxWeight + range * 0.1;
+            const paddedRange = paddedMax - paddedMin;
 
-            // Draw grid lines (softer)
-            ctx.strokeStyle = '#dbeafe';
+            const padding = { top: 30, right: 20, bottom: 40, left: 50 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+
+            // Draw subtle grid lines
+            ctx.strokeStyle = '#f3f4f6';
             ctx.lineWidth = 1;
-            for (let i = 0; i <= 5; i++) {
-                const y = padding + (chartHeight / 5) * i;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding.top + (chartHeight / 4) * i;
                 ctx.beginPath();
-                ctx.moveTo(padding, y);
-                ctx.lineTo(width - padding, y);
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
                 ctx.stroke();
-
-                // Y-axis labels
-                const weight = maxWeight - (range / 5) * i;
-                ctx.fillStyle = '#64748b';
-                ctx.font = 'bold 11px -apple-system, sans-serif';
-                ctx.textAlign = 'right';
-                ctx.fillText(weight.toFixed(1) + ' kg', padding - 8, y + 4);
             }
 
-            // Draw area fill under line (gradient)
+            // Y-axis labels
+            for (let i = 0; i <= 4; i++) {
+                const y = padding.top + (chartHeight / 4) * i;
+                const weight = paddedMax - (paddedRange / 4) * i;
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '11px -apple-system, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(weight.toFixed(1), padding.left - 10, y + 4);
+            }
+
+            // Draw area fill under line
             if (chartData.length > 1) {
-                const gradient = ctx.createLinearGradient(0, padding, 0, padding + chartHeight);
-                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
-                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
+                const gradient = ctx.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+                gradient.addColorStop(0, 'rgba(99, 102, 241, 0.15)');
+                gradient.addColorStop(1, 'rgba(99, 102, 241, 0.01)');
 
                 ctx.fillStyle = gradient;
                 ctx.beginPath();
 
-                // Start from bottom left
-                const firstX = padding;
-                ctx.moveTo(firstX, padding + chartHeight);
+                const firstX = padding.left;
+                ctx.moveTo(firstX, height - padding.bottom);
 
-                // Draw line
                 chartData.forEach((entry, i) => {
-                    const x = padding + (chartWidth / (chartData.length - 1)) * i;
-                    const y = padding + chartHeight - ((entry.weight - minWeight) / range) * chartHeight;
+                    const x = padding.left + (chartWidth / (chartData.length - 1)) * i;
+                    const normalizedY = (entry.weight - paddedMin) / paddedRange;
+                    const y = height - padding.bottom - (normalizedY * chartHeight);
                     ctx.lineTo(x, y);
                 });
 
-                // Close path at bottom right
-                const lastX = padding + chartWidth;
-                ctx.lineTo(lastX, padding + chartHeight);
+                const lastX = padding.left + chartWidth;
+                ctx.lineTo(lastX, height - padding.bottom);
                 ctx.closePath();
                 ctx.fill();
 
-                // Draw main line (thicker and with gradient)
-                const lineGradient = ctx.createLinearGradient(0, 0, width, 0);
-                lineGradient.addColorStop(0, '#3b82f6');
-                lineGradient.addColorStop(1, '#8b5cf6');
-
-                ctx.strokeStyle = lineGradient;
-                ctx.lineWidth = 3;
+                // Draw smooth line
+                ctx.strokeStyle = '#6366f1';
+                ctx.lineWidth = 2.5;
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
                 ctx.beginPath();
 
                 chartData.forEach((entry, i) => {
-                    const x = padding + (chartWidth / (chartData.length - 1)) * i;
-                    const y = padding + chartHeight - ((entry.weight - minWeight) / range) * chartHeight;
+                    const x = padding.left + (chartWidth / (chartData.length - 1)) * i;
+                    const normalizedY = (entry.weight - paddedMin) / paddedRange;
+                    const y = height - padding.bottom - (normalizedY * chartHeight);
 
                     if (i === 0) {
                         ctx.moveTo(x, y);
@@ -3914,46 +3920,82 @@
 
                 ctx.stroke();
 
-                // Draw points with glow effect
+                // Draw points
                 chartData.forEach((entry, i) => {
-                    const x = padding + (chartWidth / (chartData.length - 1)) * i;
-                    const y = padding + chartHeight - ((entry.weight - minWeight) / range) * chartHeight;
+                    const x = padding.left + (chartWidth / (chartData.length - 1)) * i;
+                    const normalizedY = (entry.weight - paddedMin) / paddedRange;
+                    const y = height - padding.bottom - (normalizedY * chartHeight);
 
-                    // Outer glow
-                    ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+                    // Point glow
+                    ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
                     ctx.beginPath();
-                    ctx.arc(x, y, 6, 0, Math.PI * 2);
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Main point
-                    ctx.fillStyle = '#fff';
+                    // Point
+                    ctx.fillStyle = '#6366f1';
                     ctx.beginPath();
-                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Inner dot
-                    ctx.fillStyle = '#3b82f6';
+                    // White center
+                    ctx.fillStyle = '#ffffff';
                     ctx.beginPath();
-                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.arc(x, y, 1.5, 0, Math.PI * 2);
                     ctx.fill();
+                });
 
-                    // Show weight value on top of every 3rd point or first/last
-                    if (i === 0 || i === chartData.length - 1 || i % 3 === 0) {
-                        ctx.fillStyle = '#1e40af';
+                // Draw weight labels (first, last, and highest/lowest)
+                const maxIndex = weights.indexOf(maxWeight);
+                const minIndex = weights.indexOf(minWeight);
+
+                chartData.forEach((entry, i) => {
+                    if (i === 0 || i === chartData.length - 1 || i === maxIndex || i === minIndex) {
+                        const x = padding.left + (chartWidth / (chartData.length - 1)) * i;
+                        const normalizedY = (entry.weight - paddedMin) / paddedRange;
+                        const y = height - padding.bottom - (normalizedY * chartHeight);
+
+                        // Label background
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+                        ctx.shadowBlur = 4;
+                        ctx.shadowOffsetY = 1;
+
+                        const labelWidth = 38;
+                        const labelHeight = 16;
+                        const labelX = x - labelWidth / 2;
+                        const labelY = y - labelHeight - 8;
+
+                        ctx.beginPath();
+                        ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 4);
+                        ctx.fill();
+
+                        ctx.shadowColor = 'transparent';
+                        ctx.shadowBlur = 0;
+                        ctx.shadowOffsetY = 0;
+
+                        // Label text
+                        ctx.fillStyle = '#1f2937';
                         ctx.font = 'bold 10px -apple-system, sans-serif';
                         ctx.textAlign = 'center';
-                        ctx.fillText(entry.weight + ' kg', x, y - 12);
+                        ctx.fillText(entry.weight + ' kg', x, y - 13);
                     }
+                });
 
-                    // Show date for first, last, and every 5th point
-                    if (i === 0 || i === chartData.length - 1 || (i % 5 === 0 && chartData.length > 10)) {
-                        const date = new Date(entry.date);
-                        const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                        ctx.fillStyle = '#64748b';
-                        ctx.font = '9px -apple-system, sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(label, x, height - 8);
-                    }
+                // X-axis date labels
+                const labelIndices = chartData.length <= 7
+                    ? chartData.map((_, i) => i)
+                    : [0, Math.floor(chartData.length / 2), chartData.length - 1];
+
+                labelIndices.forEach(i => {
+                    const x = padding.left + (chartWidth / (chartData.length - 1)) * i;
+                    const date = new Date(chartData[i].date);
+                    const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                    ctx.fillStyle = '#9ca3af';
+                    ctx.font = '10px -apple-system, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(label, x, height - padding.bottom + 20);
                 });
             }
         }
