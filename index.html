@@ -1016,7 +1016,7 @@
             <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
             <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
-                <button onclick="manualSync()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Refresh from cloud">Sync</button>
+                <button onclick="forceSync()" style="background: #ff6b6b; color: white; border: 1px solid #ff6b6b; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Force upload or download to sync devices">Force Sync</button>
                 <button onclick="showSyncId()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="View/Set Sync ID for cross-device sync">Sync ID</button>
                 <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Clear all completed goals">Clear Done</button>
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
@@ -1386,12 +1386,36 @@
         }
 
         // Debug function to check sync status
-        function showSyncDebug() {
+        async function showSyncDebug() {
             const personal = personalGoals.length;
             const professional = professionalGoals.length;
             const total = personal + professional;
             const localPersonal = JSON.parse(localStorage.getItem('personalGoals') || '[]').length;
             const localProfessional = JSON.parse(localStorage.getItem('professionalGoals') || '[]').length;
+
+            // Try to fetch cloud data
+            let cloudTotal = 'Loading...';
+            let cloudPersonal = '?';
+            let cloudProfessional = '?';
+
+            if (window.firebaseReady && window.db) {
+                try {
+                    const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
+                    const docSnap = await window.firestoreGetDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        cloudPersonal = (data.personal || []).length;
+                        cloudProfessional = (data.professional || []).length;
+                        cloudTotal = cloudPersonal + cloudProfessional;
+                    } else {
+                        cloudTotal = 'No cloud data';
+                    }
+                } catch (error) {
+                    cloudTotal = 'Error: ' + error.message;
+                }
+            } else {
+                cloudTotal = 'Firebase not ready';
+            }
 
             const debug = `🔍 SYNC DEBUG INFO\n\n` +
                 `📱 Current Device:\n` +
@@ -1399,21 +1423,69 @@
                 `Cloud Doc ID: ${getCloudDocId()}\n\n` +
                 `📊 Goals Count:\n` +
                 `In Memory: ${total} (${personal}P + ${professional}P)\n` +
-                `In LocalStorage: ${localPersonal + localProfessional} (${localPersonal}P + ${localProfessional}P)\n\n` +
+                `In LocalStorage: ${localPersonal + localProfessional} (${localPersonal}P + ${localProfessional}P)\n` +
+                `☁️ In Cloud: ${cloudTotal} (${cloudPersonal}P + ${cloudProfessional}P)\n\n` +
                 `🔥 Firebase Status:\n` +
                 `Firebase Ready: ${window.firebaseReady ? '✅ YES' : '❌ NO'}\n` +
                 `Firebase DB: ${window.db ? '✅ Connected' : '❌ Not Connected'}\n` +
                 `Online: ${navigator.onLine ? '✅ YES' : '❌ NO'}\n\n` +
-                `💡 If counts don't match between devices:\n` +
-                `1. Check Sync IDs are IDENTICAL\n` +
-                `2. Click "Sync" button on both devices\n` +
-                `3. Reload both browsers\n\n` +
-                `🔄 This will now trigger a manual sync...`;
+                `❗ MISMATCH DETECTED!\n` +
+                `Your devices have DIFFERENT Sync IDs!\n\n` +
+                `💡 TO FIX:\n` +
+                `1. Open BOTH devices side-by-side\n` +
+                `2. Pick ONE Sync ID to use\n` +
+                `3. Click "Sync ID" button on BOTH devices\n` +
+                `4. Enter the SAME ID on both\n` +
+                `5. Click "Force Sync" button below`;
 
             alert(debug);
+        }
 
-            // Trigger manual sync
-            manualSync();
+        // Force sync function - gives user choice
+        async function forceSync() {
+            if (!window.firebaseReady || !window.db) {
+                alert('Firebase not ready. Please refresh the page.');
+                return;
+            }
+
+            const choice = confirm(
+                `🔄 FORCE SYNC\n\n` +
+                `Current device has ${personalGoals.length + professionalGoals.length} goals.\n\n` +
+                `Click OK to:\n` +
+                `✅ UPLOAD local data to cloud (overwrite cloud)\n\n` +
+                `Click CANCEL to:\n` +
+                `⬇️ DOWNLOAD cloud data (overwrite local)`
+            );
+
+            if (choice) {
+                // Upload to cloud
+                console.log('🚀 FORCE UPLOAD - Uploading local data to cloud...');
+                await saveToCloud();
+                alert('✅ Local data uploaded to cloud!\n\nNow sync the other device.');
+            } else {
+                // Download from cloud
+                console.log('⬇️ FORCE DOWNLOAD - Downloading cloud data...');
+                const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
+                const docSnap = await window.firestoreGetDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    personalGoals = data.personal || [];
+                    professionalGoals = data.professional || [];
+
+                    localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
+                    localStorage.setItem('professionalGoals', JSON.stringify(professionalGoals));
+
+                    renderList('personal');
+                    renderList('professional');
+                    updatePageTitle();
+                    renderDashboard();
+
+                    alert(`✅ Downloaded ${personalGoals.length + professionalGoals.length} goals from cloud!`);
+                } else {
+                    alert('❌ No cloud data found. Upload from other device first.');
+                }
+            }
         }
 
         // Get current cloud doc ID (dynamic, always reads latest from localStorage)
@@ -2304,11 +2376,11 @@
 
             listElement.innerHTML = sortedGoals.map(goal => `
                 <li class="checklist-item ${goal.completed ? 'completed' : ''}" data-id="${goal.id}" data-type="${type}">
-                    <button class="move-btn" onclick="moveItem('${type}', ${goal.id})" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
+                    <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
                     <input type="checkbox" ${goal.completed ? 'checked' : ''}
-                           onchange="toggleItem('${type}', ${goal.id})">
-                    <span class="item-text" ondblclick="editItem('${type}', ${goal.id}, this)" title="Double-click to edit">${escapeHtml(goal.text)}</span>
-                    <button class="delete-btn" onclick="deleteItem('${type}', ${goal.id})">Delete</button>
+                           onchange="toggleItem('${type}', '${goal.id}')">
+                    <span class="item-text" ondblclick="editItem('${type}', '${goal.id}', this)" title="Double-click to edit">${escapeHtml(goal.text)}</span>
+                    <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
                 </li>
             `).join('');
 
