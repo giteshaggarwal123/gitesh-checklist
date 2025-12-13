@@ -1192,6 +1192,13 @@
                     <button onclick="setFilter('personal', 'completed')" id="personal-filter-completed" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; background: #fff; color: #666; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;">Done</button>
                 </div>
 
+                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                    <select id="personal-priority" style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; background: white; cursor: pointer; font-weight: 500;">
+                        <option value="medium">⚪ Medium</option>
+                        <option value="high">🔴 High</option>
+                        <option value="low">🟢 Low</option>
+                    </select>
+                </div>
                 <div class="input-group">
                     <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')" oninput="updateCharCount('personal')">
                     <button class="add-btn" onclick="addItem('personal')">Add</button>
@@ -1233,6 +1240,13 @@
                     <button onclick="setFilter('professional', 'completed')" id="professional-filter-completed" style="flex: 1; padding: 6px; border: 1px solid #e0e0e0; background: #fff; color: #666; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 500; transition: all 0.2s;">Done</button>
                 </div>
 
+                <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                    <select id="professional-priority" style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; background: white; cursor: pointer; font-weight: 500;">
+                        <option value="medium">⚪ Medium</option>
+                        <option value="high">🔴 High</option>
+                        <option value="low">🟢 Low</option>
+                    </select>
+                </div>
                 <div class="input-group">
                     <input type="text" id="professional-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')" oninput="updateCharCount('professional')">
                     <button class="add-btn" onclick="addItem('professional')">Add</button>
@@ -2298,7 +2312,9 @@
 
         function addItem(type) {
             const input = document.getElementById(`${type}-input`);
+            const prioritySelect = document.getElementById(`${type}-priority`);
             const text = input.value.trim().toLowerCase();
+            const priority = prioritySelect ? prioritySelect.value : 'medium';
 
             // Check for empty or whitespace-only
             if (text === '' || text.replace(/\s/g, '') === '') {
@@ -2328,7 +2344,8 @@
             goals.unshift({
                 id: generateId(),
                 text: text,
-                completed: false
+                completed: false,
+                priority: priority
             });
 
             saveData(type);
@@ -2498,15 +2515,20 @@
                 return;
             }
 
-            listElement.innerHTML = sortedGoals.map(goal => `
+            listElement.innerHTML = sortedGoals.map(goal => {
+                const priorityIcon = goal.priority === 'high' ? '🔴' : (goal.priority === 'low' ? '🟢' : '⚪');
+                const priorityLabel = goal.priority === 'high' ? 'High' : (goal.priority === 'low' ? 'Low' : 'Med');
+                return `
                 <li class="checklist-item ${goal.completed ? 'completed' : ''}" data-id="${goal.id}" data-type="${type}">
                     <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
                     <input type="checkbox" ${goal.completed ? 'checked' : ''}
                            onchange="toggleItem('${type}', '${goal.id}')">
                     <span class="item-text" ondblclick="editItem('${type}', '${goal.id}', this)" title="Double-click to edit">${escapeHtml(goal.text)}</span>
+                    <span style="font-size: 10px; color: #666; margin-left: 6px; padding: 2px 6px; border-radius: 4px; background: #f5f5f5;" title="${priorityLabel} priority">${priorityIcon}</span>
                     <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
                 </li>
-            `).join('');
+                `;
+            }).join('');
 
             // Update dashboard
             renderDashboard();
