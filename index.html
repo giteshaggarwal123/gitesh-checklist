@@ -1112,7 +1112,12 @@
             </div>
 
             <div id="weight-content" style="overflow: hidden; transition: max-height 0.3s ease-out;">
-                <div class="input-group" style="margin-bottom: 12px; margin-top: 12px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0;">
+                    <input type="number" id="height-input" placeholder="Height (cm)" step="1" min="100" max="250" onchange="saveHeightAndTarget()" style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px;">
+                    <input type="number" id="target-weight-input" placeholder="Target (kg)" step="0.1" min="0" max="300" onchange="saveHeightAndTarget()" style="padding: 8px 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px;">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 12px;">
                     <input type="number" id="weight-input" placeholder="Enter weight (kg)" step="0.1" min="0" max="300" onkeypress="handleWeightKeyPress(event)" style="flex: 1; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
                     <button class="add-btn" onclick="addWeight()" style="padding: 10px 18px;">Log Weight</button>
                 </div>
@@ -1133,6 +1138,14 @@
                     <div style="text-align: center; padding: 10px; background: #fef3c7; border-radius: 6px; border: 1px solid #fde68a;">
                         <div style="font-size: 18px; font-weight: 600; color: #92400e;" id="start-weight">--</div>
                         <div style="font-size: 10px; color: #92400e; margin-top: 2px;">Start</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: #fce7f3; border-radius: 6px; border: 1px solid #fbcfe8;">
+                        <div style="font-size: 18px; font-weight: 600; color: #9f1239;" id="bmi-value">--</div>
+                        <div style="font-size: 10px; color: #9f1239; margin-top: 2px;" id="bmi-category">BMI</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: #ede9fe; border-radius: 6px; border: 1px solid #ddd6fe;">
+                        <div style="font-size: 18px; font-weight: 600; color: #6b21a8;" id="target-progress">--</div>
+                        <div style="font-size: 10px; color: #6b21a8; margin-top: 2px;">To Target</div>
                     </div>
                 </div>
 
@@ -2067,6 +2080,9 @@
         };
 
         window.onload = function() {
+            // Scroll to top on page load/refresh
+            window.scrollTo(0, 0);
+
             renderList('personal');
             renderList('professional');
             renderDashboard();
@@ -3400,6 +3416,8 @@
         // ============ WEIGHT TRACKER ============
         let weightData = [];
         let weightExpanded = false; // Default collapsed
+        let userHeight = null; // in cm
+        let targetWeight = null; // in kg
 
         // Sort weight data by date (newest first)
         function sortWeightData() {
@@ -3434,12 +3452,52 @@
                 const docRef = window.firestoreDoc(window.db, 'weight', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
                     weightData: weightData,
+                    height: userHeight,
+                    targetWeight: targetWeight,
                     lastUpdated: new Date().toISOString()
                 });
                 console.log('Weight data synced to cloud');
             } catch (error) {
                 console.error('Error saving weight to cloud:', error);
             }
+        }
+
+        // Save height and target weight
+        function saveHeightAndTarget() {
+            const heightInput = document.getElementById('height-input');
+            const targetInput = document.getElementById('target-weight-input');
+
+            userHeight = heightInput.value ? parseFloat(heightInput.value) : null;
+            targetWeight = targetInput.value ? parseFloat(targetInput.value) : null;
+
+            // Save to localStorage
+            if (userHeight) localStorage.setItem('userHeight', userHeight);
+            else localStorage.removeItem('userHeight');
+
+            if (targetWeight) localStorage.setItem('targetWeight', targetWeight);
+            else localStorage.removeItem('targetWeight');
+
+            // Save to cloud
+            saveWeightToCloud();
+
+            // Re-render to update BMI and target progress
+            renderWeightTracker();
+        }
+
+        // Load height and target weight
+        function loadHeightAndTarget() {
+            const storedHeight = localStorage.getItem('userHeight');
+            const storedTarget = localStorage.getItem('targetWeight');
+
+            userHeight = storedHeight ? parseFloat(storedHeight) : null;
+            targetWeight = storedTarget ? parseFloat(storedTarget) : null;
+
+            // Update input fields
+            const heightInput = document.getElementById('height-input');
+            const targetInput = document.getElementById('target-weight-input');
+
+            if (heightInput && userHeight) heightInput.value = userHeight;
+            if (targetInput && targetWeight) targetInput.value = targetWeight;
         }
 
         // Load weight from cloud
@@ -3456,6 +3514,19 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     const cloudWeight = data.weightData || [];
+
+                    // Load height and target weight from cloud
+                    if (data.height) {
+                        userHeight = data.height;
+                        localStorage.setItem('userHeight', userHeight);
+                    }
+                    if (data.targetWeight) {
+                        targetWeight = data.targetWeight;
+                        localStorage.setItem('targetWeight', targetWeight);
+                    }
+
+                    // Update input fields
+                    loadHeightAndTarget();
 
                     // MERGE instead of overwrite to prevent data loss
                     weightData = mergeWeightData(weightData, cloudWeight);
@@ -3477,6 +3548,20 @@
                     if (doc.exists()) {
                         const data = doc.data();
                         weightData = data.weightData || [];
+
+                        // Load height and target weight from cloud
+                        if (data.height) {
+                            userHeight = data.height;
+                            localStorage.setItem('userHeight', userHeight);
+                        }
+                        if (data.targetWeight) {
+                            targetWeight = data.targetWeight;
+                            localStorage.setItem('targetWeight', targetWeight);
+                        }
+
+                        // Update input fields
+                        loadHeightAndTarget();
+
                         sortWeightData(); // Ensure data is sorted
 
                         // Save to localStorage for offline access
@@ -3525,6 +3610,9 @@
                 content.style.maxHeight = '0px';
                 toggleBtn.textContent = '▶';
             }
+
+            // Load height and target weight
+            loadHeightAndTarget();
         }
 
         // Add weight entry
@@ -3627,11 +3715,49 @@
                     document.getElementById('weight-change-prev').textContent = 'First entry';
                     document.getElementById('weight-change-prev').style.fontSize = '11px';
                 }
+
+                // Calculate and display BMI
+                const bmiValueEl = document.getElementById('bmi-value');
+                const bmiCategoryEl = document.getElementById('bmi-category');
+                if (userHeight && userHeight > 0) {
+                    const heightInMeters = userHeight / 100;
+                    const bmi = current / (heightInMeters * heightInMeters);
+                    let category = '';
+
+                    if (bmi < 18.5) {
+                        category = 'Underweight';
+                    } else if (bmi < 25) {
+                        category = 'Normal';
+                    } else if (bmi < 30) {
+                        category = 'Overweight';
+                    } else {
+                        category = 'Obese';
+                    }
+
+                    bmiValueEl.textContent = bmi.toFixed(1);
+                    bmiCategoryEl.textContent = category;
+                } else {
+                    bmiValueEl.textContent = '--';
+                    bmiCategoryEl.textContent = 'BMI';
+                }
+
+                // Calculate and display target progress
+                const targetProgressEl = document.getElementById('target-progress');
+                if (targetWeight && targetWeight > 0) {
+                    const difference = current - targetWeight;
+                    const displayText = difference > 0 ? `${difference.toFixed(1)} kg over` : difference < 0 ? `${Math.abs(difference).toFixed(1)} kg to go` : 'At target!';
+                    targetProgressEl.textContent = displayText;
+                } else {
+                    targetProgressEl.textContent = '--';
+                }
             } else {
                 document.getElementById('current-weight').textContent = '--';
                 document.getElementById('start-weight').textContent = '--';
                 document.getElementById('weight-change-total').textContent = '--';
                 document.getElementById('weight-change-prev').textContent = '--';
+                document.getElementById('bmi-value').textContent = '--';
+                document.getElementById('bmi-category').textContent = 'BMI';
+                document.getElementById('target-progress').textContent = '--';
             }
 
             // Render chart
