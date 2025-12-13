@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Gitesh Life Tracker v2.1</title>
+    <title>Gitesh Life Tracker v3.1</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='60' fill='white' font-weight='bold'>✓</text></svg>">
     <style>
         * {
@@ -1012,8 +1012,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v2.1</span></h1>
-        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span> • <strong style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 4px 10px; border-radius: 6px; color: #92400e;">Sync ID: <span id="sync-id-display" style="font-weight: 700; cursor: pointer;" onclick="showSyncId()" title="Click to view/change Sync ID">...</span></strong></p>
+        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v3.1</span></h1>
+        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span> • <strong style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 4px 10px; border-radius: 6px; color: #92400e;">📱💻 Code: <span id="sync-id-display" style="font-weight: 700; cursor: pointer;" onclick="showSyncId()" title="Click to view/change your sync code">...</span></strong></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
             <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
@@ -1339,13 +1339,35 @@
     </script>
 
     <script>
-        // Cloud sync with Firestore - shared user ID across devices
+        // Cloud sync with Firestore - ONE simple sync code
         function getUserId() {
             let userId = localStorage.getItem('userId');
             if (!userId) {
-                // Generate a memorable 6-character sync code
-                userId = Math.random().toString(36).substr(2, 6).toUpperCase();
+                // First time - ask user to create a sync code
+                userId = prompt(
+                    `🎉 WELCOME TO GITESH LIFE TRACKER!\n\n` +
+                    `To sync across mobile & desktop, create a simple sync code.\n\n` +
+                    `Examples:\n` +
+                    `• Your name: "GITESH"\n` +
+                    `• Simple word: "GOALS2025"\n` +
+                    `• Any code: "MYLIFE"\n\n` +
+                    `⚠️ REMEMBER THIS CODE!\n` +
+                    `You'll need to enter the SAME code on all your devices.\n\n` +
+                    `Enter your sync code (4+ characters):`,
+                    ''
+                );
+
+                if (!userId || userId.trim().length < 4) {
+                    // Generate fallback if user cancels
+                    userId = 'USER' + Math.random().toString(36).substr(2, 4).toUpperCase();
+                    alert(`No code entered. Generated: ${userId}\n\nYou can change it anytime by clicking the yellow "Sync Code" box.`);
+                }
+
+                userId = userId.trim().toUpperCase();
                 localStorage.setItem('userId', userId);
+
+                // Show confirmation
+                alert(`✅ Sync Code Set: ${userId}\n\n📱 On mobile: Enter this SAME code\n💻 On desktop: Enter this SAME code\n\n🔄 Your data will sync automatically!`);
             }
             return userId;
         }
@@ -1362,21 +1384,28 @@
 
         function showSyncId() {
             const currentId = getUserId();
-            const message = `🔄 SYNC YOUR DEVICES\n\n` +
-                `Your Current Sync ID: ${currentId}\n\n` +
-                `TO SYNC MOBILE & DESKTOP:\n` +
-                `1. Copy this ID: ${currentId}\n` +
-                `2. Open app on other device\n` +
-                `3. Click "Sync ID" button there\n` +
-                `4. Enter this same ID: ${currentId}\n` +
-                `5. Reload both devices\n\n` +
+            const change = confirm(
+                `🔄 YOUR SYNC CODE: ${currentId}\n\n` +
+                `📱 MOBILE: Enter "${currentId}"\n` +
+                `💻 DESKTOP: Enter "${currentId}"\n\n` +
+                `Same code = Same data on all devices!\n\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-                `To change your Sync ID, enter a new one below\n` +
-                `(at least 4 characters, or leave blank to keep current):`;
-            const newId = prompt(message, currentId);
-            if (newId && newId !== currentId) {
-                if (setSyncId(newId)) {
-                    updateSyncIdDisplay();
+                `Click OK to CHANGE your sync code\n` +
+                `Click CANCEL to keep it`
+            );
+
+            if (change) {
+                const newId = prompt(
+                    `Enter NEW sync code (4+ characters):\n\n` +
+                    `Current: ${currentId}\n\n` +
+                    `⚠️ Warning: Changing this will point to\n` +
+                    `different data in the cloud!`,
+                    currentId
+                );
+
+                if (newId && newId.trim().length >= 4 && newId !== currentId) {
+                    localStorage.setItem('userId', newId.trim().toUpperCase());
+                    alert(`✅ Sync code changed to: ${newId.trim().toUpperCase()}\n\nReloading app...`);
                     location.reload();
                 }
             }
