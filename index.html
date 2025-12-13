@@ -901,64 +901,59 @@
 
         /* Dashboard Summary */
         .dashboard-summary {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            background: white;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s;
+        }
+
+        .dashboard-summary:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
         }
 
         .dashboard-card {
-            background: white;
-            border-radius: 10px;
-            padding: 16px;
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 12px;
             border: 1px solid #e8e8e8;
-            transition: all 0.2s;
+            transition: all 0.15s;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .dashboard-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: #f5f5f5;
+            border-color: #ddd;
         }
 
         .dashboard-card-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #64748b;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
+            color: #999;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .dashboard-card-icon {
-            font-size: 18px;
+            letter-spacing: 0.3px;
         }
 
         .dashboard-card-value {
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
             line-height: 1.2;
         }
 
         .dashboard-card-subtitle {
             font-size: 12px;
-            color: #64748b;
+            color: #666;
             display: flex;
             align-items: center;
             gap: 4px;
@@ -989,20 +984,19 @@
         @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                gap: 8px;
             }
 
             .dashboard-card {
-                padding: 12px;
+                padding: 10px;
             }
 
             .dashboard-card-value {
-                font-size: 24px;
+                font-size: 20px;
             }
 
             .dashboard-summary {
-                padding: 16px;
-                margin-bottom: 20px;
+                padding: 12px 16px;
             }
         }
     </style>
@@ -1029,49 +1023,28 @@
         <!-- Dashboard Summary -->
         <div class="dashboard-summary">
             <div class="dashboard-grid" id="dashboard-grid">
-                <!-- Dashboard cards will be rendered here by JavaScript -->
                 <div class="dashboard-card">
-                    <div class="dashboard-card-header">
-                        <span class="dashboard-card-icon">🎯</span>
-                        <span>Active Goals</span>
-                    </div>
+                    <div class="dashboard-card-header">Active Goals</div>
                     <div class="dashboard-card-value" id="dashboard-goals-count">0</div>
-                    <div class="dashboard-card-subtitle" id="dashboard-goals-subtitle">
-                        Loading...
-                    </div>
+                    <div class="dashboard-card-subtitle" id="dashboard-goals-subtitle">Loading...</div>
                 </div>
 
                 <div class="dashboard-card">
-                    <div class="dashboard-card-header">
-                        <span class="dashboard-card-icon">✅</span>
-                        <span>Today's Habits</span>
-                    </div>
+                    <div class="dashboard-card-header">Today's Habits</div>
                     <div class="dashboard-card-value" id="dashboard-habits-percent">0%</div>
-                    <div class="dashboard-card-subtitle" id="dashboard-habits-subtitle">
-                        0/9 completed
-                    </div>
+                    <div class="dashboard-card-subtitle" id="dashboard-habits-subtitle">0/9 completed</div>
                 </div>
 
                 <div class="dashboard-card">
-                    <div class="dashboard-card-header">
-                        <span class="dashboard-card-icon">🔥</span>
-                        <span>Best Streak</span>
-                    </div>
+                    <div class="dashboard-card-header">Best Streak</div>
                     <div class="dashboard-card-value" id="dashboard-best-streak">0</div>
-                    <div class="dashboard-card-subtitle" id="dashboard-streak-subtitle">
-                        No active streaks
-                    </div>
+                    <div class="dashboard-card-subtitle" id="dashboard-streak-subtitle">No active streaks</div>
                 </div>
 
                 <div class="dashboard-card">
-                    <div class="dashboard-card-header">
-                        <span class="dashboard-card-icon">⚖️</span>
-                        <span>Weight Progress</span>
-                    </div>
+                    <div class="dashboard-card-header">Weight</div>
                     <div class="dashboard-card-value" id="dashboard-weight-value">--</div>
-                    <div class="dashboard-card-subtitle" id="dashboard-weight-subtitle">
-                        No data yet
-                    </div>
+                    <div class="dashboard-card-subtitle" id="dashboard-weight-subtitle">No data yet</div>
                 </div>
             </div>
         </div>
