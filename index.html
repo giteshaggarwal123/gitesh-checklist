@@ -303,6 +303,123 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
+        /* Notes Section */
+        .notes-section {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .notes-section:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .notes-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .notes-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notes-list::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .notes-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .notes-list::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        .note-item {
+            background: #fafafa;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.15s;
+            position: relative;
+        }
+
+        .note-item:hover {
+            background: #f5f5f5;
+            border-color: #ddd;
+        }
+
+        .note-content {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 6px;
+            word-wrap: break-word;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        .note-content:hover {
+            color: #007bff;
+        }
+
+        .note-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .note-timestamp {
+            font-size: 10px;
+            color: #999;
+        }
+
+        .note-delete {
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid transparent;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            opacity: 0;
+            transition: all 0.15s;
+            font-weight: 500;
+        }
+
+        .note-item:hover .note-delete {
+            opacity: 1;
+        }
+
+        .note-delete:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
         .daily-habits-header {
             display: flex;
             justify-content: space-between;
@@ -731,6 +848,30 @@
                     <span class="habit-check" aria-hidden="true">✓</span>
                     <span class="habit-text">Supplements</span>
                 </button>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="notes-section">
+            <div class="notes-header">
+                <h3 class="notes-title">Quick Notes <span id="notes-count" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
+                <button class="recommend-btn" onclick="clearAllNotes()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="notes-search" placeholder="Search notes..." style="width: 100%; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; margin-bottom: 10px;" oninput="searchNotes()">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 12px;">
+                <input type="text" id="note-input" placeholder="Add a quick note..." onkeypress="handleNoteKeyPress(event)" maxlength="500" style="flex: 1; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                <button class="add-btn" onclick="addNote()" style="padding: 10px 18px;">Add Note</button>
+            </div>
+            <div style="text-align: right; font-size: 10px; color: #999; margin-top: -8px; margin-bottom: 12px;">
+                <span id="note-char-count">0/500</span>
+            </div>
+
+            <div id="notes-list" class="notes-list">
+                <div class="empty-state">No notes yet. Add one above!</div>
             </div>
         </div>
 
@@ -2033,6 +2174,298 @@
                 loadHabits();
             }
         }, 60000); // Check every minute
+
+        // ============ NOTES SECTION ============
+        let notes = [];
+        let notesSearchTerm = '';
+        let noteIdCounter = Date.now();
+
+        // Generate unique ID for notes
+        function generateNoteId() {
+            return noteIdCounter++;
+        }
+
+        // Load notes from localStorage
+        function loadNotes() {
+            const stored = localStorage.getItem('notes');
+            if (stored) {
+                try {
+                    notes = JSON.parse(stored);
+                } catch (error) {
+                    console.error('Error parsing stored notes:', error);
+                    notes = [];
+                }
+            }
+            renderNotes();
+        }
+
+        // Save notes to localStorage
+        function saveNotesLocal() {
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        // Save notes to cloud
+        async function saveNotesToCloud() {
+            if (!window.firebaseReady || !window.db) return;
+
+            try {
+                const docRef = window.firestoreDoc(window.db, 'notes', CLOUD_DOC_ID);
+                await window.firestoreSetDoc(docRef, {
+                    notes: notes,
+                    lastUpdated: new Date().toISOString()
+                });
+                console.log('Notes synced to cloud');
+            } catch (error) {
+                console.error('Error saving notes to cloud:', error);
+            }
+        }
+
+        // Load notes from cloud
+        async function loadNotesFromCloud() {
+            if (!window.firebaseReady || !window.db) {
+                console.log('Firebase not ready for notes');
+                return;
+            }
+
+            try {
+                const docRef = window.firestoreDoc(window.db, 'notes', CLOUD_DOC_ID);
+                const docSnap = await window.firestoreGetDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    notes = data.notes || [];
+                    saveNotesLocal();
+                    renderNotes();
+                    console.log('✅ Loaded notes from cloud');
+                } else {
+                    await saveNotesToCloud();
+                }
+
+                // Listen for real-time updates
+                window.firestoreOnSnapshot(docRef, (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        notes = data.notes || [];
+                        renderNotes();
+                        console.log('🔄 Notes synced from cloud');
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading notes from cloud:', error);
+            }
+        }
+
+        // Add note
+        function addNote() {
+            const input = document.getElementById('note-input');
+            const text = input.value.trim();
+
+            if (text === '' || text.replace(/\s/g, '') === '') {
+                if (input.value.trim() !== '') {
+                    alert('Note cannot be only whitespace.');
+                }
+                input.value = '';
+                return;
+            }
+
+            if (text.length > 500) {
+                alert('Note is too long! Please keep it under 500 characters.');
+                return;
+            }
+
+            const newNote = {
+                id: generateNoteId(),
+                text: text,
+                timestamp: new Date().toISOString()
+            };
+
+            notes.unshift(newNote);
+            saveNotesLocal();
+            saveNotesToCloud();
+            renderNotes();
+            input.value = '';
+            updateNoteCharCount();
+        }
+
+        // Delete note
+        function deleteNote(id) {
+            if (!confirm('Delete this note?')) return;
+            notes = notes.filter(n => n.id !== id);
+            saveNotesLocal();
+            saveNotesToCloud();
+            renderNotes();
+        }
+
+        // Edit note
+        function editNote(id, element) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            const currentText = note.text;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentText;
+            input.style.width = '100%';
+            input.style.padding = '8px';
+            input.style.border = '1px solid #007bff';
+            input.style.borderRadius = '4px';
+            input.style.fontSize = '13px';
+            input.maxLength = 500;
+
+            const saveEdit = () => {
+                const newText = input.value.trim();
+                if (newText && newText !== currentText) {
+                    if (newText.length > 500) {
+                        alert('Note is too long! Please keep it under 500 characters.');
+                        return;
+                    }
+                    note.text = newText;
+                    note.timestamp = new Date().toISOString();
+                    saveNotesLocal();
+                    saveNotesToCloud();
+                }
+                renderNotes();
+            };
+
+            input.onblur = saveEdit;
+            input.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    saveEdit();
+                } else if (e.key === 'Escape') {
+                    renderNotes();
+                }
+            };
+
+            element.replaceWith(input);
+            input.focus();
+            input.select();
+        }
+
+        // Search notes
+        function searchNotes() {
+            notesSearchTerm = document.getElementById('notes-search').value.toLowerCase().trim();
+            renderNotes();
+        }
+
+        // Clear all notes
+        function clearAllNotes() {
+            if (notes.length === 0) {
+                alert('No notes to clear.');
+                return;
+            }
+
+            if (!confirm(`Delete all ${notes.length} notes?`)) return;
+
+            notes = [];
+            saveNotesLocal();
+            saveNotesToCloud();
+            renderNotes();
+        }
+
+        // Update note character count
+        function updateNoteCharCount() {
+            const input = document.getElementById('note-input');
+            const counter = document.getElementById('note-char-count');
+            if (input && counter) {
+                const length = input.value.length;
+                counter.textContent = `${length}/500`;
+
+                if (length > 450) {
+                    counter.style.color = '#EF4444';
+                    counter.style.fontWeight = '600';
+                } else if (length > 400) {
+                    counter.style.color = '#F59E0B';
+                    counter.style.fontWeight = '500';
+                } else {
+                    counter.style.color = '#999';
+                    counter.style.fontWeight = 'normal';
+                }
+            }
+        }
+
+        // Format timestamp
+        function formatTimestamp(isoString) {
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        // Render notes
+        function renderNotes() {
+            const listElement = document.getElementById('notes-list');
+            const countElement = document.getElementById('notes-count');
+
+            // Update count badge
+            if (countElement) {
+                countElement.textContent = notes.length;
+            }
+
+            if (notes.length === 0) {
+                listElement.innerHTML = '<div class="empty-state">No notes yet. Add one above!</div>';
+                return;
+            }
+
+            // Filter by search term
+            let filteredNotes = notes;
+            if (notesSearchTerm) {
+                filteredNotes = notes.filter(n => n.text.toLowerCase().includes(notesSearchTerm));
+            }
+
+            if (filteredNotes.length === 0 && notesSearchTerm) {
+                listElement.innerHTML = '<div class="empty-state">No notes match your search</div>';
+                return;
+            }
+
+            listElement.innerHTML = filteredNotes.map(note => `
+                <div class="note-item" data-id="${note.id}">
+                    <div class="note-content" ondblclick="editNote(${note.id}, this)" title="Double-click to edit">${escapeHtml(note.text)}</div>
+                    <div class="note-footer">
+                        <span class="note-timestamp">${formatTimestamp(note.timestamp)}</span>
+                        <button class="note-delete" onclick="deleteNote(${note.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Handle Enter key in note input
+        function handleNoteKeyPress(event) {
+            if (event.key === 'Enter') {
+                addNote();
+            }
+        }
+
+        // Initialize notes on page load
+        window.addEventListener('load', function() {
+            loadNotes();
+
+            // Character counter for note input
+            const noteInput = document.getElementById('note-input');
+            if (noteInput) {
+                noteInput.addEventListener('input', updateNoteCharCount);
+            }
+
+            // If Firebase is ready, load from cloud
+            if (window.firebaseReady) {
+                loadNotesFromCloud();
+            }
+        });
+
+        // Load notes when Firebase becomes ready
+        const originalOnFirebaseReadyForNotes = window.onFirebaseReady;
+        window.onFirebaseReady = function() {
+            if (originalOnFirebaseReadyForNotes) originalOnFirebaseReadyForNotes();
+            loadNotesFromCloud();
+        };
     </script>
 </body>
 </html>
