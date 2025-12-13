@@ -1323,6 +1323,12 @@
 
     <!-- Firebase SDK -->
     <script type="module">
+        // Disable browser scroll restoration and force scroll to top on page load/refresh
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
         try {
             const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
             const { getFirestore, doc, setDoc, getDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
@@ -1581,20 +1587,22 @@
 
                 // Clear cloud database
                 if (window.firebaseReady && window.db) {
-                    const docRef = window.firestoreDoc(window.db, 'goals', 'GITESH_MAIN_DB');
+                    const cloudDocId = getCloudDocId();
+
+                    const docRef = window.firestoreDoc(window.db, 'goals', cloudDocId);
                     await window.firestoreSetDoc(docRef, {
                         personal: [],
                         professional: [],
                         lastUpdated: new Date().toISOString()
                     });
 
-                    const habitsRef = window.firestoreDoc(window.db, 'habits', 'GITESH_MAIN_DB');
+                    const habitsRef = window.firestoreDoc(window.db, 'habits', cloudDocId);
                     await window.firestoreSetDoc(habitsRef, { habits: {} });
 
-                    const notesRef = window.firestoreDoc(window.db, 'notes', 'GITESH_MAIN_DB');
+                    const notesRef = window.firestoreDoc(window.db, 'notes', cloudDocId);
                     await window.firestoreSetDoc(notesRef, { notes: [] });
 
-                    const weightRef = window.firestoreDoc(window.db, 'weight', 'GITESH_MAIN_DB');
+                    const weightRef = window.firestoreDoc(window.db, 'weight', cloudDocId);
                     await window.firestoreSetDoc(weightRef, { weightData: [] });
                 }
 
@@ -3967,7 +3975,12 @@
                         const labelY = y - labelHeight - 8;
 
                         ctx.beginPath();
-                        ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 4);
+                        // Use roundRect if available, otherwise fallback to regular rect
+                        if (ctx.roundRect) {
+                            ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 4);
+                        } else {
+                            ctx.rect(labelX, labelY, labelWidth, labelHeight);
+                        }
                         ctx.fill();
 
                         ctx.shadowColor = 'transparent';
