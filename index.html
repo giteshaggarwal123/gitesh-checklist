@@ -681,7 +681,6 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 5px;
             }
-        }
 
             .list-section {
                 padding: 8px;
@@ -902,7 +901,7 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')" oninput="updateCharCount('personal')" maxlength="250">
+                    <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')" oninput="updateCharCount('personal')" maxlength="200">
                     <button class="add-btn" onclick="addItem('personal')">Add</button>
                 </div>
                 <div style="text-align: right; font-size: 10px; color: #999; margin-top: 4px;">
@@ -943,7 +942,7 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="professional-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')" oninput="updateCharCount('professional')" maxlength="250">
+                    <input type="text" id="professional-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')" oninput="updateCharCount('professional')" maxlength="200">
                     <button class="add-btn" onclick="addItem('professional')">Add</button>
                 </div>
                 <div style="text-align: right; font-size: 10px; color: #999; margin-top: 4px;">
@@ -1350,9 +1349,11 @@
             }
         }
 
-        // Initialize on page load
+        // Initialize on page load (combined for goals, habits, and notes)
         window.onFirebaseReady = function() {
-            loadFromCloud();
+            loadFromCloud(); // Load goals
+            loadHabitsFromCloud(); // Load habits
+            loadNotesFromCloud(); // Load notes
         };
 
         window.onload = function() {
@@ -1395,7 +1396,16 @@
         };
 
         function handleSearch() {
-            searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            searchTerm = query;
+
+            // Also update notes search
+            const notesSearchInput = document.getElementById('notes-search');
+            if (notesSearchInput) {
+                notesSearchInput.value = query;
+                searchNotes(); // Trigger notes search
+            }
+
             renderList('personal');
             renderList('professional');
         }
@@ -1405,6 +1415,7 @@
                 personal: personalGoals,
                 professional: professionalGoals,
                 dailyHabits: dailyHabits,
+                notes: notes,
                 exportDate: new Date().toISOString()
             };
             const jsonStr = JSON.stringify(data, null, 2);
@@ -1928,6 +1939,17 @@
                             <div style="height: 100%; width: ${habitsRate}%; background: linear-gradient(90deg, var(--success) 0%, #34d399 100%); transition: width 0.3s;"></div>
                         </div>
                     </div>
+
+                    <div style="margin-top: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 13px; color: #666; font-weight: 500;">Quick Notes</span>
+                            <span style="font-size: 12px; color: #999;">${notes.length} note${notes.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div style="text-align: center; padding: 12px; background: #fef3c7; border-radius: 8px; margin-top: 8px;">
+                            <div style="font-size: 20px; font-weight: 600; color: #92400e;">${notes.length}</div>
+                            <div style="font-size: 11px; color: #92400e; margin-top: 4px;">Total Notes</div>
+                        </div>
+                    </div>
                 </div>
             `;
 
@@ -2164,12 +2186,7 @@
             }
         });
 
-        // Load habits when Firebase becomes ready
-        const originalOnFirebaseReady = window.onFirebaseReady;
-        window.onFirebaseReady = function() {
-            if (originalOnFirebaseReady) originalOnFirebaseReady();
-            loadHabitsFromCloud();
-        };
+        // Habits loading is now handled in main onFirebaseReady (line 1354)
 
         // Check for day change every minute
         setInterval(function() {
@@ -2520,12 +2537,7 @@
             }
         });
 
-        // Load notes when Firebase becomes ready
-        const originalOnFirebaseReadyForNotes = window.onFirebaseReady;
-        window.onFirebaseReady = function() {
-            if (originalOnFirebaseReadyForNotes) originalOnFirebaseReadyForNotes();
-            loadNotesFromCloud();
-        };
+        // Notes loading is now handled in main onFirebaseReady (line 1354)
     </script>
 </body>
 </html>
