@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Gitesh Life Tracker v3.0</title>
+    <title>Gitesh Life Tracker v2.1</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='60' fill='white' font-weight='bold'>✓</text></svg>">
     <style>
         * {
@@ -1012,22 +1012,16 @@
 </head>
 <body>
     <div class="container">
-        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v3.0</span></h1>
-        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span> • <strong style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 4px 10px; border-radius: 6px; color: #1565c0;">Account: <span id="sync-id-display" style="font-weight: 700; cursor: pointer;" onclick="showSyncId()" title="Click to view account status">...</span></strong></p>
+        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v2.1</span></h1>
+        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span> • <strong style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 4px 10px; border-radius: 6px; color: #92400e;">Sync ID: <span id="sync-id-display" style="font-weight: 700; cursor: pointer;" onclick="showSyncId()" title="Click to view/change Sync ID">...</span></strong></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
             <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
             <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
-                <button onclick="showSyncId()" style="background: #4285f4; color: white; border: 1px solid #4285f4; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 6px;" title="Sign in with Google for automatic sync">
-                    <svg width="14" height="14" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M47.532 24.5528C47.532 22.9214 47.3997 21.2811 47.1175 19.6761H24.48V28.9181H37.4434C36.9055 31.8988 35.177 34.5356 32.6461 36.2111V42.2078H40.3801C44.9217 38.0278 47.532 31.8547 47.532 24.5528Z" fill="white"/>
-                        <path d="M24.48 48.0016C30.9529 48.0016 36.4116 45.8764 40.3888 42.2078L32.6549 36.2111C30.5031 37.675 27.7252 38.5039 24.4888 38.5039C18.2275 38.5039 12.9187 34.2798 11.0139 28.6006H3.03296V34.7825C7.10718 42.8868 15.4056 48.0016 24.48 48.0016Z" fill="white"/>
-                        <path d="M11.0051 28.6006C9.99973 25.6199 9.99973 22.3922 11.0051 19.4115V13.2296H3.03298C-0.371021 20.0112 -0.371021 28.0009 3.03298 34.7825L11.0051 28.6006Z" fill="white"/>
-                        <path d="M24.48 9.49932C27.9016 9.44641 31.2086 10.7339 33.6866 13.0973L40.5387 6.24523C36.2 2.17101 30.4414 -0.068932 24.48 0.00161733C15.4055 0.00161733 7.10718 5.11644 3.03296 13.2296L11.005 19.4115C12.901 13.7235 18.2187 9.49932 24.48 9.49932Z" fill="white"/>
-                    </svg>
-                    <span>Sign In</span>
-                </button>
+                <button onclick="testSync()" style="background: #51cf66; color: white; border: 1px solid #51cf66; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Test if sync is working between devices">Test Sync</button>
+                <button onclick="forceSync()" style="background: #ff6b6b; color: white; border: 1px solid #ff6b6b; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Force upload or download to sync devices">Force Sync</button>
+                <button onclick="showSyncId()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="View/Set Sync ID for cross-device sync">Sync ID</button>
                 <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Clear all completed goals">Clear Done</button>
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
@@ -1305,7 +1299,6 @@
         try {
             const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
             const { getFirestore, doc, setDoc, getDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
-            const { getAuth, signInAnonymously, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
 
             // Firebase configuration
             const firebaseConfig = {
@@ -1321,49 +1314,17 @@
             // Initialize Firebase
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
-            const auth = getAuth(app);
 
             // Make Firebase available globally
             window.db = db;
-            window.auth = auth;
             window.firestoreDoc = doc;
             window.firestoreSetDoc = setDoc;
             window.firestoreGetDoc = getDoc;
             window.firestoreOnSnapshot = onSnapshot;
-            window.signInAnonymously = signInAnonymously;
-            window.signInWithPopup = signInWithPopup;
-            window.GoogleAuthProvider = GoogleAuthProvider;
             window.firebaseReady = true;
 
-            // Auto sign-in anonymously for seamless experience
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    console.log('✅ Signed in:', user.isAnonymous ? 'Anonymous' : user.email || user.uid);
-                    window.currentUser = user;
-
-                    // Update Sync ID display to show user email or UID
-                    const syncIdDisplay = document.getElementById('sync-id-display');
-                    if (syncIdDisplay) {
-                        if (user.email) {
-                            syncIdDisplay.textContent = user.email;
-                            syncIdDisplay.title = 'Synced via Google Account';
-                        } else {
-                            syncIdDisplay.textContent = user.uid.substr(0, 8).toUpperCase();
-                            syncIdDisplay.title = 'Anonymous Session - Click to sign in with Google';
-                        }
-                    }
-
-                    // Trigger load once user is authenticated
-                    if (window.onFirebaseReady) window.onFirebaseReady();
-                } else {
-                    // No user signed in, sign in anonymously
-                    console.log('🔐 Signing in anonymously...');
-                    signInAnonymously(auth).catch((error) => {
-                        console.error('Anonymous sign-in failed:', error);
-                    });
-                }
-            });
-
+            // Trigger load once Firebase is ready
+            if (window.onFirebaseReady) window.onFirebaseReady();
         } catch (error) {
             console.error('Firebase initialization failed:', error);
             window.firebaseReady = false;
@@ -1378,83 +1339,54 @@
     </script>
 
     <script>
-        // Cloud sync with Firebase Auth - uses authenticated user ID
+        // Cloud sync with Firestore - shared user ID across devices
         function getUserId() {
-            // Use authenticated user's UID (persistent across devices when signed in)
-            if (window.currentUser) {
-                return window.currentUser.uid;
-            }
-            // Fallback to localStorage for offline mode
             let userId = localStorage.getItem('userId');
             if (!userId) {
-                userId = 'offline_' + Math.random().toString(36).substr(2, 9);
+                // Generate a memorable 6-character sync code
+                userId = Math.random().toString(36).substr(2, 6).toUpperCase();
                 localStorage.setItem('userId', userId);
             }
             return userId;
         }
 
-        // Sign in with Google for multi-device sync
-        async function signInWithGoogle() {
-            if (!window.auth || !window.GoogleAuthProvider || !window.signInWithPopup) {
-                alert('Firebase Auth not ready. Please refresh the page.');
-                return;
+        function setSyncId(newId) {
+            if (!newId || newId.length < 4) {
+                alert('Sync ID must be at least 4 characters');
+                return false;
             }
-
-            try {
-                const provider = new window.GoogleAuthProvider();
-                const result = await window.signInWithPopup(window.auth, provider);
-                const user = result.user;
-
-                console.log('✅ Signed in with Google:', user.email);
-                alert(`✅ Signed in with Google!\n\nEmail: ${user.email}\n\nYour data will now sync automatically across all devices where you sign in with this Google account.`);
-
-                // Reload to sync with Google account data
-                location.reload();
-            } catch (error) {
-                console.error('Google sign-in error:', error);
-                if (error.code === 'auth/popup-closed-by-user') {
-                    // User closed popup, ignore
-                } else {
-                    alert(`Sign-in failed: ${error.message}`);
-                }
-            }
+            localStorage.setItem('userId', newId.toUpperCase());
+            alert('Sync ID updated! Please reload the page to sync with new ID.');
+            return true;
         }
 
         function showSyncId() {
-            if (!window.currentUser) {
-                alert('Not signed in yet. Please wait...');
-                return;
-            }
-
-            if (window.currentUser.isAnonymous) {
-                // Anonymous user - offer to sign in with Google
-                const signIn = confirm(
-                    `🔐 ANONYMOUS SESSION\n\n` +
-                    `You're currently using an anonymous session.\n` +
-                    `Your data is saved locally on THIS device only.\n\n` +
-                    `Click OK to sign in with Google for:\n` +
-                    `✅ Automatic sync across ALL devices\n` +
-                    `✅ Never lose your data\n` +
-                    `✅ Access from anywhere\n\n` +
-                    `Click CANCEL to continue with anonymous session.`
-                );
-
-                if (signIn) {
-                    signInWithGoogle();
+            const currentId = getUserId();
+            const message = `🔄 SYNC YOUR DEVICES\n\n` +
+                `Your Current Sync ID: ${currentId}\n\n` +
+                `TO SYNC MOBILE & DESKTOP:\n` +
+                `1. Copy this ID: ${currentId}\n` +
+                `2. Open app on other device\n` +
+                `3. Click "Sync ID" button there\n` +
+                `4. Enter this same ID: ${currentId}\n` +
+                `5. Reload both devices\n\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `To change your Sync ID, enter a new one below\n` +
+                `(at least 4 characters, or leave blank to keep current):`;
+            const newId = prompt(message, currentId);
+            if (newId && newId !== currentId) {
+                if (setSyncId(newId)) {
+                    updateSyncIdDisplay();
+                    location.reload();
                 }
-            } else {
-                // Signed in with Google
-                alert(
-                    `✅ SIGNED IN WITH GOOGLE\n\n` +
-                    `Email: ${window.currentUser.email}\n\n` +
-                    `Your data syncs automatically across all devices where you sign in with this Google account.\n\n` +
-                    `No manual Sync ID needed! Just sign in with the same Google account on other devices.`
-                );
             }
         }
 
         function updateSyncIdDisplay() {
-            // Handled by onAuthStateChanged in Firebase init
+            const displayEl = document.getElementById('sync-id-display');
+            if (displayEl) {
+                displayEl.textContent = getUserId();
+            }
         }
 
         // Debug function to check sync status
@@ -1489,17 +1421,10 @@
                 cloudTotal = 'Firebase not ready';
             }
 
-            const userInfo = window.currentUser ?
-                (window.currentUser.email || `Anonymous (${window.currentUser.uid.substr(0, 8)})`) :
-                'Not signed in';
-
-            const authType = window.currentUser?.isAnonymous ? '⚠️ Anonymous (local only)' : '✅ Google Account';
-
-            const debug = `🔍 SYNC DEBUG INFO v3.0\n\n` +
-                `👤 Authentication:\n` +
-                `User: ${userInfo}\n` +
-                `Type: ${authType}\n` +
-                `User ID: ${getUserId().substr(0, 24)}...\n\n` +
+            const debug = `🔍 SYNC DEBUG INFO\n\n` +
+                `📱 Current Device:\n` +
+                `Sync ID: ${getUserId()}\n` +
+                `Cloud Doc ID: ${getCloudDocId()}\n\n` +
                 `📊 Goals Count:\n` +
                 `In Memory: ${total} (${personal}P + ${professional}P)\n` +
                 `In LocalStorage: ${localPersonal + localProfessional} (${localPersonal}P + ${localProfessional}P)\n` +
@@ -1508,10 +1433,14 @@
                 `Firebase Ready: ${window.firebaseReady ? '✅ YES' : '❌ NO'}\n` +
                 `Firebase DB: ${window.db ? '✅ Connected' : '❌ Not Connected'}\n` +
                 `Online: ${navigator.onLine ? '✅ YES' : '❌ NO'}\n\n` +
-                `💡 TO SYNC ACROSS DEVICES:\n` +
-                `Click the blue "Sign In" button and sign in\n` +
-                `with the SAME Google account on all devices.\n` +
-                `Your data will sync automatically!`;
+                `❗ MISMATCH DETECTED!\n` +
+                `Your devices have DIFFERENT Sync IDs!\n\n` +
+                `💡 TO FIX:\n` +
+                `1. Open BOTH devices side-by-side\n` +
+                `2. Pick ONE Sync ID to use\n` +
+                `3. Click "Sync ID" button on BOTH devices\n` +
+                `4. Enter the SAME ID on both\n` +
+                `5. Click "Force Sync" button below`;
 
             alert(debug);
         }
@@ -2081,11 +2010,9 @@
             // Show version and sync info on load (for debugging)
             console.log(`
 ╔════════════════════════════════════════╗
-║   Gitesh Life Tracker v3.0 LOADED     ║
-║   🎉 NOW WITH GOOGLE AUTH!            ║
+║   Gitesh Life Tracker v2.1 LOADED     ║
 ╠════════════════════════════════════════╣
-║  User: ${window.currentUser ? (window.currentUser.email || 'Anonymous') : 'Not signed in'}
-║  UID: ${getUserId().substr(0, 20)}...
+║  Sync ID: ${getUserId()}
 ║  Goals: ${personalGoals.length}P + ${professionalGoals.length}P = ${personalGoals.length + professionalGoals.length} total
 ║  Firebase: ${window.firebaseReady ? '✅ Ready' : '❌ Not Ready'}
 ║  Online: ${navigator.onLine ? '✅ YES' : '❌ NO'}
