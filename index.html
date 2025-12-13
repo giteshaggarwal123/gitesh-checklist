@@ -1184,11 +1184,11 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')" oninput="updateCharCount('personal')" maxlength="200">
+                    <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')" oninput="updateCharCount('personal')">
                     <button class="add-btn" onclick="addItem('personal')">Add</button>
                 </div>
                 <div style="text-align: right; font-size: 10px; color: #999; margin-top: 4px;">
-                    <span id="personal-char-count">0/200</span>
+                    <span id="personal-char-count">0 chars</span>
                 </div>
 
                 <ul class="checklist" id="personal-list">
@@ -1225,11 +1225,11 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="professional-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')" oninput="updateCharCount('professional')" maxlength="200">
+                    <input type="text" id="professional-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')" oninput="updateCharCount('professional')">
                     <button class="add-btn" onclick="addItem('professional')">Add</button>
                 </div>
                 <div style="text-align: right; font-size: 10px; color: #999; margin-top: 4px;">
-                    <span id="professional-char-count">0/200</span>
+                    <span id="professional-char-count">0 chars</span>
                 </div>
 
                 <ul class="checklist" id="professional-list">
@@ -1346,9 +1346,9 @@
         let professionalGoals = JSON.parse(localStorage.getItem('professionalGoals')) || [];
         let idCounter = Date.now();
 
-        // Generate unique ID
+        // Generate unique ID with collision prevention
         function generateId() {
-            return idCounter++;
+            return idCounter++ + '_' + Math.random().toString(36).substr(2, 9);
         }
 
         // Escape HTML to prevent XSS
@@ -1381,19 +1381,9 @@
             const counter = document.getElementById(`${type}-char-count`);
             if (input && counter) {
                 const length = input.value.length;
-                counter.textContent = `${length}/200`;
-
-                // Change color if approaching limit
-                if (length > 180) {
-                    counter.style.color = '#EF4444';
-                    counter.style.fontWeight = '600';
-                } else if (length > 150) {
-                    counter.style.color = '#F59E0B';
-                    counter.style.fontWeight = '500';
-                } else {
-                    counter.style.color = '#999';
-                    counter.style.fontWeight = 'normal';
-                }
+                counter.textContent = `${length} chars`;
+                counter.style.color = '#999';
+                counter.style.fontWeight = 'normal';
             }
         }
 
@@ -1853,6 +1843,7 @@
                         }
                         if (data.weightData && Array.isArray(data.weightData)) {
                             weightData = data.weightData;
+                            sortWeightData(); // Ensure data is sorted
                             saveWeightLocal();
                             saveWeightToCloud();
                             renderWeightTracker();
@@ -2021,12 +2012,6 @@
             const saveEdit = () => {
                 const newText = input.value.trim().toLowerCase();
                 if (newText && newText !== currentText) {
-                    // Check length
-                    if (newText.length > 200) {
-                        alert('Goal is too long! Please keep it under 200 characters.');
-                        return;
-                    }
-
                     // Check for duplicates
                     const goals = type === 'personal' ? personalGoals : professionalGoals;
                     const duplicate = goals.find(g => g.text === newText && g.id !== goal.id);
@@ -2035,6 +2020,7 @@
                         return;
                     }
 
+                    saveUndoState(); // Save state for undo
                     goal.text = newText;
                     saveData(type);
                 }
@@ -2645,9 +2631,9 @@
         let noteIdCounter = Date.now();
         let notesExpanded = false; // Default collapsed
 
-        // Generate unique ID for notes
+        // Generate unique ID for notes with collision prevention
         function generateNoteId() {
-            return noteIdCounter++;
+            return noteIdCounter++ + '_' + Math.random().toString(36).substr(2, 9);
         }
 
         // Toggle notes section expand/collapse
@@ -2979,12 +2965,18 @@
         let weightData = [];
         let weightExpanded = false; // Default collapsed
 
+        // Sort weight data by date (newest first)
+        function sortWeightData() {
+            weightData.sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
         // Load weight data from localStorage
         function loadWeightData() {
             const stored = localStorage.getItem('weightData');
             if (stored) {
                 try {
                     weightData = JSON.parse(stored);
+                    sortWeightData(); // Ensure data is sorted
                 } catch (error) {
                     console.error('Error parsing weight data:', error);
                     weightData = [];
@@ -3028,6 +3020,7 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     weightData = data.weightData || [];
+                    sortWeightData(); // Ensure data is sorted
                     saveWeightLocal();
                     renderWeightTracker();
                     console.log('✅ Loaded weight from cloud');
@@ -3040,6 +3033,7 @@
                     if (doc.exists()) {
                         const data = doc.data();
                         weightData = data.weightData || [];
+                        sortWeightData(); // Ensure data is sorted
                         renderWeightTracker();
                         console.log('🔄 Weight synced from cloud');
                     }
