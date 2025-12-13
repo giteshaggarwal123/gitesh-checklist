@@ -303,6 +303,113 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
+        /* Weight Tracker */
+        .weight-tracker {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .weight-tracker:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .weight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .weight-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .weight-log {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .weight-log::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .weight-log::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .weight-log::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .weight-log::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        .weight-entry {
+            background: #fafafa;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.15s;
+        }
+
+        .weight-entry:hover {
+            background: #f5f5f5;
+            border-color: #ddd;
+        }
+
+        .weight-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .weight-date {
+            font-size: 11px;
+            color: #999;
+            margin-left: 8px;
+        }
+
+        .weight-delete {
+            background: transparent;
+            color: #dc3545;
+            border: 1px solid transparent;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            opacity: 0;
+            transition: all 0.15s;
+            font-weight: 500;
+        }
+
+        .weight-entry:hover .weight-delete {
+            opacity: 1;
+        }
+
+        .weight-delete:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
         /* Notes Section */
         .notes-section {
             background: white;
@@ -850,6 +957,40 @@
             </div>
         </div>
 
+        <!-- Weight Tracker -->
+        <div class="weight-tracker">
+            <div class="weight-header">
+                <h3 class="weight-title">Weight Tracker <span id="weight-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0 logs</span></h3>
+                <button class="recommend-btn" onclick="toggleWeightSection()" id="weight-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+            </div>
+
+            <div id="weight-content" style="overflow: hidden; transition: max-height 0.3s ease-out;">
+                <div class="input-group" style="margin-bottom: 12px; margin-top: 12px;">
+                    <input type="number" id="weight-input" placeholder="Enter weight (kg)" step="0.1" min="0" max="300" onkeypress="handleWeightKeyPress(event)" style="flex: 1; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                    <button class="add-btn" onclick="addWeight()" style="padding: 10px 18px;">Log Weight</button>
+                </div>
+
+                <div id="weight-stats" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                    <div style="text-align: center; padding: 10px; background: #f0f9ff; border-radius: 6px; border: 1px solid #e0f2fe;">
+                        <div style="font-size: 18px; font-weight: 600; color: #0369a1;" id="current-weight">--</div>
+                        <div style="font-size: 10px; color: #0369a1; margin-top: 2px;">Current</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: #f0fdf4; border-radius: 6px; border: 1px solid #dcfce7;">
+                        <div style="font-size: 18px; font-weight: 600; color: #15803d;" id="weight-change">--</div>
+                        <div style="font-size: 10px; color: #15803d; margin-top: 2px;">Change</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: #fef3c7; border-radius: 6px; border: 1px solid #fde68a;">
+                        <div style="font-size: 18px; font-weight: 600; color: #92400e;" id="start-weight">--</div>
+                        <div style="font-size: 10px; color: #92400e; margin-top: 2px;">Start</div>
+                    </div>
+                </div>
+
+                <canvas id="weight-chart" width="600" height="150" style="width: 100%; height: 150px; background: #fafafa; border-radius: 8px; border: 1px solid #e8e8e8; margin-bottom: 12px;"></canvas>
+
+                <div id="weight-log" class="weight-log"></div>
+            </div>
+        </div>
+
         <!-- Notes Section -->
         <div class="notes-section">
             <div class="notes-header" onclick="toggleNotesSection()" style="cursor: pointer;" title="Click to expand/collapse">
@@ -1349,11 +1490,12 @@
             }
         }
 
-        // Initialize on page load (combined for goals, habits, and notes)
+        // Initialize on page load (combined for goals, habits, notes, and weight)
         window.onFirebaseReady = function() {
             loadFromCloud(); // Load goals
             loadHabitsFromCloud(); // Load habits
             loadNotesFromCloud(); // Load notes
+            loadWeightFromCloud(); // Load weight
         };
 
         window.onload = function() {
@@ -1416,6 +1558,7 @@
                 professional: professionalGoals,
                 dailyHabits: dailyHabits,
                 notes: notes,
+                weightData: weightData,
                 exportDate: new Date().toISOString()
             };
             const jsonStr = JSON.stringify(data, null, 2);
@@ -1461,7 +1604,7 @@
                         return;
                     }
 
-                    if (confirm('This will replace your current goals, habits, and sync to cloud. Continue?')) {
+                    if (confirm('This will replace your current goals, habits, notes, weight data and sync to cloud. Continue?')) {
                         saveUndoState(); // Allow undo
                         personalGoals = data.personal || [];
                         professionalGoals = data.professional || [];
@@ -1471,12 +1614,18 @@
                             saveHabitsToCloud();
                             renderHabits();
                         }
+                        if (data.weightData && Array.isArray(data.weightData)) {
+                            weightData = data.weightData;
+                            saveWeightLocal();
+                            saveWeightToCloud();
+                            renderWeightTracker();
+                        }
                         saveData('personal');
                         saveData('professional');
                         renderList('personal');
                         renderList('professional');
                         // Cloud sync happens automatically via saveData
-                        alert('Goals and habits imported and synced to cloud successfully!');
+                        alert('All data imported and synced to cloud successfully!');
                     }
                 } catch (error) {
                     alert('Error importing file: ' + error.message);
@@ -2538,6 +2687,334 @@
         });
 
         // Notes loading is now handled in main onFirebaseReady (line 1354)
+
+        // ============ WEIGHT TRACKER ============
+        let weightData = [];
+        let weightExpanded = true;
+
+        // Load weight data from localStorage
+        function loadWeightData() {
+            const stored = localStorage.getItem('weightData');
+            if (stored) {
+                try {
+                    weightData = JSON.parse(stored);
+                } catch (error) {
+                    console.error('Error parsing weight data:', error);
+                    weightData = [];
+                }
+            }
+            renderWeightTracker();
+        }
+
+        // Save weight data to localStorage
+        function saveWeightLocal() {
+            localStorage.setItem('weightData', JSON.stringify(weightData));
+        }
+
+        // Save weight to cloud
+        async function saveWeightToCloud() {
+            if (!window.firebaseReady || !window.db) return;
+
+            try {
+                const docRef = window.firestoreDoc(window.db, 'weight', CLOUD_DOC_ID);
+                await window.firestoreSetDoc(docRef, {
+                    weightData: weightData,
+                    lastUpdated: new Date().toISOString()
+                });
+                console.log('Weight data synced to cloud');
+            } catch (error) {
+                console.error('Error saving weight to cloud:', error);
+            }
+        }
+
+        // Load weight from cloud
+        async function loadWeightFromCloud() {
+            if (!window.firebaseReady || !window.db) {
+                console.log('Firebase not ready for weight');
+                return;
+            }
+
+            try {
+                const docRef = window.firestoreDoc(window.db, 'weight', CLOUD_DOC_ID);
+                const docSnap = await window.firestoreGetDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    weightData = data.weightData || [];
+                    saveWeightLocal();
+                    renderWeightTracker();
+                    console.log('✅ Loaded weight from cloud');
+                } else {
+                    await saveWeightToCloud();
+                }
+
+                // Listen for real-time updates
+                window.firestoreOnSnapshot(docRef, (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        weightData = data.weightData || [];
+                        renderWeightTracker();
+                        console.log('🔄 Weight synced from cloud');
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading weight from cloud:', error);
+            }
+        }
+
+        // Toggle weight section
+        function toggleWeightSection() {
+            weightExpanded = !weightExpanded;
+            const content = document.getElementById('weight-content');
+            const toggleBtn = document.getElementById('weight-toggle-btn');
+
+            if (weightExpanded) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                toggleBtn.textContent = '▼';
+            } else {
+                content.style.maxHeight = '0px';
+                toggleBtn.textContent = '▶';
+            }
+
+            localStorage.setItem('weightExpanded', weightExpanded);
+        }
+
+        // Initialize weight section state
+        function initWeightSection() {
+            const saved = localStorage.getItem('weightExpanded');
+            if (saved !== null) {
+                weightExpanded = saved === 'true';
+            }
+
+            const content = document.getElementById('weight-content');
+            const toggleBtn = document.getElementById('weight-toggle-btn');
+
+            if (weightExpanded) {
+                content.style.maxHeight = 'none';
+                const height = content.scrollHeight;
+                content.style.maxHeight = '0px';
+                setTimeout(() => {
+                    content.style.maxHeight = height + 'px';
+                }, 10);
+                toggleBtn.textContent = '▼';
+            } else {
+                content.style.maxHeight = '0px';
+                toggleBtn.textContent = '▶';
+            }
+        }
+
+        // Add weight entry
+        function addWeight() {
+            const input = document.getElementById('weight-input');
+            const weight = parseFloat(input.value);
+
+            if (!weight || weight <= 0 || weight > 300) {
+                alert('Please enter a valid weight between 0 and 300 kg');
+                return;
+            }
+
+            const today = getTodayDate();
+
+            // Check if already logged today
+            const existingIndex = weightData.findIndex(entry => entry.date === today);
+            if (existingIndex !== -1) {
+                if (!confirm('You already logged weight today. Update it?')) return;
+                weightData[existingIndex].weight = weight;
+            } else {
+                weightData.unshift({
+                    date: today,
+                    weight: weight,
+                    timestamp: new Date().toISOString()
+                });
+            }
+
+            saveWeightLocal();
+            saveWeightToCloud();
+            renderWeightTracker();
+            input.value = '';
+        }
+
+        // Delete weight entry
+        function deleteWeight(date) {
+            if (!confirm('Delete this weight entry?')) return;
+            weightData = weightData.filter(entry => entry.date !== date);
+            saveWeightLocal();
+            saveWeightToCloud();
+            renderWeightTracker();
+        }
+
+        // Render weight tracker
+        function renderWeightTracker() {
+            // Update count
+            const countEl = document.getElementById('weight-count');
+            if (countEl) {
+                countEl.textContent = `${weightData.length} log${weightData.length !== 1 ? 's' : ''}`;
+            }
+
+            // Update stats
+            if (weightData.length > 0) {
+                const current = weightData[0].weight;
+                const start = weightData[weightData.length - 1].weight;
+                const change = current - start;
+
+                document.getElementById('current-weight').textContent = `${current} kg`;
+                document.getElementById('start-weight').textContent = `${start} kg`;
+
+                const changeEl = document.getElementById('weight-change');
+                const changeText = change > 0 ? `+${change.toFixed(1)}` : change.toFixed(1);
+                changeEl.textContent = `${changeText} kg`;
+                changeEl.style.color = change > 0 ? '#dc2626' : change < 0 ? '#15803d' : '#666';
+                changeEl.parentElement.style.background = change > 0 ? '#fee2e2' : change < 0 ? '#f0fdf4' : '#f8f9fa';
+                changeEl.parentElement.style.borderColor = change > 0 ? '#fecaca' : change < 0 ? '#dcfce7' : '#e8e8e8';
+            } else {
+                document.getElementById('current-weight').textContent = '--';
+                document.getElementById('start-weight').textContent = '--';
+                document.getElementById('weight-change').textContent = '--';
+            }
+
+            // Render chart
+            renderWeightChart();
+
+            // Render log
+            const logEl = document.getElementById('weight-log');
+            if (weightData.length === 0) {
+                logEl.innerHTML = '<div class="empty-state">No weight entries yet. Log your weight above!</div>';
+                return;
+            }
+
+            logEl.innerHTML = weightData.slice(0, 7).map(entry => {
+                const date = new Date(entry.date);
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                return `
+                    <div class="weight-entry">
+                        <div>
+                            <span class="weight-value">${entry.weight} kg</span>
+                            <span class="weight-date">${formattedDate}</span>
+                        </div>
+                        <button class="weight-delete" onclick="deleteWeight('${entry.date}')">Delete</button>
+                    </div>
+                `;
+            }).join('');
+
+            // Update max-height if expanded
+            if (weightExpanded) {
+                const content = document.getElementById('weight-content');
+                if (content) {
+                    setTimeout(() => {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }, 10);
+                }
+            }
+        }
+
+        // Render weight chart
+        function renderWeightChart() {
+            const canvas = document.getElementById('weight-chart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            if (weightData.length === 0) {
+                ctx.fillStyle = '#999';
+                ctx.font = '14px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data to display', width / 2, height / 2);
+                return;
+            }
+
+            // Get last 30 days or all data
+            const chartData = weightData.slice(0, 30).reverse();
+            const weights = chartData.map(e => e.weight);
+            const minWeight = Math.min(...weights);
+            const maxWeight = Math.max(...weights);
+            const range = maxWeight - minWeight || 1;
+
+            const padding = 40;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+
+            // Draw grid lines
+            ctx.strokeStyle = '#e8e8e8';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+
+                // Y-axis labels
+                const weight = maxWeight - (range / 5) * i;
+                ctx.fillStyle = '#999';
+                ctx.font = '10px -apple-system, sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText(weight.toFixed(1), padding - 5, y + 3);
+            }
+
+            // Draw line chart
+            if (chartData.length > 1) {
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+
+                chartData.forEach((entry, i) => {
+                    const x = padding + (chartWidth / (chartData.length - 1)) * i;
+                    const y = padding + chartHeight - ((entry.weight - minWeight) / range) * chartHeight;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+
+                ctx.stroke();
+
+                // Draw points
+                chartData.forEach((entry, i) => {
+                    const x = padding + (chartWidth / (chartData.length - 1)) * i;
+                    const y = padding + chartHeight - ((entry.weight - minWeight) / range) * chartHeight;
+
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Show date for first and last point
+                    if (i === 0 || i === chartData.length - 1) {
+                        const date = new Date(entry.date);
+                        const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                        ctx.fillStyle = '#666';
+                        ctx.font = '10px -apple-system, sans-serif';
+                        ctx.textAlign = i === 0 ? 'left' : 'right';
+                        ctx.fillText(label, x, height - 10);
+                    }
+                });
+            }
+        }
+
+        // Handle Enter key in weight input
+        function handleWeightKeyPress(event) {
+            if (event.key === 'Enter') {
+                addWeight();
+            }
+        }
+
+        // Initialize weight tracker on page load
+        window.addEventListener('load', function() {
+            loadWeightData();
+            initWeightSection();
+
+            if (window.firebaseReady) {
+                loadWeightFromCloud();
+            }
+        });
     </script>
 </body>
 </html>
