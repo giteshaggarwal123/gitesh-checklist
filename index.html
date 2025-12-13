@@ -1541,6 +1541,68 @@
             renderList(type);
         }
 
+        // Merge goals from two sources (prevents data loss)
+        function mergeGoals(local, cloud) {
+            const merged = [...cloud];
+            const cloudIds = new Set(cloud.map(g => g.id));
+
+            // Add local goals that don't exist in cloud
+            local.forEach(goal => {
+                if (!cloudIds.has(goal.id)) {
+                    merged.push(goal);
+                }
+            });
+
+            return merged;
+        }
+
+        // Merge habits from two sources
+        function mergeHabits(local, cloud) {
+            const merged = {...cloud};
+
+            // Merge each date's habits
+            Object.keys(local).forEach(date => {
+                if (!merged[date]) {
+                    merged[date] = local[date];
+                } else {
+                    // Merge habits for this date (prefer local if conflict)
+                    merged[date] = {...merged[date], ...local[date]};
+                }
+            });
+
+            return merged;
+        }
+
+        // Merge notes from two sources
+        function mergeNotes(local, cloud) {
+            const merged = [...cloud];
+            const cloudIds = new Set(cloud.map(n => n.id));
+
+            // Add local notes that don't exist in cloud
+            local.forEach(note => {
+                if (!cloudIds.has(note.id)) {
+                    merged.push(note);
+                }
+            });
+
+            return merged;
+        }
+
+        // Merge weight data from two sources
+        function mergeWeightData(local, cloud) {
+            const merged = [...cloud];
+            const cloudDates = new Set(cloud.map(w => w.date));
+
+            // Add local weight entries that don't exist in cloud
+            local.forEach(entry => {
+                if (!cloudDates.has(entry.date)) {
+                    merged.push(entry);
+                }
+            });
+
+            return merged;
+        }
+
         // Cloud sync functions
         async function loadFromCloud() {
             if (!window.firebaseReady || !window.db) {
@@ -1555,8 +1617,16 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     isLoadingFromCloud = true;
-                    personalGoals = data.personal || [];
-                    professionalGoals = data.professional || [];
+
+                    // MERGE instead of overwrite to prevent data loss
+                    const cloudPersonal = data.personal || [];
+                    const cloudProfessional = data.professional || [];
+
+                    personalGoals = mergeGoals(personalGoals, cloudPersonal);
+                    professionalGoals = mergeGoals(professionalGoals, cloudProfessional);
+
+                    // Save merged data back to cloud
+                    await saveToCloud();
 
                     // Also save to localStorage as backup
                     localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
@@ -1566,7 +1636,7 @@
                     renderList('professional');
                     updatePageTitle();
                     isLoadingFromCloud = false;
-                    console.log('✅ Loaded from cloud');
+                    console.log('✅ Loaded and merged from cloud');
                 } else {
                     // No cloud data, upload current local data
                     await saveToCloud();
@@ -2508,7 +2578,13 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    dailyHabits = data.habits || {};
+                    const cloudHabits = data.habits || {};
+
+                    // MERGE instead of overwrite to prevent data loss
+                    dailyHabits = mergeHabits(dailyHabits, cloudHabits);
+
+                    // Save merged data back to cloud
+                    await saveHabitsToCloud();
 
                     // Ensure today exists and all habits are initialized
                     const today = getTodayDate();
@@ -2525,7 +2601,7 @@
 
                     saveHabitsLocal();
                     renderHabits();
-                    console.log('✅ Loaded habits from cloud');
+                    console.log('✅ Loaded and merged habits from cloud');
                 } else {
                     // No cloud data, upload current local data
                     await saveHabitsToCloud();
@@ -2784,10 +2860,17 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    notes = data.notes || [];
+                    const cloudNotes = data.notes || [];
+
+                    // MERGE instead of overwrite to prevent data loss
+                    notes = mergeNotes(notes, cloudNotes);
+
+                    // Save merged data back to cloud
+                    await saveNotesToCloud();
+
                     saveNotesLocal();
                     renderNotes();
-                    console.log('✅ Loaded notes from cloud');
+                    console.log('✅ Loaded and merged notes from cloud');
                 } else {
                     await saveNotesToCloud();
                 }
@@ -3086,11 +3169,19 @@
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    weightData = data.weightData || [];
+                    const cloudWeight = data.weightData || [];
+
+                    // MERGE instead of overwrite to prevent data loss
+                    weightData = mergeWeightData(weightData, cloudWeight);
+
                     sortWeightData(); // Ensure data is sorted
+
+                    // Save merged data back to cloud
+                    await saveWeightToCloud();
+
                     saveWeightLocal();
                     renderWeightTracker();
-                    console.log('✅ Loaded weight from cloud');
+                    console.log('✅ Loaded and merged weight from cloud');
                 } else {
                     await saveWeightToCloud();
                 }
