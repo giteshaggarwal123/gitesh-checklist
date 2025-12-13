@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Gitesh Life Tracker v3.1</title>
+    <title>Gitesh Life Tracker v4.0</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='60' fill='white' font-weight='bold'>✓</text></svg>">
     <style>
         * {
@@ -1012,16 +1012,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v3.1</span></h1>
-        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span> • <strong style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 4px 10px; border-radius: 6px; color: #92400e;">📱💻 Code: <span id="sync-id-display" style="font-weight: 700; cursor: pointer;" onclick="showSyncId()" title="Click to view/change your sync code">...</span></strong></p>
+        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v4.0</span></h1>
+        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">☁️ Auto-Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
             <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
             <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
-                <button onclick="testSync()" style="background: #51cf66; color: white; border: 1px solid #51cf66; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Test if sync is working between devices">Test Sync</button>
-                <button onclick="forceSync()" style="background: #ff6b6b; color: white; border: 1px solid #ff6b6b; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Force upload or download to sync devices">Force Sync</button>
-                <button onclick="showSyncId()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="View/Set Sync ID for cross-device sync">Sync ID</button>
                 <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Clear all completed goals">Clear Done</button>
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
@@ -1339,37 +1336,11 @@
     </script>
 
     <script>
-        // Cloud sync with Firestore - ONE simple sync code
+        // ONE DATABASE FOR ALL DEVICES - Personal app for Gitesh
         function getUserId() {
-            let userId = localStorage.getItem('userId');
-            if (!userId) {
-                // First time - ask user to create a sync code
-                userId = prompt(
-                    `🎉 WELCOME TO GITESH LIFE TRACKER!\n\n` +
-                    `To sync across mobile & desktop, create a simple sync code.\n\n` +
-                    `Examples:\n` +
-                    `• Your name: "GITESH"\n` +
-                    `• Simple word: "GOALS2025"\n` +
-                    `• Any code: "MYLIFE"\n\n` +
-                    `⚠️ REMEMBER THIS CODE!\n` +
-                    `You'll need to enter the SAME code on all your devices.\n\n` +
-                    `Enter your sync code (4+ characters):`,
-                    ''
-                );
-
-                if (!userId || userId.trim().length < 4) {
-                    // Generate fallback if user cancels
-                    userId = 'USER' + Math.random().toString(36).substr(2, 4).toUpperCase();
-                    alert(`No code entered. Generated: ${userId}\n\nYou can change it anytime by clicking the yellow "Sync Code" box.`);
-                }
-
-                userId = userId.trim().toUpperCase();
-                localStorage.setItem('userId', userId);
-
-                // Show confirmation
-                alert(`✅ Sync Code Set: ${userId}\n\n📱 On mobile: Enter this SAME code\n💻 On desktop: Enter this SAME code\n\n🔄 Your data will sync automatically!`);
-            }
-            return userId;
+            // FIXED ID - same on ALL devices (mobile, desktop, any browser)
+            // This ensures ONE database with same data everywhere
+            return 'GITESH_MAIN_DB';
         }
 
         function setSyncId(newId) {
