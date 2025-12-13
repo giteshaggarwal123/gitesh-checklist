@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gitesh Goal Recommendation System</title>
+    <title>Gitesh Life Tracker</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='60' fill='white' font-weight='bold'>✓</text></svg>">
     <style>
         * {
@@ -598,6 +598,14 @@
             margin-bottom: 2px;
         }
 
+        .habit-streak {
+            font-size: 8px;
+            color: #f59e0b;
+            font-weight: 700;
+            display: inline-block;
+            margin-left: 2px;
+        }
+
         .habit-check {
             opacity: 0;
             font-size: 14px;
@@ -894,7 +902,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Gitesh Goal Recommendation System</h1>
+        <h1>Gitesh Life Tracker</h1>
         <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
@@ -920,39 +928,39 @@
             <div class="habits-grid" role="group" aria-label="Daily habits tracker">
                 <button class="habit-btn" onclick="toggleHabit('water')" id="habit-water" aria-label="3L Water daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">3L Water</span>
+                    <span class="habit-text">3L Water <span class="habit-streak" id="streak-water"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('workout')" id="habit-workout" aria-label="Workout or steps daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">Workout / Steps</span>
+                    <span class="habit-text">Workout / Steps <span class="habit-streak" id="streak-workout"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('temple')" id="habit-temple" aria-label="Temple or mindset daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">Temple / Mindset</span>
+                    <span class="habit-text">Temple / Mindset <span class="habit-streak" id="streak-temple"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('meditation')" id="habit-meditation" aria-label="Meditation daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">Meditation</span>
+                    <span class="habit-text">Meditation <span class="habit-streak" id="streak-meditation"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('noBadHabits')" id="habit-noBadHabits" aria-label="No bad habits daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">No Bad Habits</span>
+                    <span class="habit-text">No Bad Habits <span class="habit-streak" id="streak-noBadHabits"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('learning')" id="habit-learning" aria-label="Audiobook or learning daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">Audiobook / Learning</span>
+                    <span class="habit-text">Audiobook / Learning <span class="habit-streak" id="streak-learning"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('protein')" id="habit-protein" aria-label="High-protein diet daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">High-Protein Diet</span>
+                    <span class="habit-text">High-Protein Diet <span class="habit-streak" id="streak-protein"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('skincare')" id="habit-skincare" aria-label="Skincare daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">Skincare</span>
+                    <span class="habit-text">Skincare <span class="habit-streak" id="streak-skincare"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('supplements')" id="habit-supplements" aria-label="Supplements daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">Supplements</span>
+                    <span class="habit-text">Supplements <span class="habit-streak" id="streak-supplements"></span></span>
                 </button>
             </div>
         </div>
@@ -1233,7 +1241,7 @@
             if (total > 0 || completedHabits > 0) {
                 document.title = `(${completed}/${total} goals, ${completedHabits}/9 habits) Gitesh`;
             } else {
-                document.title = 'Gitesh Goal Recommendation System';
+                document.title = 'Gitesh Life Tracker';
             }
         }
 
@@ -2278,6 +2286,22 @@
             }
         }
 
+        // Calculate habit streak
+        function calculateStreak(habitName) {
+            let streak = 0;
+            const dates = Object.keys(dailyHabits).sort().reverse(); // Most recent first
+
+            for (const date of dates) {
+                if (dailyHabits[date][habitName] === true) {
+                    streak++;
+                } else {
+                    break; // Streak broken
+                }
+            }
+
+            return streak;
+        }
+
         // Toggle habit completion
         function toggleHabit(habitName) {
             const today = getTodayDate();
@@ -2334,6 +2358,17 @@
                     } else {
                         btn.classList.remove('completed');
                     }
+
+                    // Update streak display
+                    const streakEl = document.getElementById(`streak-${habitName}`);
+                    if (streakEl) {
+                        const streak = calculateStreak(habitName);
+                        if (streak > 0) {
+                            streakEl.textContent = `🔥${streak}`;
+                        } else {
+                            streakEl.textContent = '';
+                        }
+                    }
                 }
             });
 
@@ -2381,7 +2416,7 @@
         let notes = [];
         let notesSearchTerm = '';
         let noteIdCounter = Date.now();
-        let notesExpanded = true; // Default to expanded
+        let notesExpanded = false; // Default collapsed
 
         // Generate unique ID for notes
         function generateNoteId() {
@@ -2721,7 +2756,7 @@
 
         // ============ WEIGHT TRACKER ============
         let weightData = [];
-        let weightExpanded = true;
+        let weightExpanded = false; // Default collapsed
 
         // Load weight data from localStorage
         function loadWeightData() {
@@ -2865,6 +2900,27 @@
             input.value = '';
         }
 
+        // Edit weight entry
+        function editWeight(date, currentWeight) {
+            const newWeight = prompt(`Edit weight for ${date}:`, currentWeight);
+            if (newWeight === null) return; // Cancelled
+
+            const weight = parseFloat(newWeight);
+            if (!weight || weight <= 0 || weight > 300) {
+                alert('Please enter a valid weight between 0 and 300 kg');
+                return;
+            }
+
+            const entry = weightData.find(e => e.date === date);
+            if (entry) {
+                entry.weight = weight;
+                entry.timestamp = new Date().toISOString(); // Update timestamp
+                saveWeightLocal();
+                saveWeightToCloud();
+                renderWeightTracker();
+            }
+        }
+
         // Delete weight entry
         function deleteWeight(date) {
             if (!confirm('Delete this weight entry?')) return;
@@ -2936,7 +2992,7 @@
 
                 return `
                     <div class="weight-entry">
-                        <div>
+                        <div ondblclick="editWeight('${entry.date}', ${entry.weight})" style="cursor: pointer; flex: 1;" title="Double-click to edit">
                             <span class="weight-value">${entry.weight} kg</span>
                             <span class="weight-date">${formattedDate}</span>
                         </div>
