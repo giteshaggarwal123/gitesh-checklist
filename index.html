@@ -1019,12 +1019,12 @@
             <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
             <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
+                <button onclick="resetEverything()" style="background: #dc3545; color: white; border: 1px solid #dc3545; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Delete all data and start fresh">🗑️ Reset All</button>
                 <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Clear all completed goals">Clear Done</button>
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
                 <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Upload backup JSON">Import</button>
                 <button onclick="showHelp()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Keyboard shortcuts">?</button>
-                <button onclick="showSyncDebug()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Debug sync status">🔍</button>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
             </div>
         </div>
@@ -1519,6 +1519,61 @@
         // Get current cloud doc ID (dynamic, always reads latest from localStorage)
         function getCloudDocId() {
             return getUserId();
+        }
+
+        // RESET EVERYTHING - Clear all data and start fresh
+        async function resetEverything() {
+            const confirm1 = confirm(
+                '⚠️ RESET EVERYTHING?\n\n' +
+                'This will DELETE:\n' +
+                '• All goals (personal & professional)\n' +
+                '• All habits\n' +
+                '• All notes\n' +
+                '• All weight data\n' +
+                '• Cloud database\n\n' +
+                'This CANNOT be undone!\n\n' +
+                'Click OK to continue, CANCEL to abort.'
+            );
+
+            if (!confirm1) return;
+
+            const confirm2 = confirm(
+                '⚠️ FINAL WARNING!\n\n' +
+                'Are you ABSOLUTELY SURE?\n\n' +
+                'All your data will be permanently deleted!'
+            );
+
+            if (!confirm2) return;
+
+            try {
+                // Clear localStorage
+                localStorage.clear();
+
+                // Clear cloud database
+                if (window.firebaseReady && window.db) {
+                    const docRef = window.firestoreDoc(window.db, 'goals', 'GITESH_MAIN_DB');
+                    await window.firestoreSetDoc(docRef, {
+                        personal: [],
+                        professional: [],
+                        lastUpdated: new Date().toISOString()
+                    });
+
+                    const habitsRef = window.firestoreDoc(window.db, 'habits', 'GITESH_MAIN_DB');
+                    await window.firestoreSetDoc(habitsRef, { habits: {} });
+
+                    const notesRef = window.firestoreDoc(window.db, 'notes', 'GITESH_MAIN_DB');
+                    await window.firestoreSetDoc(notesRef, { notes: [] });
+
+                    const weightRef = window.firestoreDoc(window.db, 'weight', 'GITESH_MAIN_DB');
+                    await window.firestoreSetDoc(weightRef, { weightData: [] });
+                }
+
+                alert('✅ Everything deleted!\n\nReloading app...');
+                location.reload();
+            } catch (error) {
+                console.error('Reset failed:', error);
+                alert('❌ Reset failed: ' + error.message);
+            }
         }
 
         let goalsUnsubscribe = null; // Store listener unsubscribe function
