@@ -858,6 +858,7 @@
             .delete-btn {
                 font-size: 9px;
                 padding: 2px 4px;
+                opacity: 1; /* Always show on mobile since no hover */
             }
 
             .change-btn {
@@ -896,6 +897,11 @@
             .empty-state {
                 font-size: 11px;
                 padding: 15px;
+            }
+
+            .weight-delete,
+            .note-delete {
+                opacity: 1; /* Always show on mobile since no hover */
             }
         }
 
@@ -1417,11 +1423,11 @@
         // Search/filter state
         let searchTerm = '';
 
-        // Sort state
-        let sortAlphabetically = { personal: false, professional: false };
+        // Sort state (load from localStorage or default to false)
+        let sortAlphabetically = JSON.parse(localStorage.getItem('sortAlphabetically')) || { personal: false, professional: false };
 
-        // Filter state (all, active, completed)
-        let filterState = { personal: 'all', professional: 'all' };
+        // Filter state (all, active, completed) (load from localStorage or default to 'all')
+        let filterState = JSON.parse(localStorage.getItem('filterState')) || { personal: 'all', professional: 'all' };
 
         // Undo state
         let undoStack = [];
@@ -1467,17 +1473,16 @@
 
         function toggleSort(type) {
             sortAlphabetically[type] = !sortAlphabetically[type];
+            localStorage.setItem('sortAlphabetically', JSON.stringify(sortAlphabetically));
             renderList(type);
         }
 
-        function setFilter(type, filter) {
-            filterState[type] = filter;
-
-            // Update button styles
+        function updateFilterButtons(type) {
+            const currentFilter = filterState[type];
             ['all', 'active', 'completed'].forEach(f => {
                 const btn = document.getElementById(`${type}-filter-${f}`);
                 if (btn) {
-                    if (f === filter) {
+                    if (f === currentFilter) {
                         btn.style.background = 'var(--primary)';
                         btn.style.color = 'white';
                     } else {
@@ -1486,7 +1491,12 @@
                     }
                 }
             });
+        }
 
+        function setFilter(type, filter) {
+            filterState[type] = filter;
+            localStorage.setItem('filterState', JSON.stringify(filterState));
+            updateFilterButtons(type);
             renderList(type);
         }
 
@@ -1724,6 +1734,8 @@
             renderDashboard();
             updatePageTitle();
             updateUndoButton();
+            updateFilterButtons('personal');
+            updateFilterButtons('professional');
 
             // If Firebase is already ready, load from cloud
             if (window.firebaseReady) {
