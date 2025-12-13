@@ -1010,7 +1010,7 @@
 <body>
     <div class="container">
         <h1>Gitesh Life Tracker</h1>
-        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span></p>
+        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span> • Sync ID: <span id="sync-id-display" style="font-weight: 600; color: var(--primary); cursor: pointer;" onclick="showSyncId()" title="Click to view/change Sync ID">...</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
             <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
@@ -1357,12 +1357,30 @@
 
         function showSyncId() {
             const currentId = getUserId();
-            const message = `Your Sync ID: ${currentId}\n\nUse this ID on other devices to sync your data.\n\nTo change your Sync ID, enter a new one (at least 4 characters):`;
+            const message = `🔄 SYNC YOUR DEVICES\n\n` +
+                `Your Current Sync ID: ${currentId}\n\n` +
+                `TO SYNC MOBILE & DESKTOP:\n` +
+                `1. Copy this ID: ${currentId}\n` +
+                `2. Open app on other device\n` +
+                `3. Click "Sync ID" button there\n` +
+                `4. Enter this same ID: ${currentId}\n` +
+                `5. Reload both devices\n\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                `To change your Sync ID, enter a new one below\n` +
+                `(at least 4 characters, or leave blank to keep current):`;
             const newId = prompt(message, currentId);
             if (newId && newId !== currentId) {
                 if (setSyncId(newId)) {
+                    updateSyncIdDisplay();
                     location.reload();
                 }
+            }
+        }
+
+        function updateSyncIdDisplay() {
+            const displayEl = document.getElementById('sync-id-display');
+            if (displayEl) {
+                displayEl.textContent = getUserId();
             }
         }
 
@@ -1560,6 +1578,11 @@
                         const data = doc.data();
                         personalGoals = data.personal || [];
                         professionalGoals = data.professional || [];
+
+                        // Save to localStorage for offline access
+                        localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
+                        localStorage.setItem('professionalGoals', JSON.stringify(professionalGoals));
+
                         renderList('personal');
                         renderList('professional');
                         console.log('🔄 Synced from cloud');
@@ -1759,6 +1782,7 @@
             updateUndoButton();
             updateFilterButtons('personal');
             updateFilterButtons('professional');
+            updateSyncIdDisplay();
 
             // If Firebase is already ready, load from cloud
             if (window.firebaseReady) {
@@ -2522,6 +2546,10 @@
                                 dailyHabits[today][habit] = false;
                             }
                         });
+
+                        // Save to localStorage for offline access
+                        saveHabitsLocal();
+
                         renderHabits();
                         console.log('🔄 Habits synced from cloud');
                     }
@@ -2769,6 +2797,10 @@
                     if (doc.exists()) {
                         const data = doc.data();
                         notes = data.notes || [];
+
+                        // Save to localStorage for offline access
+                        saveNotesLocal();
+
                         renderNotes();
                         console.log('🔄 Notes synced from cloud');
                     }
@@ -3069,6 +3101,10 @@
                         const data = doc.data();
                         weightData = data.weightData || [];
                         sortWeightData(); // Ensure data is sorted
+
+                        // Save to localStorage for offline access
+                        saveWeightLocal();
+
                         renderWeightTracker();
                         console.log('🔄 Weight synced from cloud');
                     }
