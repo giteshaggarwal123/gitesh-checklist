@@ -1023,6 +1023,7 @@
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
                 <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Upload backup JSON">Import</button>
                 <button onclick="showHelp()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Keyboard shortcuts">?</button>
+                <button onclick="showSyncDebug()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Debug sync status">🔍</button>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
             </div>
         </div>
@@ -1384,6 +1385,37 @@
             }
         }
 
+        // Debug function to check sync status
+        function showSyncDebug() {
+            const personal = personalGoals.length;
+            const professional = professionalGoals.length;
+            const total = personal + professional;
+            const localPersonal = JSON.parse(localStorage.getItem('personalGoals') || '[]').length;
+            const localProfessional = JSON.parse(localStorage.getItem('professionalGoals') || '[]').length;
+
+            const debug = `🔍 SYNC DEBUG INFO\n\n` +
+                `📱 Current Device:\n` +
+                `Sync ID: ${getUserId()}\n` +
+                `Cloud Doc ID: ${CLOUD_DOC_ID}\n\n` +
+                `📊 Goals Count:\n` +
+                `In Memory: ${total} (${personal}P + ${professional}P)\n` +
+                `In LocalStorage: ${localPersonal + localProfessional} (${localPersonal}P + ${localProfessional}P)\n\n` +
+                `🔥 Firebase Status:\n` +
+                `Firebase Ready: ${window.firebaseReady ? '✅ YES' : '❌ NO'}\n` +
+                `Firebase DB: ${window.db ? '✅ Connected' : '❌ Not Connected'}\n` +
+                `Online: ${navigator.onLine ? '✅ YES' : '❌ NO'}\n\n` +
+                `💡 If counts don't match between devices:\n` +
+                `1. Check Sync IDs are IDENTICAL\n` +
+                `2. Click "Sync" button on both devices\n` +
+                `3. Reload both browsers\n\n` +
+                `🔄 This will now trigger a manual sync...`;
+
+            alert(debug);
+
+            // Trigger manual sync
+            manualSync();
+        }
+
         const CLOUD_DOC_ID = getUserId();
         let isLoadingFromCloud = false;
         let isOnline = navigator.onLine;
@@ -1684,7 +1716,7 @@
                     statusEl.className = 'sync-status synced';
                     statusEl.textContent = 'Cloud Synced';
                 }
-                console.log('Saved to cloud');
+                console.log(`💾 Saved to cloud [Doc: ${CLOUD_DOC_ID}] - ${personalGoals.length}P + ${professionalGoals.length}P = ${personalGoals.length + professionalGoals.length} total goals`);
             } catch (error) {
                 console.error('Error saving to cloud:', error);
                 const statusEl = document.getElementById('sync-status');
