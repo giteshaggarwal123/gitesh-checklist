@@ -1396,7 +1396,7 @@
             const debug = `🔍 SYNC DEBUG INFO\n\n` +
                 `📱 Current Device:\n` +
                 `Sync ID: ${getUserId()}\n` +
-                `Cloud Doc ID: ${CLOUD_DOC_ID}\n\n` +
+                `Cloud Doc ID: ${getCloudDocId()}\n\n` +
                 `📊 Goals Count:\n` +
                 `In Memory: ${total} (${personal}P + ${professional}P)\n` +
                 `In LocalStorage: ${localPersonal + localProfessional} (${localPersonal}P + ${localProfessional}P)\n\n` +
@@ -1416,7 +1416,12 @@
             manualSync();
         }
 
-        const CLOUD_DOC_ID = getUserId();
+        // Get current cloud doc ID (dynamic, always reads latest from localStorage)
+        function getCloudDocId() {
+            return getUserId();
+        }
+
+        let goalsUnsubscribe = null; // Store listener unsubscribe function
         let isLoadingFromCloud = false;
         let isOnline = navigator.onLine;
 
@@ -1643,7 +1648,8 @@
             }
 
             try {
-                const docRef = window.firestoreDoc(window.db, 'goals', CLOUD_DOC_ID);
+                const currentDocId = getCloudDocId();
+                const docRef = window.firestoreDoc(window.db, 'goals', currentDocId);
                 const docSnap = await window.firestoreGetDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -1674,12 +1680,25 @@
                     await saveToCloud();
                 }
 
-                // Listen for real-time updates
-                window.firestoreOnSnapshot(docRef, (doc) => {
+                // Unsubscribe from old listener before creating new one
+                if (goalsUnsubscribe) {
+                    console.log('🔌 Unsubscribing from old listener');
+                    goalsUnsubscribe();
+                    goalsUnsubscribe = null;
+                }
+
+                // Listen for real-time updates (store unsubscribe function)
+                console.log(`👂 Setting up real-time listener for doc: ${currentDocId}`);
+                goalsUnsubscribe = window.firestoreOnSnapshot(docRef, (doc) => {
                     if (doc.exists() && !isLoadingFromCloud) {
                         const data = doc.data();
-                        personalGoals = data.personal || [];
-                        professionalGoals = data.professional || [];
+                        const cloudPersonal = data.personal || [];
+                        const cloudProfessional = data.professional || [];
+
+                        console.log(`🔄 Listener fired! Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
+
+                        personalGoals = cloudPersonal;
+                        professionalGoals = cloudProfessional;
 
                         // Save to localStorage for offline access
                         localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
@@ -1687,7 +1706,9 @@
 
                         renderList('personal');
                         renderList('professional');
-                        console.log('🔄 Synced from cloud');
+                        updatePageTitle();
+                        renderDashboard();
+                        console.log('✅ UI updated with cloud data');
                     }
                 });
             } catch (error) {
@@ -1705,7 +1726,7 @@
                     statusEl.textContent = 'Syncing...';
                 }
 
-                const docRef = window.firestoreDoc(window.db, 'goals', CLOUD_DOC_ID);
+                const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
                     personal: personalGoals,
                     professional: professionalGoals,
@@ -1716,7 +1737,7 @@
                     statusEl.className = 'sync-status synced';
                     statusEl.textContent = 'Cloud Synced';
                 }
-                console.log(`💾 Saved to cloud [Doc: ${CLOUD_DOC_ID}] - ${personalGoals.length}P + ${professionalGoals.length}P = ${personalGoals.length + professionalGoals.length} total goals`);
+                console.log(`💾 Saved to cloud [Doc: ${getCloudDocId()}] - ${personalGoals.length}P + ${professionalGoals.length}P = ${personalGoals.length + professionalGoals.length} total goals`);
             } catch (error) {
                 console.error('Error saving to cloud:', error);
                 const statusEl = document.getElementById('sync-status');
@@ -1899,6 +1920,21 @@
                 }
             });
             window.addEventListener('offline', updateOnlineStatus);
+
+            // Visibility change listener - sync when tab becomes visible
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && window.firebaseReady && navigator.onLine) {
+                    console.log('👁️ Tab became visible, checking for updates...');
+                    // Don't call loadFromCloud() here as the listener should auto-update
+                    // Just trigger a manual check by calling manualSync in background
+                    setTimeout(() => {
+                        if (window.firebaseReady) {
+                            console.log('🔄 Auto-syncing after visibility change');
+                            loadFromCloud();
+                        }
+                    }, 500); // Small delay to avoid rapid syncs
+                }
+            });
 
             // Keyboard shortcuts
             document.addEventListener('keydown', function(e) {
@@ -2586,7 +2622,7 @@
             if (!window.firebaseReady || !window.db) return;
 
             try {
-                const docRef = window.firestoreDoc(window.db, 'habits', CLOUD_DOC_ID);
+                const docRef = window.firestoreDoc(window.db, 'habits', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
                     habits: dailyHabits,
                     lastUpdated: new Date().toISOString()
@@ -2605,7 +2641,7 @@
             }
 
             try {
-                const docRef = window.firestoreDoc(window.db, 'habits', CLOUD_DOC_ID);
+                const docRef = window.firestoreDoc(window.db, 'habits', getCloudDocId());
                 const docSnap = await window.firestoreGetDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -2868,7 +2904,7 @@
             if (!window.firebaseReady || !window.db) return;
 
             try {
-                const docRef = window.firestoreDoc(window.db, 'notes', CLOUD_DOC_ID);
+                const docRef = window.firestoreDoc(window.db, 'notes', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
                     notes: notes,
                     lastUpdated: new Date().toISOString()
@@ -2887,7 +2923,7 @@
             }
 
             try {
-                const docRef = window.firestoreDoc(window.db, 'notes', CLOUD_DOC_ID);
+                const docRef = window.firestoreDoc(window.db, 'notes', getCloudDocId());
                 const docSnap = await window.firestoreGetDoc(docRef);
 
                 if (docSnap.exists()) {
@@ -3177,7 +3213,7 @@
             if (!window.firebaseReady || !window.db) return;
 
             try {
-                const docRef = window.firestoreDoc(window.db, 'weight', CLOUD_DOC_ID);
+                const docRef = window.firestoreDoc(window.db, 'weight', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
                     weightData: weightData,
                     lastUpdated: new Date().toISOString()
@@ -3196,7 +3232,7 @@
             }
 
             try {
-                const docRef = window.firestoreDoc(window.db, 'weight', CLOUD_DOC_ID);
+                const docRef = window.firestoreDoc(window.db, 'weight', getCloudDocId());
                 const docSnap = await window.firestoreGetDoc(docRef);
 
                 if (docSnap.exists()) {
