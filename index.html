@@ -853,25 +853,30 @@
 
         <!-- Notes Section -->
         <div class="notes-section">
-            <div class="notes-header">
+            <div class="notes-header" onclick="toggleNotesSection()" style="cursor: pointer;" title="Click to expand/collapse">
                 <h3 class="notes-title">Quick Notes <span id="notes-count" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
-                <button class="recommend-btn" onclick="clearAllNotes()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="recommend-btn" onclick="event.stopPropagation(); clearAllNotes()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                    <button class="recommend-btn" id="notes-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                </div>
             </div>
 
-            <div style="margin-bottom: 12px;">
-                <input type="text" id="notes-search" placeholder="Search notes..." style="width: 100%; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; margin-bottom: 10px;" oninput="searchNotes()">
-            </div>
+            <div id="notes-content" style="overflow: hidden; transition: max-height 0.3s ease-out;">
+                <div style="margin-bottom: 12px; padding-top: 8px;">
+                    <input type="text" id="notes-search" placeholder="Search notes..." style="width: 100%; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; margin-bottom: 10px;" oninput="searchNotes()">
+                </div>
 
-            <div class="input-group" style="margin-bottom: 12px;">
-                <input type="text" id="note-input" placeholder="Add a quick note..." onkeypress="handleNoteKeyPress(event)" maxlength="500" style="flex: 1; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
-                <button class="add-btn" onclick="addNote()" style="padding: 10px 18px;">Add Note</button>
-            </div>
-            <div style="text-align: right; font-size: 10px; color: #999; margin-top: -8px; margin-bottom: 12px;">
-                <span id="note-char-count">0/500</span>
-            </div>
+                <div class="input-group" style="margin-bottom: 12px;">
+                    <input type="text" id="note-input" placeholder="Add a quick note..." onkeypress="handleNoteKeyPress(event)" maxlength="500" style="flex: 1; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                    <button class="add-btn" onclick="addNote()" style="padding: 10px 18px;">Add Note</button>
+                </div>
+                <div style="text-align: right; font-size: 10px; color: #999; margin-top: -8px; margin-bottom: 12px;">
+                    <span id="note-char-count">0/500</span>
+                </div>
 
-            <div id="notes-list" class="notes-list">
-                <div class="empty-state">No notes yet. Add one above!</div>
+                <div id="notes-list" class="notes-list">
+                    <div class="empty-state">No notes yet. Add one above!</div>
+                </div>
             </div>
         </div>
 
@@ -2179,10 +2184,54 @@
         let notes = [];
         let notesSearchTerm = '';
         let noteIdCounter = Date.now();
+        let notesExpanded = true; // Default to expanded
 
         // Generate unique ID for notes
         function generateNoteId() {
             return noteIdCounter++;
+        }
+
+        // Toggle notes section expand/collapse
+        function toggleNotesSection() {
+            notesExpanded = !notesExpanded;
+            const content = document.getElementById('notes-content');
+            const toggleBtn = document.getElementById('notes-toggle-btn');
+
+            if (notesExpanded) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                toggleBtn.textContent = '▼';
+            } else {
+                content.style.maxHeight = '0px';
+                toggleBtn.textContent = '▶';
+            }
+
+            // Save state
+            localStorage.setItem('notesExpanded', notesExpanded);
+        }
+
+        // Initialize notes section state
+        function initNotesSection() {
+            const saved = localStorage.getItem('notesExpanded');
+            if (saved !== null) {
+                notesExpanded = saved === 'true';
+            }
+
+            const content = document.getElementById('notes-content');
+            const toggleBtn = document.getElementById('notes-toggle-btn');
+
+            if (notesExpanded) {
+                // Set to auto first to calculate height, then set actual height for animation
+                content.style.maxHeight = 'none';
+                const height = content.scrollHeight;
+                content.style.maxHeight = '0px';
+                setTimeout(() => {
+                    content.style.maxHeight = height + 'px';
+                }, 10);
+                toggleBtn.textContent = '▼';
+            } else {
+                content.style.maxHeight = '0px';
+                toggleBtn.textContent = '▶';
+            }
         }
 
         // Load notes from localStorage
@@ -2435,6 +2484,16 @@
                     </div>
                 </div>
             `).join('');
+
+            // Update max-height if expanded (to accommodate new notes)
+            if (notesExpanded) {
+                const content = document.getElementById('notes-content');
+                if (content) {
+                    setTimeout(() => {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }, 10);
+                }
+            }
         }
 
         // Handle Enter key in note input
@@ -2447,6 +2506,7 @@
         // Initialize notes on page load
         window.addEventListener('load', function() {
             loadNotes();
+            initNotesSection();
 
             // Character counter for note input
             const noteInput = document.getElementById('note-input');
