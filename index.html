@@ -906,7 +906,7 @@
         <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Cloud Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
-            <input type="text" id="search-input" placeholder="Search goals..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
+            <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
             <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
                 <button onclick="manualSync()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Refresh from cloud">Sync</button>
@@ -997,7 +997,7 @@
                     </div>
                 </div>
 
-                <canvas id="weight-chart" style="width: 100%; height: 150px; background: #fafafa; border-radius: 8px; border: 1px solid #e8e8e8; margin-bottom: 12px;"></canvas>
+                <canvas id="weight-chart" style="width: 100%; height: 180px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; border: 2px solid #bae6fd; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);"></canvas>
 
                 <div id="weight-log" class="weight-log"></div>
             </div>
@@ -2875,7 +2875,7 @@
             const weight = parseFloat(input.value);
 
             if (!weight || weight <= 0 || weight > 300) {
-                alert('Please enter a valid weight between 0 and 300 kg');
+                alert('Please enter a valid weight (greater than 0, up to 300 kg)');
                 return;
             }
 
@@ -2907,7 +2907,7 @@
 
             const weight = parseFloat(newWeight);
             if (!weight || weight <= 0 || weight > 300) {
-                alert('Please enter a valid weight between 0 and 300 kg');
+                alert('Please enter a valid weight (greater than 0, up to 300 kg)');
                 return;
             }
 
@@ -3020,14 +3020,15 @@
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
 
-            // Handle retina displays
+            // Handle retina displays and responsive width
             const dpr = window.devicePixelRatio || 1;
-            const displayWidth = 600;
-            const displayHeight = 150;
+            const containerWidth = canvas.parentElement.offsetWidth;
+            const displayWidth = Math.min(containerWidth - 40, 800); // Max 800px, responsive
+            const displayHeight = 180;
 
             canvas.width = displayWidth * dpr;
             canvas.height = displayHeight * dpr;
-            canvas.style.width = displayWidth + 'px';
+            canvas.style.width = '100%';
             canvas.style.height = displayHeight + 'px';
 
             ctx.scale(dpr, dpr);
@@ -3057,8 +3058,8 @@
             const chartWidth = width - padding * 2;
             const chartHeight = height - padding * 2;
 
-            // Draw grid lines
-            ctx.strokeStyle = '#e8e8e8';
+            // Draw grid lines (softer)
+            ctx.strokeStyle = '#dbeafe';
             ctx.lineWidth = 1;
             for (let i = 0; i <= 5; i++) {
                 const y = padding + (chartHeight / 5) * i;
@@ -3069,16 +3070,47 @@
 
                 // Y-axis labels
                 const weight = maxWeight - (range / 5) * i;
-                ctx.fillStyle = '#999';
-                ctx.font = '10px -apple-system, sans-serif';
+                ctx.fillStyle = '#64748b';
+                ctx.font = 'bold 11px -apple-system, sans-serif';
                 ctx.textAlign = 'right';
-                ctx.fillText(weight.toFixed(1), padding - 5, y + 3);
+                ctx.fillText(weight.toFixed(1) + ' kg', padding - 8, y + 4);
             }
 
-            // Draw line chart
+            // Draw area fill under line (gradient)
             if (chartData.length > 1) {
-                ctx.strokeStyle = '#3b82f6';
-                ctx.lineWidth = 2;
+                const gradient = ctx.createLinearGradient(0, padding, 0, padding + chartHeight);
+                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+                gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+
+                // Start from bottom left
+                const firstX = padding;
+                ctx.moveTo(firstX, padding + chartHeight);
+
+                // Draw line
+                chartData.forEach((entry, i) => {
+                    const x = padding + (chartWidth / (chartData.length - 1)) * i;
+                    const y = padding + chartHeight - ((entry.weight - minWeight) / range) * chartHeight;
+                    ctx.lineTo(x, y);
+                });
+
+                // Close path at bottom right
+                const lastX = padding + chartWidth;
+                ctx.lineTo(lastX, padding + chartHeight);
+                ctx.closePath();
+                ctx.fill();
+
+                // Draw main line (thicker and with gradient)
+                const lineGradient = ctx.createLinearGradient(0, 0, width, 0);
+                lineGradient.addColorStop(0, '#3b82f6');
+                lineGradient.addColorStop(1, '#8b5cf6');
+
+                ctx.strokeStyle = lineGradient;
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
                 ctx.beginPath();
 
                 chartData.forEach((entry, i) => {
@@ -3094,24 +3126,45 @@
 
                 ctx.stroke();
 
-                // Draw points
+                // Draw points with glow effect
                 chartData.forEach((entry, i) => {
                     const x = padding + (chartWidth / (chartData.length - 1)) * i;
                     const y = padding + chartHeight - ((entry.weight - minWeight) / range) * chartHeight;
 
-                    ctx.fillStyle = '#3b82f6';
+                    // Outer glow
+                    ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Main point
+                    ctx.fillStyle = '#fff';
                     ctx.beginPath();
                     ctx.arc(x, y, 4, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Show date for first and last point
-                    if (i === 0 || i === chartData.length - 1) {
+                    // Inner dot
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Show weight value on top of every 3rd point or first/last
+                    if (i === 0 || i === chartData.length - 1 || i % 3 === 0) {
+                        ctx.fillStyle = '#1e40af';
+                        ctx.font = 'bold 10px -apple-system, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(entry.weight + ' kg', x, y - 12);
+                    }
+
+                    // Show date for first, last, and every 5th point
+                    if (i === 0 || i === chartData.length - 1 || (i % 5 === 0 && chartData.length > 10)) {
                         const date = new Date(entry.date);
                         const label = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                        ctx.fillStyle = '#666';
-                        ctx.font = '10px -apple-system, sans-serif';
-                        ctx.textAlign = i === 0 ? 'left' : 'right';
-                        ctx.fillText(label, x, height - 10);
+                        ctx.fillStyle = '#64748b';
+                        ctx.font = '9px -apple-system, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(label, x, height - 8);
                     }
                 });
             }
