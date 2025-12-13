@@ -960,7 +960,7 @@
         <!-- Weight Tracker -->
         <div class="weight-tracker">
             <div class="weight-header">
-                <h3 class="weight-title">Weight Tracker <span id="weight-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0 logs</span></h3>
+                <h3 class="weight-title">Weight Tracker <span id="weight-count" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #065f46; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0 logs</span></h3>
                 <button class="recommend-btn" onclick="toggleWeightSection()" id="weight-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
             </div>
 
@@ -970,14 +970,18 @@
                     <button class="add-btn" onclick="addWeight()" style="padding: 10px 18px;">Log Weight</button>
                 </div>
 
-                <div id="weight-stats" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div id="weight-stats" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px;">
                     <div style="text-align: center; padding: 10px; background: #f0f9ff; border-radius: 6px; border: 1px solid #e0f2fe;">
                         <div style="font-size: 18px; font-weight: 600; color: #0369a1;" id="current-weight">--</div>
                         <div style="font-size: 10px; color: #0369a1; margin-top: 2px;">Current</div>
                     </div>
                     <div style="text-align: center; padding: 10px; background: #f0fdf4; border-radius: 6px; border: 1px solid #dcfce7;">
-                        <div style="font-size: 18px; font-weight: 600; color: #15803d;" id="weight-change">--</div>
-                        <div style="font-size: 10px; color: #15803d; margin-top: 2px;">Change</div>
+                        <div style="font-size: 18px; font-weight: 600; color: #15803d;" id="weight-change-prev">--</div>
+                        <div style="font-size: 10px; color: #15803d; margin-top: 2px;">vs Previous</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: #f0fdf4; border-radius: 6px; border: 1px solid #dcfce7;">
+                        <div style="font-size: 18px; font-weight: 600; color: #15803d;" id="weight-change-total">--</div>
+                        <div style="font-size: 10px; color: #15803d; margin-top: 2px;">Total Change</div>
                     </div>
                     <div style="text-align: center; padding: 10px; background: #fef3c7; border-radius: 6px; border: 1px solid #fde68a;">
                         <div style="font-size: 18px; font-weight: 600; color: #92400e;" id="start-weight">--</div>
@@ -985,7 +989,7 @@
                     </div>
                 </div>
 
-                <canvas id="weight-chart" width="600" height="150" style="width: 100%; height: 150px; background: #fafafa; border-radius: 8px; border: 1px solid #e8e8e8; margin-bottom: 12px;"></canvas>
+                <canvas id="weight-chart" style="width: 100%; height: 150px; background: #fafafa; border-radius: 8px; border: 1px solid #e8e8e8; margin-bottom: 12px;"></canvas>
 
                 <div id="weight-log" class="weight-log"></div>
             </div>
@@ -1566,7 +1570,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `goals-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `gitesh-complete-backup-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -1613,6 +1617,12 @@
                             localStorage.setItem('dailyHabits', JSON.stringify(dailyHabits));
                             saveHabitsToCloud();
                             renderHabits();
+                        }
+                        if (data.notes && Array.isArray(data.notes)) {
+                            notes = data.notes;
+                            saveNotesLocal();
+                            saveNotesToCloud();
+                            renderNotes();
                         }
                         if (data.weightData && Array.isArray(data.weightData)) {
                             weightData = data.weightData;
@@ -2097,6 +2107,27 @@
                         <div style="text-align: center; padding: 12px; background: #fef3c7; border-radius: 8px; margin-top: 8px;">
                             <div style="font-size: 20px; font-weight: 600; color: #92400e;">${notes.length}</div>
                             <div style="font-size: 11px; color: #92400e; margin-top: 4px;">Total Notes</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 13px; color: #666; font-weight: 500;">Weight Tracker</span>
+                            <span style="font-size: 12px; color: #999;">${weightData.length} log${weightData.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px;">
+                            <div style="text-align: center; padding: 10px; background: #dbeafe; border-radius: 6px;">
+                                <div style="font-size: 16px; font-weight: 600; color: #1e40af;">${weightData.length > 0 ? weightData[0].weight + ' kg' : '--'}</div>
+                                <div style="font-size: 10px; color: #1e40af; margin-top: 2px;">Current</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: ${weightData.length > 0 && (weightData[0].weight - weightData[weightData.length - 1].weight) < 0 ? '#d1fae5' : '#fee2e2'}; border-radius: 6px;">
+                                <div style="font-size: 16px; font-weight: 600; color: ${weightData.length > 0 && (weightData[0].weight - weightData[weightData.length - 1].weight) < 0 ? '#15803d' : '#dc2626'};">${weightData.length > 0 ? ((weightData[0].weight - weightData[weightData.length - 1].weight) > 0 ? '+' : '') + (weightData[0].weight - weightData[weightData.length - 1].weight).toFixed(1) + ' kg' : '--'}</div>
+                                <div style="font-size: 10px; color: ${weightData.length > 0 && (weightData[0].weight - weightData[weightData.length - 1].weight) < 0 ? '#15803d' : '#dc2626'}; margin-top: 2px;">Change</div>
+                            </div>
+                            <div style="text-align: center; padding: 10px; background: #fef3c7; border-radius: 6px;">
+                                <div style="font-size: 16px; font-weight: 600; color: #92400e;">${weightData.length > 0 ? weightData[weightData.length - 1].weight + ' kg' : '--'}</div>
+                                <div style="font-size: 10px; color: #92400e; margin-top: 2px;">Start</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2855,21 +2886,38 @@
             if (weightData.length > 0) {
                 const current = weightData[0].weight;
                 const start = weightData[weightData.length - 1].weight;
-                const change = current - start;
+                const totalChange = current - start;
 
                 document.getElementById('current-weight').textContent = `${current} kg`;
                 document.getElementById('start-weight').textContent = `${start} kg`;
 
-                const changeEl = document.getElementById('weight-change');
-                const changeText = change > 0 ? `+${change.toFixed(1)}` : change.toFixed(1);
-                changeEl.textContent = `${changeText} kg`;
-                changeEl.style.color = change > 0 ? '#dc2626' : change < 0 ? '#15803d' : '#666';
-                changeEl.parentElement.style.background = change > 0 ? '#fee2e2' : change < 0 ? '#f0fdf4' : '#f8f9fa';
-                changeEl.parentElement.style.borderColor = change > 0 ? '#fecaca' : change < 0 ? '#dcfce7' : '#e8e8e8';
+                // Total change from start
+                const changeTotalEl = document.getElementById('weight-change-total');
+                const totalChangeText = totalChange > 0 ? `+${totalChange.toFixed(1)}` : totalChange.toFixed(1);
+                changeTotalEl.textContent = `${totalChangeText} kg`;
+                changeTotalEl.style.color = totalChange > 0 ? '#dc2626' : totalChange < 0 ? '#15803d' : '#666';
+                changeTotalEl.parentElement.style.background = totalChange > 0 ? '#fee2e2' : totalChange < 0 ? '#f0fdf4' : '#f8f9fa';
+                changeTotalEl.parentElement.style.borderColor = totalChange > 0 ? '#fecaca' : totalChange < 0 ? '#dcfce7' : '#e8e8e8';
+
+                // Change from previous entry
+                if (weightData.length > 1) {
+                    const previous = weightData[1].weight;
+                    const prevChange = current - previous;
+                    const changePrevEl = document.getElementById('weight-change-prev');
+                    const prevChangeText = prevChange > 0 ? `+${prevChange.toFixed(1)}` : prevChange.toFixed(1);
+                    changePrevEl.textContent = `${prevChangeText} kg`;
+                    changePrevEl.style.color = prevChange > 0 ? '#dc2626' : prevChange < 0 ? '#15803d' : '#666';
+                    changePrevEl.parentElement.style.background = prevChange > 0 ? '#fee2e2' : prevChange < 0 ? '#f0fdf4' : '#f8f9fa';
+                    changePrevEl.parentElement.style.borderColor = prevChange > 0 ? '#fecaca' : prevChange < 0 ? '#dcfce7' : '#e8e8e8';
+                } else {
+                    document.getElementById('weight-change-prev').textContent = 'First entry';
+                    document.getElementById('weight-change-prev').style.fontSize = '11px';
+                }
             } else {
                 document.getElementById('current-weight').textContent = '--';
                 document.getElementById('start-weight').textContent = '--';
-                document.getElementById('weight-change').textContent = '--';
+                document.getElementById('weight-change-total').textContent = '--';
+                document.getElementById('weight-change-prev').textContent = '--';
             }
 
             // Render chart
@@ -2914,8 +2962,22 @@
             if (!canvas) return;
 
             const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
+            if (!ctx) return;
+
+            // Handle retina displays
+            const dpr = window.devicePixelRatio || 1;
+            const displayWidth = 600;
+            const displayHeight = 150;
+
+            canvas.width = displayWidth * dpr;
+            canvas.height = displayHeight * dpr;
+            canvas.style.width = displayWidth + 'px';
+            canvas.style.height = displayHeight + 'px';
+
+            ctx.scale(dpr, dpr);
+
+            const width = displayWidth;
+            const height = displayHeight;
 
             // Clear canvas
             ctx.clearRect(0, 0, width, height);
