@@ -898,6 +898,113 @@
                 padding: 15px;
             }
         }
+
+        /* Dashboard Summary */
+        .dashboard-summary {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-card-icon {
+            font-size: 18px;
+        }
+
+        .dashboard-card-value {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .dashboard-card-subtitle {
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dashboard-card-trend {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .dashboard-card-trend.positive {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .dashboard-card-trend.negative {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .dashboard-card-trend.neutral {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .dashboard-card {
+                padding: 12px;
+            }
+
+            .dashboard-card-value {
+                font-size: 24px;
+            }
+
+            .dashboard-summary {
+                padding: 16px;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -916,6 +1023,56 @@
                 <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Upload backup JSON">Import</button>
                 <button onclick="showHelp()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Keyboard shortcuts">?</button>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+            </div>
+        </div>
+
+        <!-- Dashboard Summary -->
+        <div class="dashboard-summary">
+            <div class="dashboard-grid" id="dashboard-grid">
+                <!-- Dashboard cards will be rendered here by JavaScript -->
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <span class="dashboard-card-icon">🎯</span>
+                        <span>Active Goals</span>
+                    </div>
+                    <div class="dashboard-card-value" id="dashboard-goals-count">0</div>
+                    <div class="dashboard-card-subtitle" id="dashboard-goals-subtitle">
+                        Loading...
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <span class="dashboard-card-icon">✅</span>
+                        <span>Today's Habits</span>
+                    </div>
+                    <div class="dashboard-card-value" id="dashboard-habits-percent">0%</div>
+                    <div class="dashboard-card-subtitle" id="dashboard-habits-subtitle">
+                        0/9 completed
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <span class="dashboard-card-icon">🔥</span>
+                        <span>Best Streak</span>
+                    </div>
+                    <div class="dashboard-card-value" id="dashboard-best-streak">0</div>
+                    <div class="dashboard-card-subtitle" id="dashboard-streak-subtitle">
+                        No active streaks
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <span class="dashboard-card-icon">⚖️</span>
+                        <span>Weight Progress</span>
+                    </div>
+                    <div class="dashboard-card-value" id="dashboard-weight-value">--</div>
+                    <div class="dashboard-card-subtitle" id="dashboard-weight-subtitle">
+                        No data yet
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1502,6 +1659,94 @@
             }
         }
 
+        // Render Dashboard Summary
+        function renderDashboard() {
+            // 1. Active Goals Count
+            const totalGoals = personalGoals.length + professionalGoals.length;
+            const activeGoals = personalGoals.filter(g => !g.completed).length + professionalGoals.filter(g => !g.completed).length;
+            const completedGoals = personalGoals.filter(g => g.completed).length + professionalGoals.filter(g => g.completed).length;
+
+            document.getElementById('dashboard-goals-count').textContent = activeGoals;
+
+            let goalsSubtitle = '';
+            if (totalGoals === 0) {
+                goalsSubtitle = 'No goals yet';
+            } else {
+                goalsSubtitle = `${completedGoals} completed`;
+                if (activeGoals > 0) {
+                    goalsSubtitle += ` • ${activeGoals} active`;
+                }
+            }
+            document.getElementById('dashboard-goals-subtitle').innerHTML = goalsSubtitle;
+
+            // 2. Today's Habits Completion
+            const today = getTodayDate();
+            const todayHabits = dailyHabits[today] || {};
+            const completedHabitsCount = HABITS.filter(h => todayHabits[h] === true).length;
+            const totalHabits = HABITS.length;
+            const habitsPercent = totalHabits > 0 ? Math.round((completedHabitsCount / totalHabits) * 100) : 0;
+
+            document.getElementById('dashboard-habits-percent').textContent = habitsPercent + '%';
+            document.getElementById('dashboard-habits-subtitle').textContent = `${completedHabitsCount}/${totalHabits} completed`;
+
+            // 3. Best Habit Streak
+            let bestStreak = 0;
+            let bestStreakHabit = '';
+
+            HABITS.forEach(habitName => {
+                const streak = calculateStreak(habitName);
+                if (streak > bestStreak) {
+                    bestStreak = streak;
+                    bestStreakHabit = habitName;
+                }
+            });
+
+            document.getElementById('dashboard-best-streak').textContent = bestStreak;
+
+            if (bestStreak > 0) {
+                const habitDisplayNames = {
+                    'water': '3L Water',
+                    'workout': 'Workout',
+                    'temple': 'Temple',
+                    'meditation': 'Meditation',
+                    'noBadHabits': 'No Bad Habits',
+                    'learning': 'Learning',
+                    'protein': 'Protein',
+                    'posture': 'Posture',
+                    'sleep': 'Sleep'
+                };
+                document.getElementById('dashboard-streak-subtitle').textContent = habitDisplayNames[bestStreakHabit] || bestStreakHabit;
+            } else {
+                document.getElementById('dashboard-streak-subtitle').textContent = 'No active streaks';
+            }
+
+            // 4. Weight Progress
+            if (weightData && weightData.length > 0) {
+                const sortedWeight = [...weightData].sort((a, b) => new Date(a.date) - new Date(b.date));
+                const latestEntry = sortedWeight[sortedWeight.length - 1];
+                const startEntry = sortedWeight[0];
+
+                const currentWeight = latestEntry.weight;
+                const totalChange = currentWeight - startEntry.weight;
+
+                document.getElementById('dashboard-weight-value').textContent = currentWeight.toFixed(1) + ' kg';
+
+                let weightSubtitle = '';
+                if (sortedWeight.length === 1) {
+                    weightSubtitle = 'First entry';
+                } else {
+                    const changeText = totalChange > 0 ? `+${totalChange.toFixed(1)}` : totalChange.toFixed(1);
+                    const changeClass = totalChange < 0 ? 'positive' : totalChange > 0 ? 'negative' : 'neutral';
+                    weightSubtitle = `<span class="dashboard-card-trend ${changeClass}">${changeText} kg</span> total`;
+                }
+
+                document.getElementById('dashboard-weight-subtitle').innerHTML = weightSubtitle;
+            } else {
+                document.getElementById('dashboard-weight-value').textContent = '--';
+                document.getElementById('dashboard-weight-subtitle').innerHTML = 'No data yet';
+            }
+        }
+
         // Initialize on page load (combined for goals, habits, notes, and weight)
         window.onFirebaseReady = function() {
             loadFromCloud(); // Load goals
@@ -1513,6 +1758,7 @@
         window.onload = function() {
             renderList('personal');
             renderList('professional');
+            renderDashboard();
             updatePageTitle();
             updateUndoButton();
 
@@ -1865,6 +2111,7 @@
 
             if (goals.length === 0) {
                 listElement.innerHTML = '<li class="empty-state">No goals yet. Add one above!</li>';
+                renderDashboard();
                 return;
             }
 
@@ -1895,6 +2142,7 @@
 
             if (sortedGoals.length === 0 && searchTerm) {
                 listElement.innerHTML = '<li class="empty-state">No goals match your search</li>';
+                renderDashboard();
                 return;
             }
 
@@ -1907,6 +2155,9 @@
                     <button class="delete-btn" onclick="deleteItem('${type}', ${goal.id})">Delete</button>
                 </li>
             `).join('');
+
+            // Update dashboard
+            renderDashboard();
         }
 
         function saveData(type) {
@@ -2389,6 +2640,9 @@
 
             // Update page title to reflect habit changes
             updatePageTitle();
+
+            // Update dashboard
+            renderDashboard();
         }
 
         // Initialize habits on page load
@@ -2452,13 +2706,7 @@
             const toggleBtn = document.getElementById('notes-toggle-btn');
 
             if (notesExpanded) {
-                // Set to auto first to calculate height, then set actual height for animation
                 content.style.maxHeight = 'none';
-                const height = content.scrollHeight;
-                content.style.maxHeight = '0px';
-                setTimeout(() => {
-                    content.style.maxHeight = height + 'px';
-                }, 10);
                 toggleBtn.textContent = '▼';
             } else {
                 content.style.maxHeight = '0px';
@@ -2857,11 +3105,6 @@
 
             if (weightExpanded) {
                 content.style.maxHeight = 'none';
-                const height = content.scrollHeight;
-                content.style.maxHeight = '0px';
-                setTimeout(() => {
-                    content.style.maxHeight = height + 'px';
-                }, 10);
                 toggleBtn.textContent = '▼';
             } else {
                 content.style.maxHeight = '0px';
@@ -2983,6 +3226,7 @@
             const logEl = document.getElementById('weight-log');
             if (weightData.length === 0) {
                 logEl.innerHTML = '<div class="empty-state">No weight entries yet. Log your weight above!</div>';
+                renderDashboard();
                 return;
             }
 
@@ -3010,6 +3254,9 @@
                     }, 10);
                 }
             }
+
+            // Update dashboard
+            renderDashboard();
         }
 
         // Render weight chart
