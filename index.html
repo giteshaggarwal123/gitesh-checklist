@@ -3031,6 +3031,11 @@
                     if (doc.exists() && !isLoadingFromCloud && !isSavingToCloud) {
                         const data = doc.data();
 
+                        console.log('🖼️ Before merge - Local goals with images:', {
+                            personal: personalGoals.filter(g => g.attachments?.some(a => a.type === 'img' && a.data)).length,
+                            professional: professionalGoals.filter(g => g.attachments?.some(a => a.type === 'img' && a.data)).length
+                        });
+
                         // Merge cloud data with local images (images stay in localStorage only)
                         const cloudPersonalMerged = mergeCloudWithLocalImages(data.personal || [], personalGoals);
                         const cloudProfessionalMerged = mergeCloudWithLocalImages(data.professional || [], professionalGoals);
@@ -3040,6 +3045,10 @@
 
                         console.log(`🔄 Listener UPDATING LOCAL DATA - Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
                         console.log(`🔄 Current local: ${personalGoals.length}P + ${professionalGoals.length}P`);
+                        console.log('🖼️ After merge - Goals with images:', {
+                            personal: cloudPersonal.filter(g => g.attachments?.some(a => a.type === 'img' && a.data)).length,
+                            professional: cloudProfessional.filter(g => g.attachments?.some(a => a.type === 'img' && a.data)).length
+                        });
 
                         // Use cloud data merged with local images
                         personalGoals = cloudPersonal;
@@ -3182,7 +3191,7 @@
             return processedGoals;
         }
 
-        // Merge cloud goals with local image data
+        // Merge cloud goals with local goals, preserving local images
         function mergeCloudWithLocalImages(cloudGoals, localGoals) {
             // Create a map of local goals by ID for quick lookup
             const localGoalsMap = new Map();
@@ -3190,28 +3199,32 @@
                 localGoalsMap.set(goal.id, goal);
             });
 
-            return cloudGoals.map(cloudGoal => {
+            // Start with all cloud goals
+            const mergedGoals = cloudGoals.map(cloudGoal => {
                 const localGoal = localGoalsMap.get(cloudGoal.id);
 
                 if (localGoal && localGoal.attachments && localGoal.attachments.length > 0) {
-                    // Merge: use cloud goal structure but restore image data from local
-                    const mergedAttachments = cloudGoal.attachments?.map(cloudAtt => {
-                        if (cloudAtt.cloudPlaceholder) {
-                            // Find matching attachment in local data
-                            const localAtt = localGoal.attachments.find(la => la.id === cloudAtt.id);
-                            if (localAtt && localAtt.data) {
-                                // Restore full attachment with image data from localStorage
-                                return localAtt;
-                            }
-                        }
-                        return cloudAtt;
-                    }) || [];
-
-                    return { ...cloudGoal, attachments: mergedAttachments };
+                    // If local has attachments with actual image data, keep ALL local attachments
+                    const hasLocalImages = localGoal.attachments.some(att => att.type === 'img' && att.data);
+                    if (hasLocalImages) {
+                        // Use cloud goal but completely replace attachments with local version
+                        return { ...cloudGoal, attachments: localGoal.attachments };
+                    }
                 }
 
                 return cloudGoal;
             });
+
+            // Add any local goals that aren't in cloud (newly added with images)
+            localGoals.forEach(localGoal => {
+                const existsInCloud = cloudGoals.some(cg => cg.id === localGoal.id);
+                if (!existsInCloud && localGoal.attachments && localGoal.attachments.length > 0) {
+                    // Local goal with images not yet in cloud
+                    mergedGoals.push(localGoal);
+                }
+            });
+
+            return mergedGoals;
         }
 
         async function saveToCloud() {
