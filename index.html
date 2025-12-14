@@ -2831,6 +2831,14 @@
                 searchNotes(); // Trigger notes search
             }
 
+            // Also update documents search
+            const documentsSearchInput = document.getElementById('documents-search');
+            if (documentsSearchInput) {
+                documentsSearchInput.value = query;
+                documentsSearchTerm = query;
+                renderDocuments(); // Trigger documents search
+            }
+
             renderList('personal');
             renderList('professional');
         }
@@ -3344,11 +3352,14 @@
                         const icon = getFileIcon(att.type);
                         if (att.type === 'img') {
                             return `
-                                <img src="${att.data}"
-                                     class="attachment-thumbnail"
-                                     onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')"
-                                     title="${escapeHtml(att.name)}"
-                                     alt="${escapeHtml(att.name)}">
+                                <div style="position: relative; display: inline-block;">
+                                    <img src="${att.data}"
+                                         class="attachment-thumbnail"
+                                         onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')"
+                                         title="${escapeHtml(att.name)}"
+                                         alt="${escapeHtml(att.name)}">
+                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment" style="position: absolute; top: -4px; right: -4px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">×</span>
+                                </div>
                             `;
                         } else {
                             return `
@@ -4538,6 +4549,14 @@
                         continue;
                     }
 
+                    // Prompt for document name
+                    const customName = prompt(`Enter a name for this document (or leave blank to use original name):`, file.name);
+                    if (customName === null) {
+                        // User cancelled
+                        continue;
+                    }
+                    const documentName = customName.trim() || file.name;
+
                     // Read file
                     let fileData = await readFileAsBase64(file);
                     const fileType = getFileType(file.name);
@@ -4556,7 +4575,7 @@
                     // Create document object
                     const newDocument = {
                         id: generateDocumentId(),
-                        name: file.name,
+                        name: documentName,
                         type: fileType,
                         size: file.size,
                         data: fileData,
@@ -4582,6 +4601,20 @@
         function deleteDocument(id) {
             if (!confirm('Delete this document?')) return;
             documents = documents.filter(d => d.id !== id);
+            saveDocumentsLocal();
+            saveDocumentsToCloud();
+            renderDocuments();
+        }
+
+        // Rename document
+        function renameDocument(id) {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) return;
+
+            const newName = prompt('Enter new name for this document:', doc.name);
+            if (newName === null || newName.trim() === '') return;
+
+            doc.name = newName.trim();
             saveDocumentsLocal();
             saveDocumentsToCloud();
             renderDocuments();
@@ -4679,7 +4712,7 @@
                     <div class="document-item" data-id="${doc.id}">
                         <div class="document-icon ${doc.type}">${icon}</div>
                         <div class="document-info">
-                            <div class="document-name" onclick="previewDocument('${doc.id}')" title="${escapeHtml(doc.name)}">${escapeHtml(doc.name)}</div>
+                            <div class="document-name" ondblclick="renameDocument('${doc.id}')" onclick="previewDocument('${doc.id}')" title="${escapeHtml(doc.name)} (double-click to rename)">${escapeHtml(doc.name)}</div>
                             <div class="document-meta">
                                 <span>${formatFileSize(doc.size)}</span>
                                 <span>${uploadDate}</span>
@@ -4782,6 +4815,14 @@
                             continue;
                         }
 
+                        // Prompt for attachment name
+                        const customName = prompt(`Enter a name for this attachment (or leave blank to use original name):`, file.name);
+                        if (customName === null) {
+                            // User cancelled
+                            continue;
+                        }
+                        const attachmentName = customName.trim() || file.name;
+
                         // Read file
                         let fileData = await readFileAsBase64(file);
                         const fileType = getFileType(file.name);
@@ -4800,7 +4841,7 @@
                         // Create attachment object
                         const newAttachment = {
                             id: generateAttachmentId(),
-                            name: file.name,
+                            name: attachmentName,
                             type: fileType,
                             size: file.size,
                             data: fileData,
