@@ -1604,6 +1604,134 @@
             color: #831843;
             text-align: center;
         }
+
+        /* Reminders Section */
+        .reminders-section {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .reminders-section:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .reminders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .reminders-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .reminders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .reminder-item {
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .reminder-item:hover {
+            background: #f5f5f5;
+            border-color: #ddd;
+        }
+
+        .reminder-item.due-soon {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #fbbf24;
+        }
+
+        .reminder-item.overdue {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border-color: #f87171;
+        }
+
+        .reminder-info {
+            flex: 1;
+        }
+
+        .reminder-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .reminder-details {
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .reminder-frequency {
+            padding: 2px 6px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .reminder-delete {
+            background: #fff;
+            color: #999;
+            border: 1px solid #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .reminder-delete:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .reminder-notification {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid #f87171;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            animation: slide-down 0.3s ease-out;
+        }
+
+        .reminder-notification-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #991b1b;
+            text-align: center;
+        }
+
         /* Password Protection */
         .password-overlay {
             position: fixed;
@@ -1950,6 +2078,45 @@
 
                 <div id="birthdays-list" class="birthday-list">
                     <div class="empty-state">No birthdays yet. Add one above!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reminders Section -->
+        <div class="reminders-section">
+            <div class="reminders-header" onclick="toggleRemindersSection()" style="cursor: pointer;" title="Click to expand/collapse">
+                <h3 class="reminders-title">Reminders <span id="reminders-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="recommend-btn" onclick="event.stopPropagation(); clearAllReminders()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                    <button class="recommend-btn" id="reminders-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                </div>
+            </div>
+
+            <div id="reminders-content" style="overflow: hidden; transition: max-height 0.3s ease-out;">
+                <div id="reminders-notification" style="display: none;"></div>
+
+                <div style="margin-bottom: 12px;">
+                    <input type="text" id="reminder-name-input" placeholder="Reminder name (e.g., Netflix Subscription)" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; margin-bottom: 8px;">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                        <select id="reminder-frequency-input" style="padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                            <option value="">Select Frequency</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="half-yearly">Half-Yearly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                        <input type="date" id="reminder-date-input" placeholder="Next Due Date" style="padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
+                        <input type="number" id="reminder-amount-input" placeholder="Amount (optional)" step="0.01" min="0" style="padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                        <button class="add-btn" onclick="addReminder()" style="padding: 10px 18px;">Add Reminder</button>
+                    </div>
+                </div>
+
+                <div id="reminders-list" class="reminders-list">
+                    <div class="empty-state">No reminders yet. Add one above!</div>
                 </div>
             </div>
         </div>
@@ -6119,6 +6286,316 @@
 
             if (window.firebaseReady) {
                 loadBirthdaysFromCloud();
+            }
+        });
+
+        // ===== REMINDERS SECTION =====
+        let reminders = [];
+        let remindersExpanded = false;
+
+        // Load reminders from localStorage
+        function loadRemindersLocal() {
+            const stored = localStorage.getItem('reminders');
+            if (stored) {
+                try {
+                    reminders = JSON.parse(stored);
+                } catch (error) {
+                    console.error('Error parsing reminders:', error);
+                    reminders = [];
+                }
+            }
+        }
+
+        // Save reminders to localStorage
+        function saveRemindersLocal() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+        }
+
+        // Save reminders to Firebase
+        function saveRemindersToCloud() {
+            if (window.firebaseReady && window.db) {
+                const userId = getUserId();
+                const userDocRef = window.db.collection('users').doc(userId);
+
+                userDocRef.set({
+                    reminders: reminders,
+                    lastModified: new Date().toISOString()
+                }, { merge: true });
+            }
+        }
+
+        // Load reminders from Firebase
+        function loadRemindersFromCloud() {
+            if (window.firebaseReady && window.db) {
+                const userId = getUserId();
+                const userDocRef = window.db.collection('users').doc(userId);
+
+                userDocRef.get().then((doc) => {
+                    if (doc.exists && doc.data().reminders) {
+                        reminders = doc.data().reminders;
+                        saveRemindersLocal();
+                        renderReminders();
+                        checkReminders();
+                    }
+                }).catch((error) => {
+                    console.error('Error loading reminders from cloud:', error);
+                });
+            }
+        }
+
+        // Calculate next due date based on frequency
+        function calculateNextDueDate(currentDate, frequency) {
+            const date = new Date(currentDate);
+
+            switch(frequency) {
+                case 'monthly':
+                    date.setMonth(date.getMonth() + 1);
+                    break;
+                case 'quarterly':
+                    date.setMonth(date.getMonth() + 3);
+                    break;
+                case 'half-yearly':
+                    date.setMonth(date.getMonth() + 6);
+                    break;
+                case 'yearly':
+                    date.setFullYear(date.getFullYear() + 1);
+                    break;
+            }
+
+            return date.toISOString().split('T')[0];
+        }
+
+        // Add reminder
+        function addReminder() {
+            const nameInput = document.getElementById('reminder-name-input');
+            const frequencyInput = document.getElementById('reminder-frequency-input');
+            const dateInput = document.getElementById('reminder-date-input');
+            const amountInput = document.getElementById('reminder-amount-input');
+
+            const name = nameInput.value.trim();
+            const frequency = frequencyInput.value;
+            const dueDate = dateInput.value;
+            const amount = amountInput.value ? parseFloat(amountInput.value) : null;
+
+            if (!name || !frequency || !dueDate) {
+                alert('Please fill in name, frequency, and due date');
+                return;
+            }
+
+            reminders.push({
+                id: Date.now(),
+                name: name,
+                frequency: frequency,
+                dueDate: dueDate,
+                amount: amount,
+                createdAt: new Date().toISOString()
+            });
+
+            // Sort by due date
+            reminders.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+            saveRemindersLocal();
+            saveRemindersToCloud();
+            renderReminders();
+            checkReminders();
+
+            nameInput.value = '';
+            frequencyInput.value = '';
+            dateInput.value = '';
+            amountInput.value = '';
+        }
+
+        // Delete reminder
+        function deleteReminder(id) {
+            reminders = reminders.filter(r => r.id !== id);
+            saveRemindersLocal();
+            saveRemindersToCloud();
+            renderReminders();
+            checkReminders();
+        }
+
+        // Mark reminder as paid and update to next due date
+        function markReminderPaid(id) {
+            const reminder = reminders.find(r => r.id === id);
+            if (reminder) {
+                reminder.dueDate = calculateNextDueDate(reminder.dueDate, reminder.frequency);
+                reminders.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                saveRemindersLocal();
+                saveRemindersToCloud();
+                renderReminders();
+                checkReminders();
+            }
+        }
+
+        // Check for due/upcoming reminders
+        function checkReminders() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const overdue = reminders.filter(r => {
+                const dueDate = new Date(r.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                return dueDate < today;
+            });
+
+            const dueSoon = reminders.filter(r => {
+                const dueDate = new Date(r.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 7;
+            });
+
+            const notificationDiv = document.getElementById('reminders-notification');
+            if (overdue.length > 0 || dueSoon.length > 0) {
+                let message = '';
+                if (overdue.length > 0) {
+                    message += `${overdue.length} overdue reminder${overdue.length > 1 ? 's' : ''}`;
+                }
+                if (dueSoon.length > 0) {
+                    if (message) message += ' • ';
+                    message += `${dueSoon.length} due within 7 days`;
+                }
+
+                notificationDiv.innerHTML = `
+                    <div class="reminder-notification">
+                        <div class="reminder-notification-text">${message}</div>
+                    </div>
+                `;
+                notificationDiv.style.display = 'block';
+            } else {
+                notificationDiv.style.display = 'none';
+            }
+        }
+
+        // Check if reminder is overdue
+        function isOverdue(dueDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const due = new Date(dueDate);
+            due.setHours(0, 0, 0, 0);
+            return due < today;
+        }
+
+        // Check if reminder is due soon (within 7 days)
+        function isDueSoon(dueDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const due = new Date(dueDate);
+            due.setHours(0, 0, 0, 0);
+            const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+            return diffDays >= 0 && diffDays <= 7;
+        }
+
+        // Render reminders
+        function renderReminders() {
+            const listElement = document.getElementById('reminders-list');
+            const countElement = document.getElementById('reminders-count');
+
+            if (countElement) {
+                countElement.textContent = reminders.length;
+            }
+
+            if (reminders.length === 0) {
+                listElement.innerHTML = '<div class="empty-state">No reminders yet. Add one above!</div>';
+                return;
+            }
+
+            listElement.innerHTML = reminders.map(reminder => {
+                const dueDate = new Date(reminder.dueDate);
+                const formattedDate = dueDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const due = new Date(reminder.dueDate);
+                due.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+                let statusClass = '';
+                let daysInfo = '';
+
+                if (isOverdue(reminder.dueDate)) {
+                    statusClass = 'overdue';
+                    daysInfo = ` • ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''} overdue`;
+                } else if (isDueSoon(reminder.dueDate)) {
+                    statusClass = 'due-soon';
+                    if (diffDays === 0) {
+                        daysInfo = ' • Due today';
+                    } else {
+                        daysInfo = ` • Due in ${diffDays} day${diffDays > 1 ? 's' : ''}`;
+                    }
+                }
+
+                const amountText = reminder.amount ? ` • ₹${reminder.amount.toLocaleString('en-IN')}` : '';
+
+                return `
+                    <div class="reminder-item ${statusClass}">
+                        <div class="reminder-info">
+                            <div class="reminder-name">${escapeHtml(reminder.name)}</div>
+                            <div class="reminder-details">
+                                <span class="reminder-frequency">${reminder.frequency}</span>
+                                <span>${formattedDate}${daysInfo}${amountText}</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="recommend-btn" onclick="markReminderPaid(${reminder.id})" style="font-size: 10px; padding: 5px 10px; white-space: nowrap;">Mark Paid</button>
+                            <button class="reminder-delete" onclick="deleteReminder(${reminder.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle reminders section
+        function toggleRemindersSection() {
+            remindersExpanded = !remindersExpanded;
+            const content = document.getElementById('reminders-content');
+            const toggleBtn = document.getElementById('reminders-toggle-btn');
+
+            if (remindersExpanded) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                toggleBtn.textContent = '▲';
+            } else {
+                content.style.maxHeight = '0';
+                toggleBtn.textContent = '▼';
+            }
+        }
+
+        // Clear all reminders
+        function clearAllReminders() {
+            if (reminders.length === 0) return;
+
+            if (confirm('Are you sure you want to delete all reminders?')) {
+                reminders = [];
+                saveRemindersLocal();
+                saveRemindersToCloud();
+                renderReminders();
+                checkReminders();
+            }
+        }
+
+        // Initialize reminders section
+        function initRemindersSection() {
+            const content = document.getElementById('reminders-content');
+            const toggleBtn = document.getElementById('reminders-toggle-btn');
+
+            // Start expanded
+            remindersExpanded = true;
+            content.style.maxHeight = content.scrollHeight + 'px';
+            toggleBtn.textContent = '▲';
+        }
+
+        // Initialize reminders on page load
+        window.addEventListener('load', function() {
+            loadRemindersLocal();
+            initRemindersSection();
+            renderReminders();
+            checkReminders();
+
+            // Check reminders daily
+            setInterval(checkReminders, 60000); // Check every minute
+
+            if (window.firebaseReady) {
+                loadRemindersFromCloud();
             }
         });
     </script>
