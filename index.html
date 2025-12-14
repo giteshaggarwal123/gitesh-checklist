@@ -6203,6 +6203,14 @@
 
             if (birthdays.length === 0) {
                 listElement.innerHTML = '<div class="empty-state">No birthdays yet. Add one above!</div>';
+
+                // Update maxHeight if expanded
+                if (birthdayExpanded) {
+                    const content = document.getElementById('birthday-content');
+                    setTimeout(() => {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }, 10);
+                }
                 return;
             }
 
@@ -6233,6 +6241,14 @@
                     </div>
                 `;
             }).join('');
+
+            // Update maxHeight if expanded
+            if (birthdayExpanded) {
+                const content = document.getElementById('birthday-content');
+                setTimeout(() => {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                }, 10);
+            }
         }
 
         // Toggle birthday section
@@ -6497,6 +6513,14 @@
 
             if (reminders.length === 0) {
                 listElement.innerHTML = '<div class="empty-state">No reminders yet. Add one above!</div>';
+
+                // Update maxHeight if expanded
+                if (remindersExpanded) {
+                    const content = document.getElementById('reminders-content');
+                    setTimeout(() => {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }, 10);
+                }
                 return;
             }
 
@@ -6543,6 +6567,14 @@
                     </div>
                 `;
             }).join('');
+
+            // Update maxHeight if expanded
+            if (remindersExpanded) {
+                const content = document.getElementById('reminders-content');
+                setTimeout(() => {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                }, 10);
+            }
         }
 
         // Toggle reminders section
