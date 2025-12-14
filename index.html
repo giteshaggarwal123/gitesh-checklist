@@ -930,9 +930,14 @@
             }
 
             .delete-btn {
-                font-size: 9px;
-                padding: 2px 4px;
-                opacity: 1; /* Always show on mobile since no hover */
+                font-size: 10px;
+                padding: 4px 8px;
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+
+            .checklist-item.show-delete .delete-btn {
+                opacity: 1;
             }
 
             .change-btn {
@@ -2762,6 +2767,24 @@
             updatePageTitle();
         }
 
+        function toggleDeleteButton(event) {
+            // Only on mobile - toggle delete button visibility when text is clicked
+            if (window.innerWidth <= 768) {
+                event.stopPropagation();
+                const listItem = event.target.closest('.checklist-item');
+
+                // Remove show-delete from all other items
+                document.querySelectorAll('.checklist-item').forEach(item => {
+                    if (item !== listItem) {
+                        item.classList.remove('show-delete');
+                    }
+                });
+
+                // Toggle show-delete on current item
+                listItem.classList.toggle('show-delete');
+            }
+        }
+
         function moveItem(sourceType, id) {
             saveUndoState();
             const targetType = sourceType === 'personal' ? 'professional' : 'personal';
@@ -2906,7 +2929,7 @@
                     <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
                     <input type="checkbox" ${goal.completed ? 'checked' : ''}
                            onchange="toggleItem('${type}', '${goal.id}')">
-                    <span class="item-text" ondblclick="editItem('${type}', '${goal.id}', this)" title="Double-click to edit">${escapeHtml(goal.text)}</span>
+                    <span class="item-text" onclick="toggleDeleteButton(event)" ondblclick="editItem('${type}', '${goal.id}', this)" title="Click to show delete">${escapeHtml(goal.text)}</span>
                     <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
                 </li>
                 `;
