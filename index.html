@@ -1900,6 +1900,27 @@
             </div>
         </div>
 
+        <!-- Water Tracker -->
+        <div class="daily-habits" style="margin-bottom: 16px;">
+            <div class="daily-habits-header">
+                <h3 class="daily-habits-title">Water Tracker <span id="water-progress" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e3a8a; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0/8</span></h3>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span style="font-size: 11px; color: #64748b;" id="water-date">Today</span>
+                    <button class="recommend-btn" onclick="resetWater()" style="font-size: 10px; padding: 5px 10px;">Reset</button>
+                </div>
+            </div>
+            <div id="water-glasses" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 12px 0;"></div>
+            <div id="water-log-container" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out;">
+                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e8e8e8;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h4 style="font-size: 12px; font-weight: 600; color: #374151; margin: 0;">Today's Log</h4>
+                        <button class="recommend-btn" onclick="toggleWaterLog()" id="water-log-toggle" style="font-size: 10px; padding: 4px 8px;">▼</button>
+                    </div>
+                    <div id="water-log-list" style="font-size: 11px; color: #64748b; max-height: 120px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Daily Habits Tracker -->
         <div class="daily-habits">
             <div class="daily-habits-header">
@@ -1907,9 +1928,9 @@
                 <span class="daily-habits-date" id="habits-date">Today</span>
             </div>
             <div class="habits-grid" role="group" aria-label="Daily habits tracker">
-                <button class="habit-btn" onclick="toggleHabit('water')" id="habit-water" aria-label="3L Water daily habit">
+                <button class="habit-btn" onclick="toggleHabit('icefacial')" id="habit-icefacial" aria-label="Ice Facial daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
-                    <span class="habit-text">3L Water <span class="habit-streak" id="streak-water"></span></span>
+                    <span class="habit-text">Ice Facial <span class="habit-streak" id="streak-icefacial"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('workout')" id="habit-workout" aria-label="Workout or steps daily habit">
                     <span class="habit-check" aria-hidden="true">✓</span>
@@ -2098,13 +2119,20 @@
                 <div style="margin-bottom: 12px;">
                     <input type="text" id="reminder-name-input" placeholder="Reminder name (e.g., Netflix Subscription)" style="width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px; margin-bottom: 8px;">
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
                         <select id="reminder-frequency-input" style="padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
-                            <option value="">Select Frequency</option>
+                            <option value="">Frequency</option>
+                            <option value="daily">Daily</option>
                             <option value="monthly">Monthly</option>
                             <option value="quarterly">Quarterly</option>
                             <option value="half-yearly">Half-Yearly</option>
                             <option value="yearly">Yearly</option>
+                        </select>
+                        <select id="reminder-type-input" style="padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                            <option value="">Type</option>
+                            <option value="liability">Liability</option>
+                            <option value="investment">Investment</option>
+                            <option value="expense">Expense</option>
                         </select>
                         <input type="date" id="reminder-date-input" placeholder="Next Due Date" style="padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
                     </div>
@@ -2237,6 +2265,11 @@
 
     <!-- Password Protection Script -->
     <script>
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
         // Password protection
         const CORRECT_PASSWORD = '5020';
         const PASSWORD_SESSION_KEY = 'gitesh_tracker_authenticated';
@@ -2955,9 +2988,13 @@
                     const data = docSnap.data();
                     isLoadingFromCloud = true;
 
+                    // Load images from chunks and reconstruct
+                    const cloudPersonalWithImages = await loadAttachmentsFromCloud(data.personal || []);
+                    const cloudProfessionalWithImages = await loadAttachmentsFromCloud(data.professional || []);
+
                     // MERGE instead of overwrite to prevent data loss
-                    const cloudPersonal = deduplicateGoals(data.personal || []);
-                    const cloudProfessional = deduplicateGoals(data.professional || []);
+                    const cloudPersonal = deduplicateGoals(cloudPersonalWithImages);
+                    const cloudProfessional = deduplicateGoals(cloudProfessionalWithImages);
 
                     personalGoals = deduplicateGoals(mergeGoals(personalGoals, cloudPersonal));
                     professionalGoals = deduplicateGoals(mergeGoals(professionalGoals, cloudProfessional));
@@ -2988,18 +3025,23 @@
 
                 // Listen for real-time updates (store unsubscribe function)
                 console.log(`👂 Setting up real-time listener for doc: ${currentDocId}`);
-                goalsUnsubscribe = window.firestoreOnSnapshot(docRef, (doc) => {
+                goalsUnsubscribe = window.firestoreOnSnapshot(docRef, async (doc) => {
                     console.log(`🔔 Listener triggered - isLoadingFromCloud: ${isLoadingFromCloud}, isSavingToCloud: ${isSavingToCloud}`);
 
                     if (doc.exists() && !isLoadingFromCloud && !isSavingToCloud) {
                         const data = doc.data();
-                        const cloudPersonal = deduplicateGoals(data.personal || []);
-                        const cloudProfessional = deduplicateGoals(data.professional || []);
+
+                        // Load images from chunks
+                        const cloudPersonalWithImages = await loadAttachmentsFromCloud(data.personal || []);
+                        const cloudProfessionalWithImages = await loadAttachmentsFromCloud(data.professional || []);
+
+                        const cloudPersonal = deduplicateGoals(cloudPersonalWithImages);
+                        const cloudProfessional = deduplicateGoals(cloudProfessionalWithImages);
 
                         console.log(`🔄 Listener UPDATING LOCAL DATA - Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
                         console.log(`🔄 Current local: ${personalGoals.length}P + ${professionalGoals.length}P`);
 
-                        // Directly use cloud data (now includes attachment URLs from Storage)
+                        // Directly use cloud data (now includes images from chunks)
                         personalGoals = cloudPersonal;
                         professionalGoals = cloudProfessional;
 
@@ -3019,76 +3061,183 @@
             }
         }
 
-        // Upload image to Firebase Storage and return download URL
-        async function uploadImageToStorage(base64Data, attachmentId) {
-            if (!window.storage) return null;
+        // Store image in separate Firestore chunks to bypass 1MB limit
+        async function uploadImageToChunks(base64Data, attachmentId) {
+            if (!window.db) return null;
 
             try {
                 const userId = getUserId();
-                const storagePath = `users/${userId}/images/${attachmentId}`;
-                const storageReference = window.storageRef(window.storage, storagePath);
+                const CHUNK_SIZE = 800000; // 800KB per chunk to stay well under 1MB
 
-                // Upload base64 string
-                await window.storageUploadString(storageReference, base64Data, 'data_url');
+                // Split base64 data into chunks
+                const chunks = [];
+                for (let i = 0; i < base64Data.length; i += CHUNK_SIZE) {
+                    chunks.push(base64Data.substring(i, i + CHUNK_SIZE));
+                }
 
-                // Get download URL
-                const downloadURL = await window.storageGetDownloadURL(storageReference);
-                console.log(`☁️ Uploaded image to Storage: ${attachmentId}`);
-                return downloadURL;
+                console.log(`📦 Splitting image ${attachmentId} into ${chunks.length} chunks`);
+
+                // Save each chunk to Firestore
+                for (let i = 0; i < chunks.length; i++) {
+                    const chunkDocRef = window.firestoreDoc(window.db, 'image-chunks', `${userId}_${attachmentId}_chunk${i}`);
+                    await window.firestoreSetDoc(chunkDocRef, {
+                        chunk: chunks[i],
+                        chunkIndex: i,
+                        totalChunks: chunks.length,
+                        attachmentId: attachmentId,
+                        userId: userId,
+                        createdAt: new Date().toISOString()
+                    });
+                }
+
+                console.log(`☁️ Uploaded ${chunks.length} chunks for image: ${attachmentId}`);
+                return { chunked: true, totalChunks: chunks.length };
             } catch (error) {
-                console.error('Error uploading image to Storage:', error);
+                console.error('Error uploading image chunks:', error);
                 return null;
             }
         }
 
-        // Upload all attachments and convert to URLs
-        async function uploadAttachmentsToStorage(goals) {
-            const goalsWithUrls = [];
+        // Load image from Firestore chunks
+        async function loadImageFromChunks(attachmentId, totalChunks) {
+            if (!window.db) return null;
+
+            try {
+                const userId = getUserId();
+                const chunks = [];
+
+                // Load all chunks
+                for (let i = 0; i < totalChunks; i++) {
+                    const chunkDocRef = window.firestoreDoc(window.db, 'image-chunks', `${userId}_${attachmentId}_chunk${i}`);
+                    const chunkDoc = await window.firestoreGetDoc(chunkDocRef);
+
+                    if (chunkDoc.exists()) {
+                        chunks.push(chunkDoc.data().chunk);
+                    } else {
+                        console.error(`Missing chunk ${i} for image ${attachmentId}`);
+                        return null;
+                    }
+                }
+
+                // Reassemble the full base64 string
+                const fullData = chunks.join('');
+                console.log(`📦 Reassembled image ${attachmentId} from ${chunks.length} chunks`);
+                return fullData;
+            } catch (error) {
+                console.error('Error loading image chunks:', error);
+                return null;
+            }
+        }
+
+        // Delete image chunks from Firestore
+        async function deleteImageChunks(attachmentId, totalChunks) {
+            if (!window.db) return;
+
+            try {
+                const userId = getUserId();
+                for (let i = 0; i < totalChunks; i++) {
+                    const chunkDocRef = window.firestoreDoc(window.db, 'image-chunks', `${userId}_${attachmentId}_chunk${i}`);
+                    await window.firestoreDeleteDoc(chunkDocRef);
+                }
+                console.log(`🗑️ Deleted ${totalChunks} chunks for image: ${attachmentId}`);
+            } catch (error) {
+                console.error('Error deleting image chunks:', error);
+            }
+        }
+
+        // Process attachments for cloud storage (upload images as chunks)
+        async function processAttachmentsForCloud(goals) {
+            const processedGoals = [];
 
             for (const goal of goals) {
                 const goalCopy = { ...goal };
 
                 if (goal.attachments && goal.attachments.length > 0) {
-                    const attachmentsWithUrls = [];
+                    const processedAttachments = [];
 
                     for (const att of goal.attachments) {
                         if (att.type === 'img' && att.data && att.data.startsWith('data:')) {
-                            // Only upload if it's a new image (has data but no URL)
-                            const url = await uploadImageToStorage(att.data, att.id);
+                            // New image with base64 data - upload as chunks
+                            const chunkInfo = await uploadImageToChunks(att.data, att.id);
 
-                            if (url) {
-                                // Replace data with URL
-                                attachmentsWithUrls.push({
-                                    ...att,
-                                    url: url,
-                                    data: undefined // Remove base64 data to save space
+                            if (chunkInfo) {
+                                // Store reference to chunks instead of data
+                                processedAttachments.push({
+                                    id: att.id,
+                                    type: att.type,
+                                    chunked: true,
+                                    totalChunks: chunkInfo.totalChunks
                                 });
                             } else {
-                                // Keep original if upload failed (will retry next sync)
-                                attachmentsWithUrls.push(att);
+                                // Upload failed, skip this image
+                                console.error(`Failed to upload image ${att.id}`);
                             }
-                        } else if (att.url) {
-                            // Already has URL, just keep the URL (no data needed)
-                            attachmentsWithUrls.push({
-                                ...att,
-                                data: undefined // Remove data to save Firestore space
+                        } else if (att.chunked) {
+                            // Already chunked, keep the reference
+                            processedAttachments.push({
+                                id: att.id,
+                                type: att.type,
+                                chunked: true,
+                                totalChunks: att.totalChunks
                             });
                         } else {
                             // Other file types, keep as-is
-                            attachmentsWithUrls.push(att);
+                            processedAttachments.push(att);
                         }
                     }
 
-                    goalCopy.attachments = attachmentsWithUrls;
+                    goalCopy.attachments = processedAttachments;
                 } else {
-                    // No attachments, just copy the goal as-is
                     goalCopy.attachments = [];
                 }
 
-                goalsWithUrls.push(goalCopy);
+                processedGoals.push(goalCopy);
             }
 
-            return goalsWithUrls;
+            return processedGoals;
+        }
+
+        // Load attachments from cloud (reconstruct images from chunks)
+        async function loadAttachmentsFromCloud(goals) {
+            const goalsWithData = [];
+
+            for (const goal of goals) {
+                const goalCopy = { ...goal };
+
+                if (goal.attachments && goal.attachments.length > 0) {
+                    const attachmentsWithData = [];
+
+                    for (const att of goal.attachments) {
+                        if (att.chunked && att.totalChunks) {
+                            // Load image from chunks
+                            const data = await loadImageFromChunks(att.id, att.totalChunks);
+
+                            if (data) {
+                                attachmentsWithData.push({
+                                    id: att.id,
+                                    type: att.type,
+                                    data: data,
+                                    chunked: true,
+                                    totalChunks: att.totalChunks
+                                });
+                            } else {
+                                console.error(`Failed to load image ${att.id}`);
+                            }
+                        } else {
+                            // Not chunked, keep as-is
+                            attachmentsWithData.push(att);
+                        }
+                    }
+
+                    goalCopy.attachments = attachmentsWithData;
+                } else {
+                    goalCopy.attachments = [];
+                }
+
+                goalsWithData.push(goalCopy);
+            }
+
+            return goalsWithData;
         }
 
         async function saveToCloud() {
@@ -3111,11 +3260,11 @@
                 personalGoals = deduplicateGoals(personalGoals);
                 professionalGoals = deduplicateGoals(professionalGoals);
 
-                // Upload images to Storage and convert to URLs (avoids 1MB Firestore limit)
+                // Process images as chunks (avoids 1MB Firestore limit)
                 console.log(`☁️ Starting cloud save - ${personalGoals.length}P + ${professionalGoals.length}P goals`);
-                const personalForCloud = await uploadAttachmentsToStorage(personalGoals);
-                const professionalForCloud = await uploadAttachmentsToStorage(professionalGoals);
-                console.log('☁️ Images uploaded, saving to Firestore...');
+                const personalForCloud = await processAttachmentsForCloud(personalGoals);
+                const professionalForCloud = await processAttachmentsForCloud(professionalGoals);
+                console.log('☁️ Images chunked, saving to Firestore...');
 
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
@@ -3251,7 +3400,7 @@
 
             if (bestStreak > 0) {
                 const habitDisplayNames = {
-                    'water': '3L Water',
+                    'icefacial': 'Ice Facial',
                     'workout': 'Workout',
                     'temple': 'Temple',
                     'meditation': 'Meditation',
@@ -3782,8 +3931,22 @@
             }
         }
 
-        function deleteItem(type, id) {
+        async function deleteItem(type, id) {
             saveUndoState();
+
+            // Find the item to delete and clean up its chunks
+            const goals = type === 'personal' ? personalGoals : professionalGoals;
+            const goal = goals.find(g => g.id === id);
+
+            if (goal && goal.attachments) {
+                for (const att of goal.attachments) {
+                    if (att.chunked && att.totalChunks) {
+                        // Delete chunks from Firestore
+                        await deleteImageChunks(att.id, att.totalChunks);
+                    }
+                }
+            }
+
             if (type === 'personal') {
                 personalGoals = personalGoals.filter(g => g.id !== id);
             } else {
@@ -5511,7 +5674,7 @@
         }
 
         // Delete attachment from checklist item
-        function deleteAttachment(type, goalId, attachmentId, event) {
+        async function deleteAttachment(type, goalId, attachmentId, event) {
             event.stopPropagation();
 
             if (!confirm('Delete this attachment?')) return;
@@ -5519,6 +5682,12 @@
             const goals = type === 'personal' ? personalGoals : professionalGoals;
             const goal = goals.find(g => g.id === goalId);
             if (!goal || !goal.attachments) return;
+
+            // Find the attachment and delete its chunks if it's chunked
+            const attachment = goal.attachments.find(a => a.id === attachmentId);
+            if (attachment && attachment.chunked && attachment.totalChunks) {
+                await deleteImageChunks(attachmentId, attachment.totalChunks);
+            }
 
             goal.attachments = goal.attachments.filter(a => a.id !== attachmentId);
 
@@ -6203,34 +6372,44 @@
         }
 
         // Save birthdays to Firebase
-        function saveBirthdaysToCloud() {
+        async function saveBirthdaysToCloud() {
             if (window.firebaseReady && window.db) {
-                const userId = getUserId();
-                const userDocRef = window.db.collection('users').doc(userId);
+                try {
+                    const userId = getUserId();
+                    const userDocRef = window.firestoreDoc(window.db, 'users', userId);
 
-                userDocRef.set({
-                    birthdays: birthdays,
-                    lastModified: new Date().toISOString()
-                }, { merge: true });
+                    await window.firestoreSetDoc(userDocRef, {
+                        birthdays: birthdays,
+                        lastModified: new Date().toISOString()
+                    }, { merge: true });
+                    console.log('✅ Birthdays saved to cloud');
+                } catch (error) {
+                    console.error('Error saving birthdays to cloud:', error);
+                }
             }
         }
 
         // Load birthdays from Firebase
-        function loadBirthdaysFromCloud() {
+        async function loadBirthdaysFromCloud() {
             if (window.firebaseReady && window.db) {
-                const userId = getUserId();
-                const userDocRef = window.db.collection('users').doc(userId);
+                try {
+                    const userId = getUserId();
+                    const userDocRef = window.firestoreDoc(window.db, 'users', userId);
+                    const doc = await window.firestoreGetDoc(userDocRef);
 
-                userDocRef.get().then((doc) => {
-                    if (doc.exists && doc.data().birthdays) {
-                        birthdays = doc.data().birthdays;
-                        saveBirthdaysLocal();
-                        renderBirthdays();
-                        checkBirthdaysToday();
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        if (data.birthdays) {
+                            birthdays = data.birthdays;
+                            saveBirthdaysLocal();
+                            renderBirthdays();
+                            checkBirthdaysToday();
+                            console.log('✅ Birthdays loaded from cloud');
+                        }
                     }
-                }).catch((error) => {
+                } catch (error) {
                     console.error('Error loading birthdays from cloud:', error);
-                });
+                }
             }
         }
 
@@ -6300,6 +6479,14 @@
                     </div>
                 `;
                 notificationDiv.style.display = 'block';
+
+                // Show browser notification
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('Birthday Reminder', {
+                        body: `Today is ${names}'s birthday!`,
+                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ec4899"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>'
+                    });
+                }
             } else {
                 notificationDiv.style.display = 'none';
             }
@@ -6464,34 +6651,44 @@
         }
 
         // Save reminders to Firebase
-        function saveRemindersToCloud() {
+        async function saveRemindersToCloud() {
             if (window.firebaseReady && window.db) {
-                const userId = getUserId();
-                const userDocRef = window.db.collection('users').doc(userId);
+                try {
+                    const userId = getUserId();
+                    const userDocRef = window.firestoreDoc(window.db, 'users', userId);
 
-                userDocRef.set({
-                    reminders: reminders,
-                    lastModified: new Date().toISOString()
-                }, { merge: true });
+                    await window.firestoreSetDoc(userDocRef, {
+                        reminders: reminders,
+                        lastModified: new Date().toISOString()
+                    }, { merge: true });
+                    console.log('✅ Reminders saved to cloud');
+                } catch (error) {
+                    console.error('Error saving reminders to cloud:', error);
+                }
             }
         }
 
         // Load reminders from Firebase
-        function loadRemindersFromCloud() {
+        async function loadRemindersFromCloud() {
             if (window.firebaseReady && window.db) {
-                const userId = getUserId();
-                const userDocRef = window.db.collection('users').doc(userId);
+                try {
+                    const userId = getUserId();
+                    const userDocRef = window.firestoreDoc(window.db, 'users', userId);
+                    const doc = await window.firestoreGetDoc(userDocRef);
 
-                userDocRef.get().then((doc) => {
-                    if (doc.exists && doc.data().reminders) {
-                        reminders = doc.data().reminders;
-                        saveRemindersLocal();
-                        renderReminders();
-                        checkReminders();
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        if (data.reminders) {
+                            reminders = data.reminders;
+                            saveRemindersLocal();
+                            renderReminders();
+                            checkReminders();
+                            console.log('✅ Reminders loaded from cloud');
+                        }
                     }
-                }).catch((error) => {
+                } catch (error) {
                     console.error('Error loading reminders from cloud:', error);
-                });
+                }
             }
         }
 
@@ -6500,6 +6697,9 @@
             const date = new Date(currentDate);
 
             switch(frequency) {
+                case 'daily':
+                    date.setDate(date.getDate() + 1);
+                    break;
                 case 'monthly':
                     date.setMonth(date.getMonth() + 1);
                     break;
@@ -6521,11 +6721,13 @@
         function addReminder() {
             const nameInput = document.getElementById('reminder-name-input');
             const frequencyInput = document.getElementById('reminder-frequency-input');
+            const typeInput = document.getElementById('reminder-type-input');
             const dateInput = document.getElementById('reminder-date-input');
             const amountInput = document.getElementById('reminder-amount-input');
 
             const name = nameInput.value.trim();
             const frequency = frequencyInput.value;
+            const type = typeInput.value || 'expense'; // Default to expense
             const dueDate = dateInput.value;
             const amount = amountInput.value ? parseFloat(amountInput.value) : null;
 
@@ -6538,6 +6740,7 @@
                 id: Date.now(),
                 name: name,
                 frequency: frequency,
+                type: type,
                 dueDate: dueDate,
                 amount: amount,
                 createdAt: new Date().toISOString()
@@ -6553,6 +6756,7 @@
 
             nameInput.value = '';
             frequencyInput.value = '';
+            typeInput.value = '';
             dateInput.value = '';
             amountInput.value = '';
         }
@@ -6590,18 +6794,28 @@
                 return dueDate < today;
             });
 
+            const dueToday = reminders.filter(r => {
+                const dueDate = new Date(r.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                return dueDate.getTime() === today.getTime();
+            });
+
             const dueSoon = reminders.filter(r => {
                 const dueDate = new Date(r.dueDate);
                 dueDate.setHours(0, 0, 0, 0);
                 const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-                return diffDays >= 0 && diffDays <= 7;
+                return diffDays > 0 && diffDays <= 7;
             });
 
             const notificationDiv = document.getElementById('reminders-notification');
-            if (overdue.length > 0 || dueSoon.length > 0) {
+            if (overdue.length > 0 || dueToday.length > 0 || dueSoon.length > 0) {
                 let message = '';
                 if (overdue.length > 0) {
                     message += `${overdue.length} overdue reminder${overdue.length > 1 ? 's' : ''}`;
+                }
+                if (dueToday.length > 0) {
+                    if (message) message += ' • ';
+                    message += `${dueToday.length} due today`;
                 }
                 if (dueSoon.length > 0) {
                     if (message) message += ' • ';
@@ -6614,6 +6828,23 @@
                     </div>
                 `;
                 notificationDiv.style.display = 'block';
+
+                // Show browser notification for overdue or due today
+                if ((overdue.length > 0 || dueToday.length > 0) && 'Notification' in window && Notification.permission === 'granted') {
+                    let notifBody = '';
+                    if (dueToday.length > 0) {
+                        const names = dueToday.map(r => r.name).join(', ');
+                        notifBody = `Due today: ${names}`;
+                    } else if (overdue.length > 0) {
+                        const names = overdue.slice(0, 3).map(r => r.name).join(', ');
+                        notifBody = `Overdue: ${names}${overdue.length > 3 ? ' and more' : ''}`;
+                    }
+
+                    new Notification('Payment Reminder', {
+                        body: notifBody,
+                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23f59e0b"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>'
+                    });
+                }
             } else {
                 notificationDiv.style.display = 'none';
             }
@@ -6647,6 +6878,20 @@
                 countElement.textContent = reminders.length;
             }
 
+            // Calculate totals
+            let totalLiabilities = 0;
+            let totalInvestments = 0;
+            let totalExpenses = 0;
+
+            reminders.forEach(reminder => {
+                if (reminder.amount) {
+                    const type = reminder.type || 'expense';
+                    if (type === 'liability') totalLiabilities += reminder.amount;
+                    else if (type === 'investment') totalInvestments += reminder.amount;
+                    else totalExpenses += reminder.amount;
+                }
+            });
+
             if (reminders.length === 0) {
                 listElement.innerHTML = '<div class="empty-state">No reminders yet. Add one above!</div>';
 
@@ -6660,7 +6905,31 @@
                 return;
             }
 
-            listElement.innerHTML = reminders.map(reminder => {
+            // Add totals summary at the top
+            let totalsHTML = '<div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #86efac;">';
+            totalsHTML += '<div style="font-size: 11px; font-weight: 600; color: #166534; margin-bottom: 6px;">FINANCIAL SUMMARY</div>';
+            totalsHTML += '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 11px;">';
+            if (totalLiabilities > 0) {
+                totalsHTML += `<div style="background: white; padding: 6px 8px; border-radius: 6px; border: 1px solid #fca5a5;">
+                    <div style="color: #991b1b; font-weight: 600;">Liabilities</div>
+                    <div style="color: #dc2626; font-weight: 700; font-size: 13px;">₹${totalLiabilities.toLocaleString('en-IN')}</div>
+                </div>`;
+            }
+            if (totalInvestments > 0) {
+                totalsHTML += `<div style="background: white; padding: 6px 8px; border-radius: 6px; border: 1px solid #93c5fd;">
+                    <div style="color: #1e3a8a; font-weight: 600;">Investments</div>
+                    <div style="color: #2563eb; font-weight: 700; font-size: 13px;">₹${totalInvestments.toLocaleString('en-IN')}</div>
+                </div>`;
+            }
+            if (totalExpenses > 0) {
+                totalsHTML += `<div style="background: white; padding: 6px 8px; border-radius: 6px; border: 1px solid #fde047;">
+                    <div style="color: #713f12; font-weight: 600;">Expenses</div>
+                    <div style="color: #ca8a04; font-weight: 700; font-size: 13px;">₹${totalExpenses.toLocaleString('en-IN')}</div>
+                </div>`;
+            }
+            totalsHTML += '</div></div>';
+
+            listElement.innerHTML = totalsHTML + reminders.map(reminder => {
                 const dueDate = new Date(reminder.dueDate);
                 const formattedDate = dueDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -6685,6 +6954,21 @@
                     }
                 }
 
+                const type = reminder.type || 'expense';
+                let typeBadgeColor = '';
+                let typeBadgeBg = '';
+                if (type === 'liability') {
+                    typeBadgeColor = '#991b1b';
+                    typeBadgeBg = '#fee2e2';
+                } else if (type === 'investment') {
+                    typeBadgeColor = '#1e3a8a';
+                    typeBadgeBg = '#dbeafe';
+                } else {
+                    typeBadgeColor = '#713f12';
+                    typeBadgeBg = '#fef9c3';
+                }
+
+                const typeBadge = `<span style="background: ${typeBadgeBg}; color: ${typeBadgeColor}; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase;">${type}</span>`;
                 const amountText = reminder.amount ? ` • ₹${reminder.amount.toLocaleString('en-IN')}` : '';
 
                 return `
@@ -6693,6 +6977,7 @@
                             <div class="reminder-name">${escapeHtml(reminder.name)}</div>
                             <div class="reminder-details">
                                 <span class="reminder-frequency">${reminder.frequency}</span>
+                                ${typeBadge}
                                 <span>${formattedDate}${daysInfo}${amountText}</span>
                             </div>
                         </div>
@@ -6765,6 +7050,187 @@
             if (window.firebaseReady) {
                 loadRemindersFromCloud();
             }
+        });
+
+        // ===== WATER TRACKER =====
+        let waterData = {};
+        let waterLogExpanded = false;
+
+        function getTodayDateWater() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        function loadWaterData() {
+            const stored = localStorage.getItem('waterTracker');
+            if (stored) {
+                try {
+                    waterData = JSON.parse(stored);
+                } catch (error) {
+                    console.error('Error parsing water data:', error);
+                    waterData = {};
+                }
+            }
+
+            const today = getTodayDateWater();
+            if (!waterData[today]) {
+                waterData[today] = {
+                    glasses: 0,
+                    log: []
+                };
+            }
+
+            renderWaterTracker();
+        }
+
+        function saveWaterData() {
+            localStorage.setItem('waterTracker', JSON.stringify(waterData));
+
+            // Save to cloud
+            if (window.firebaseReady && window.db) {
+                const userId = getUserId();
+                const userDocRef = window.firestoreDoc(window.db, 'users', userId);
+                window.firestoreSetDoc(userDocRef, {
+                    waterTracker: waterData,
+                    lastModified: new Date().toISOString()
+                }, { merge: true }).catch(error => {
+                    console.error('Error saving water data to cloud:', error);
+                });
+            }
+        }
+
+        function addWaterGlass() {
+            const today = getTodayDateWater();
+            if (!waterData[today]) {
+                waterData[today] = { glasses: 0, log: [] };
+            }
+
+            if (waterData[today].glasses < 8) {
+                waterData[today].glasses++;
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+                waterData[today].log.push({
+                    time: timeStr,
+                    timestamp: now.toISOString()
+                });
+
+                saveWaterData();
+                renderWaterTracker();
+
+                // Show celebration when complete
+                if (waterData[today].glasses === 8) {
+                    setTimeout(() => {
+                        alert('Congratulations! You completed your daily water goal!');
+                    }, 300);
+                }
+            }
+        }
+
+        function resetWater() {
+            if (confirm('Reset today\'s water tracker?')) {
+                const today = getTodayDateWater();
+                waterData[today] = { glasses: 0, log: [] };
+                saveWaterData();
+                renderWaterTracker();
+            }
+        }
+
+        function toggleWaterLog() {
+            waterLogExpanded = !waterLogExpanded;
+            const container = document.getElementById('water-log-container');
+            const toggleBtn = document.getElementById('water-log-toggle');
+
+            if (waterLogExpanded) {
+                container.style.maxHeight = '200px';
+                toggleBtn.textContent = '▲';
+            } else {
+                container.style.maxHeight = '0';
+                toggleBtn.textContent = '▼';
+            }
+        }
+
+        function renderWaterTracker() {
+            const today = getTodayDateWater();
+            if (!waterData[today]) {
+                waterData[today] = { glasses: 0, log: [] };
+            }
+
+            const glasses = waterData[today].glasses;
+            const progress = document.getElementById('water-progress');
+            const glassesContainer = document.getElementById('water-glasses');
+            const waterDate = document.getElementById('water-date');
+            const logList = document.getElementById('water-log-list');
+
+            progress.textContent = `${glasses}/8`;
+
+            // Update date
+            const todayDate = new Date();
+            waterDate.textContent = todayDate.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+
+            // Render glasses
+            glassesContainer.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const isFilled = i < glasses;
+                const glass = document.createElement('button');
+                glass.className = 'habit-btn';
+                glass.style.cssText = `
+                    padding: 16px 12px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 4px;
+                    background: ${isFilled ? 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)' : 'white'};
+                    border: 2px solid ${isFilled ? '#3b82f6' : '#e8e8e8'};
+                    cursor: ${isFilled ? 'default' : 'pointer'};
+                    transition: all 0.2s ease;
+                `;
+
+                glass.innerHTML = `
+                    <div style="font-size: 24px;">${isFilled ? '💧' : '🥛'}</div>
+                    <div style="font-size: 10px; font-weight: 600; color: ${isFilled ? '#1e3a8a' : '#9ca3af'};">Glass ${i + 1}</div>
+                `;
+
+                if (!isFilled) {
+                    glass.onclick = addWaterGlass;
+                    glass.onmouseover = function() {
+                        this.style.borderColor = '#3b82f6';
+                        this.style.transform = 'translateY(-2px)';
+                    };
+                    glass.onmouseout = function() {
+                        this.style.borderColor = '#e8e8e8';
+                        this.style.transform = 'translateY(0)';
+                    };
+                }
+
+                glassesContainer.appendChild(glass);
+            }
+
+            // Render log
+            if (waterData[today].log && waterData[today].log.length > 0) {
+                logList.innerHTML = waterData[today].log.map((entry, index) => `
+                    <div style="padding: 6px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f3f4f6;">
+                        <span>💧 Glass ${index + 1}</span>
+                        <span style="color: #9ca3af;">${entry.time}</span>
+                    </div>
+                `).join('');
+            } else {
+                logList.innerHTML = '<div style="padding: 8px; text-align: center; color: #9ca3af;">No glasses logged today</div>';
+            }
+        }
+
+        // Initialize water tracker on page load
+        window.addEventListener('load', function() {
+            loadWaterData();
+
+            // Check for day change every minute
+            setInterval(function() {
+                const today = getTodayDateWater();
+                if (!waterData[today]) {
+                    console.log('New day detected! Resetting water tracker...');
+                    loadWaterData();
+                }
+            }, 60000);
         });
     </script>
 </body>
