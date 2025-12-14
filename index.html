@@ -1701,10 +1701,10 @@
     <div id="password-overlay" class="password-overlay">
         <div class="password-container">
             <div class="password-title">Gitesh Life Tracker</div>
-            <div class="password-subtitle">🔒 Enter password to access your tracker</div>
+            <div class="password-subtitle">Enter password to access your tracker</div>
             <input type="password" id="password-input" class="password-input" placeholder="Enter password" onkeypress="handlePasswordKeyPress(event)" autofocus>
             <button class="password-button" onclick="checkPassword()">Unlock Access</button>
-            <div id="password-error" class="password-error">❌ Incorrect password. Please try again.</div>
+            <div id="password-error" class="password-error">Incorrect password. Please try again.</div>
         </div>
     </div>
 
@@ -1932,7 +1932,7 @@
         <!-- Birthday Tracker Section -->
         <div class="birthday-section">
             <div class="birthday-header" onclick="toggleBirthdaySection()" style="cursor: pointer;" title="Click to expand/collapse">
-                <h3 class="birthday-title">🎂 Birthday Tracker <span id="birthday-count" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #9f1239; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
+                <h3 class="birthday-title">Birthday Tracker <span id="birthday-count" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #9f1239; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="recommend-btn" onclick="event.stopPropagation(); clearAllBirthdays()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
                     <button class="recommend-btn" id="birthday-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
@@ -5993,7 +5993,7 @@
                 const names = todayBirthdays.map(b => b.name).join(', ');
                 notificationDiv.innerHTML = `
                     <div class="birthday-notification">
-                        <div class="birthday-notification-text">🎉 Today is ${names}'s birthday! 🎂</div>
+                        <div class="birthday-notification-text">Today is ${names}'s birthday!</div>
                     </div>
                 `;
                 notificationDiv.style.display = 'block';
@@ -6046,7 +6046,7 @@
 
                 let daysInfo = '';
                 if (isToday(birthday.date)) {
-                    daysInfo = ' • Today! 🎉';
+                    daysInfo = ' • Today!';
                 } else if (isUpcoming(birthday.date)) {
                     const today = new Date();
                     const bday = new Date(birthday.date);
