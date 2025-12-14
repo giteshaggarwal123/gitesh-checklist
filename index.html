@@ -1611,7 +1611,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #fafbfd 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1620,40 +1620,48 @@
 
         .password-container {
             background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            padding: 48px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             text-align: center;
-            max-width: 400px;
+            max-width: 420px;
             width: 90%;
         }
 
         .password-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .password-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+            font-weight: 400;
         }
 
         .password-input {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
             margin-bottom: 16px;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         .password-input:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
         .password-button {
@@ -1661,24 +1669,30 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: white;
             border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2);
         }
 
         .password-button:hover {
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
         .password-error {
             color: #dc3545;
-            font-size: 13px;
-            margin-top: 10px;
+            font-size: 12px;
+            margin-top: 12px;
             display: none;
+            background: #fee;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #fcc;
         }
     </style>
 </head>
@@ -1686,11 +1700,11 @@
     <!-- Password Protection Overlay -->
     <div id="password-overlay" class="password-overlay">
         <div class="password-container">
-            <div class="password-title">🔒 Protected Access</div>
-            <div class="password-subtitle">Enter password to continue</div>
-            <input type="password" id="password-input" class="password-input" placeholder="Enter password" onkeypress="handlePasswordKeyPress(event)">
-            <button class="password-button" onclick="checkPassword()">Unlock</button>
-            <div id="password-error" class="password-error">Incorrect password. Please try again.</div>
+            <div class="password-title">Gitesh Life Tracker</div>
+            <div class="password-subtitle">🔒 Enter password to access your tracker</div>
+            <input type="password" id="password-input" class="password-input" placeholder="Enter password" onkeypress="handlePasswordKeyPress(event)" autofocus>
+            <button class="password-button" onclick="checkPassword()">Unlock Access</button>
+            <div id="password-error" class="password-error">❌ Incorrect password. Please try again.</div>
         </div>
     </div>
 
