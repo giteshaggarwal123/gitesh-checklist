@@ -3279,11 +3279,11 @@
                 }
                 console.log(`✅ CLOUD SAVE COMPLETE [Doc: ${getCloudDocId()}] - ${personalForCloud.length}P + ${professionalForCloud.length}P = ${personalForCloud.length + professionalForCloud.length} total goals`);
 
-                // Clear flag after a longer delay to ensure listener doesn't fire too soon
+                // Clear flag after a longer delay to ensure listener doesn't fire too soon (especially for chunked images)
                 setTimeout(() => {
                     isSavingToCloud = false;
                     console.log('✅ isSavingToCloud flag cleared - listener can now update');
-                }, 2000);
+                }, 5000); // 5 seconds to allow time for chunked image uploads
             } catch (error) {
                 console.error('Error saving to cloud:', error);
                 isSavingToCloud = false; // Clear flag on error
@@ -6625,10 +6625,10 @@
             const content = document.getElementById('birthday-content');
             const toggleBtn = document.getElementById('birthday-toggle-btn');
 
-            // Start expanded
-            birthdayExpanded = true;
-            content.style.maxHeight = content.scrollHeight + 'px';
-            toggleBtn.textContent = '▲';
+            // Start collapsed
+            birthdayExpanded = false;
+            content.style.maxHeight = '0';
+            toggleBtn.textContent = '▼';
         }
 
         // Initialize birthdays on page load
@@ -7049,10 +7049,10 @@
             const content = document.getElementById('reminders-content');
             const toggleBtn = document.getElementById('reminders-toggle-btn');
 
-            // Start expanded
-            remindersExpanded = true;
-            content.style.maxHeight = content.scrollHeight + 'px';
-            toggleBtn.textContent = '▲';
+            // Start collapsed
+            remindersExpanded = false;
+            content.style.maxHeight = '0';
+            toggleBtn.textContent = '▼';
         }
 
         // Initialize reminders on page load
