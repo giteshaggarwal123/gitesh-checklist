@@ -1473,11 +1473,232 @@
                 font-size: 28px;
             }
         }
+
+        /* Birthday Tracker Section */
+        .birthday-section {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .birthday-section:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .birthday-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .birthday-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .birthday-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .birthday-item {
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .birthday-item:hover {
+            background: #f5f5f5;
+            border-color: #ddd;
+        }
+
+        .birthday-item.upcoming {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #fbbf24;
+        }
+
+        .birthday-item.today {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            border-color: #ec4899;
+            animation: pulse-birthday 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-birthday {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .birthday-info {
+            flex: 1;
+        }
+
+        .birthday-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 2px;
+        }
+
+        .birthday-date {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .birthday-delete {
+            background: #fff;
+            color: #999;
+            border: 1px solid #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .birthday-delete:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .birthday-notification {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            border: 2px solid #ec4899;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            animation: slide-down 0.3s ease-out;
+        }
+
+        @keyframes slide-down {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .birthday-notification-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: #831843;
+            text-align: center;
+        }
+        /* Password Protection */
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+
+        .password-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+
+        .password-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .password-button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .password-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .password-error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Password Protection Overlay -->
+    <div id="password-overlay" class="password-overlay">
+        <div class="password-container">
+            <div class="password-title">🔒 Protected Access</div>
+            <div class="password-subtitle">Enter password to continue</div>
+            <input type="password" id="password-input" class="password-input" placeholder="Enter password" onkeypress="handlePasswordKeyPress(event)">
+            <button class="password-button" onclick="checkPassword()">Unlock</button>
+            <div id="password-error" class="password-error">Incorrect password. Please try again.</div>
+        </div>
+    </div>
+
+    <div class="container" id="main-content" style="display: none;">
         <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v4.4</span></h1>
+        <div style="text-align: center; margin-bottom: 8px;">
+            <div id="indian-datetime" style="font-size: 13px; color: #666; font-weight: 500;"></div>
+        </div>
         <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Auto-Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
@@ -1694,6 +1915,31 @@
             </div>
         </div>
 
+        <!-- Birthday Tracker Section -->
+        <div class="birthday-section">
+            <div class="birthday-header" onclick="toggleBirthdaySection()" style="cursor: pointer;" title="Click to expand/collapse">
+                <h3 class="birthday-title">🎂 Birthday Tracker <span id="birthday-count" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #9f1239; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="recommend-btn" onclick="event.stopPropagation(); clearAllBirthdays()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                    <button class="recommend-btn" id="birthday-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                </div>
+            </div>
+
+            <div id="birthday-content" style="overflow: hidden; transition: max-height 0.3s ease-out;">
+                <div id="birthday-notification" style="display: none;"></div>
+
+                <div class="input-group" style="margin-bottom: 12px; gap: 8px;">
+                    <input type="text" id="birthday-name-input" placeholder="Name" style="flex: 1; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                    <input type="date" id="birthday-date-input" placeholder="Birthday" style="flex: 1; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                    <button class="add-btn" onclick="addBirthday()" style="padding: 10px 18px;">Add</button>
+                </div>
+
+                <div id="birthdays-list" class="birthday-list">
+                    <div class="empty-state">No birthdays yet. Add one above!</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Image Preview Modal -->
         <div id="preview-modal" class="preview-modal" onclick="closePreview()">
             <span class="preview-close" onclick="closePreview()">×</span>
@@ -1807,6 +2053,62 @@
             <button onclick="closeHelp()" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 24px; width: 100%; font-weight: 500; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2);">Close</button>
         </div>
     </div>
+
+    <!-- Password Protection Script -->
+    <script>
+        // Password protection
+        const CORRECT_PASSWORD = '5020';
+        const PASSWORD_SESSION_KEY = 'gitesh_tracker_authenticated';
+
+        // Check if already authenticated in this session
+        function checkAuthStatus() {
+            const isAuthenticated = sessionStorage.getItem(PASSWORD_SESSION_KEY);
+            if (isAuthenticated === 'true') {
+                unlockApp();
+            } else {
+                // Focus on password input
+                setTimeout(() => {
+                    document.getElementById('password-input').focus();
+                }, 100);
+            }
+        }
+
+        // Check password
+        function checkPassword() {
+            const input = document.getElementById('password-input');
+            const errorDiv = document.getElementById('password-error');
+
+            if (input.value === CORRECT_PASSWORD) {
+                sessionStorage.setItem(PASSWORD_SESSION_KEY, 'true');
+                unlockApp();
+            } else {
+                errorDiv.style.display = 'block';
+                input.value = '';
+                input.focus();
+
+                // Hide error after 3 seconds
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Unlock the app
+        function unlockApp() {
+            document.getElementById('password-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        }
+
+        // Handle Enter key in password input
+        function handlePasswordKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkPassword();
+            }
+        }
+
+        // Check authentication status on page load
+        checkAuthStatus();
+    </script>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -2214,6 +2516,20 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Convert URLs to clickable hyperlinks
+        function linkifyText(text) {
+            // Escape HTML first
+            const escaped = escapeHtml(text);
+
+            // URL regex pattern
+            const urlPattern = /(https?:\/\/[^\s]+)/g;
+
+            // Replace URLs with clickable links
+            return escaped.replace(urlPattern, function(url) {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: underline; cursor: pointer;" onclick="event.stopPropagation()">${url}</a>`;
+            });
         }
 
         // Update page title with goal count
@@ -3381,7 +3697,7 @@
                         <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
                         <input type="checkbox" ${goal.completed ? 'checked' : ''}
                                onchange="toggleItem('${type}', '${goal.id}')">
-                        <span class="item-text" onclick="toggleDeleteButton(event)" ondblclick="editItem('${type}', '${goal.id}', this)" title="Click to show delete">${escapeHtml(goal.text)}</span>
+                        <span class="item-text" onclick="toggleDeleteButton(event)" ondblclick="editItem('${type}', '${goal.id}', this)" title="Click to show delete">${linkifyText(goal.text)}</span>
                         <button class="attach-btn" onclick="handleItemAttachment('${type}', '${goal.id}')" title="Attach file">📎</button>
                         <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
                     </div>
@@ -3459,18 +3775,33 @@
 
         async function handlePaste(event, type) {
             // Check if clipboard has image data
-            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            const items = (event.clipboardData || event.originalEvent?.clipboardData)?.items;
+
+            if (!items) {
+                console.log('No clipboard items available');
+                return;
+            }
+
             let hasImage = false;
 
             for (let i = 0; i < items.length; i++) {
-                if (items[i].type.indexOf('image') !== -1) {
+                if (items[i].type && items[i].type.indexOf('image') !== -1) {
                     hasImage = true;
                     event.preventDefault();
 
                     const file = items[i].getAsFile();
 
+                    if (!file) {
+                        console.log('Could not get image file from clipboard');
+                        continue;
+                    }
+
                     // Create a checklist item with the pasted image
                     const reader = new FileReader();
+                    reader.onerror = function() {
+                        alert('Error reading image file. Please try again.');
+                    };
+
                     reader.onload = async function(e) {
                         let base64Data = e.target.result;
                         let fileSize = Math.round(base64Data.length * 0.75); // Approximate size
@@ -5504,6 +5835,276 @@
 
             if (window.firebaseReady) {
                 loadWeightFromCloud();
+            }
+        });
+
+        // ===== INDIAN DATE/TIME DISPLAY =====
+        function updateIndianDateTime() {
+            const now = new Date();
+            const options = {
+                timeZone: 'Asia/Kolkata',
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            };
+            const indianTime = now.toLocaleString('en-IN', options);
+            const dateTimeElement = document.getElementById('indian-datetime');
+            if (dateTimeElement) {
+                dateTimeElement.textContent = indianTime + ' IST';
+            }
+        }
+
+        // Update time every second
+        setInterval(updateIndianDateTime, 1000);
+        updateIndianDateTime(); // Initial call
+
+        // ===== BIRTHDAY TRACKER =====
+        let birthdays = [];
+        let birthdayExpanded = false;
+
+        // Load birthdays from localStorage
+        function loadBirthdaysLocal() {
+            const stored = localStorage.getItem('birthdays');
+            if (stored) {
+                try {
+                    birthdays = JSON.parse(stored);
+                } catch (error) {
+                    console.error('Error parsing birthdays:', error);
+                    birthdays = [];
+                }
+            }
+        }
+
+        // Save birthdays to localStorage
+        function saveBirthdaysLocal() {
+            localStorage.setItem('birthdays', JSON.stringify(birthdays));
+        }
+
+        // Save birthdays to Firebase
+        function saveBirthdaysToCloud() {
+            if (window.firebaseReady && window.db) {
+                const userId = getUserId();
+                const userDocRef = window.db.collection('users').doc(userId);
+
+                userDocRef.set({
+                    birthdays: birthdays,
+                    lastModified: new Date().toISOString()
+                }, { merge: true });
+            }
+        }
+
+        // Load birthdays from Firebase
+        function loadBirthdaysFromCloud() {
+            if (window.firebaseReady && window.db) {
+                const userId = getUserId();
+                const userDocRef = window.db.collection('users').doc(userId);
+
+                userDocRef.get().then((doc) => {
+                    if (doc.exists && doc.data().birthdays) {
+                        birthdays = doc.data().birthdays;
+                        saveBirthdaysLocal();
+                        renderBirthdays();
+                        checkBirthdaysToday();
+                    }
+                }).catch((error) => {
+                    console.error('Error loading birthdays from cloud:', error);
+                });
+            }
+        }
+
+        // Add birthday
+        function addBirthday() {
+            const nameInput = document.getElementById('birthday-name-input');
+            const dateInput = document.getElementById('birthday-date-input');
+            const name = nameInput.value.trim();
+            const date = dateInput.value;
+
+            if (!name || !date) {
+                alert('Please enter both name and date');
+                return;
+            }
+
+            birthdays.push({
+                id: Date.now(),
+                name: name,
+                date: date
+            });
+
+            // Sort by month/day
+            birthdays.sort((a, b) => {
+                const dateA = new Date(a.date);
+                const dateB = new Date(b.date);
+                if (dateA.getMonth() !== dateB.getMonth()) {
+                    return dateA.getMonth() - dateB.getMonth();
+                }
+                return dateA.getDate() - dateB.getDate();
+            });
+
+            saveBirthdaysLocal();
+            saveBirthdaysToCloud();
+            renderBirthdays();
+            checkBirthdaysToday();
+
+            nameInput.value = '';
+            dateInput.value = '';
+        }
+
+        // Delete birthday
+        function deleteBirthday(id) {
+            birthdays = birthdays.filter(b => b.id !== id);
+            saveBirthdaysLocal();
+            saveBirthdaysToCloud();
+            renderBirthdays();
+            checkBirthdaysToday();
+        }
+
+        // Check if today is someone's birthday
+        function checkBirthdaysToday() {
+            const today = new Date();
+            const todayMonth = today.getMonth();
+            const todayDate = today.getDate();
+
+            const todayBirthdays = birthdays.filter(b => {
+                const bDay = new Date(b.date);
+                return bDay.getMonth() === todayMonth && bDay.getDate() === todayDate;
+            });
+
+            const notificationDiv = document.getElementById('birthday-notification');
+            if (todayBirthdays.length > 0) {
+                const names = todayBirthdays.map(b => b.name).join(', ');
+                notificationDiv.innerHTML = `
+                    <div class="birthday-notification">
+                        <div class="birthday-notification-text">🎉 Today is ${names}'s birthday! 🎂</div>
+                    </div>
+                `;
+                notificationDiv.style.display = 'block';
+            } else {
+                notificationDiv.style.display = 'none';
+            }
+        }
+
+        // Check if birthday is upcoming (within 7 days)
+        function isUpcoming(date) {
+            const today = new Date();
+            const birthday = new Date(date);
+            birthday.setFullYear(today.getFullYear());
+
+            if (birthday < today) {
+                birthday.setFullYear(today.getFullYear() + 1);
+            }
+
+            const diffTime = birthday - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            return diffDays > 0 && diffDays <= 7;
+        }
+
+        // Check if today is the birthday
+        function isToday(date) {
+            const today = new Date();
+            const birthday = new Date(date);
+            return today.getMonth() === birthday.getMonth() && today.getDate() === birthday.getDate();
+        }
+
+        // Render birthdays
+        function renderBirthdays() {
+            const listElement = document.getElementById('birthdays-list');
+            const countElement = document.getElementById('birthday-count');
+
+            if (countElement) {
+                countElement.textContent = birthdays.length;
+            }
+
+            if (birthdays.length === 0) {
+                listElement.innerHTML = '<div class="empty-state">No birthdays yet. Add one above!</div>';
+                return;
+            }
+
+            listElement.innerHTML = birthdays.map(birthday => {
+                const bDate = new Date(birthday.date);
+                const formattedDate = bDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+                const todayClass = isToday(birthday.date) ? 'today' : (isUpcoming(birthday.date) ? 'upcoming' : '');
+
+                let daysInfo = '';
+                if (isToday(birthday.date)) {
+                    daysInfo = ' • Today! 🎉';
+                } else if (isUpcoming(birthday.date)) {
+                    const today = new Date();
+                    const bday = new Date(birthday.date);
+                    bday.setFullYear(today.getFullYear());
+                    if (bday < today) bday.setFullYear(today.getFullYear() + 1);
+                    const days = Math.ceil((bday - today) / (1000 * 60 * 60 * 24));
+                    daysInfo = ` • In ${days} day${days > 1 ? 's' : ''}`;
+                }
+
+                return `
+                    <div class="birthday-item ${todayClass}">
+                        <div class="birthday-info">
+                            <div class="birthday-name">${birthday.name}</div>
+                            <div class="birthday-date">${formattedDate}${daysInfo}</div>
+                        </div>
+                        <button class="birthday-delete" onclick="deleteBirthday(${birthday.id})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle birthday section
+        function toggleBirthdaySection() {
+            birthdayExpanded = !birthdayExpanded;
+            const content = document.getElementById('birthday-content');
+            const toggleBtn = document.getElementById('birthday-toggle-btn');
+
+            if (birthdayExpanded) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                toggleBtn.textContent = '▲';
+            } else {
+                content.style.maxHeight = '0';
+                toggleBtn.textContent = '▼';
+            }
+        }
+
+        // Clear all birthdays
+        function clearAllBirthdays() {
+            if (birthdays.length === 0) return;
+
+            if (confirm('Are you sure you want to delete all birthdays?')) {
+                birthdays = [];
+                saveBirthdaysLocal();
+                saveBirthdaysToCloud();
+                renderBirthdays();
+                checkBirthdaysToday();
+            }
+        }
+
+        // Initialize birthday section
+        function initBirthdaySection() {
+            const content = document.getElementById('birthday-content');
+            const toggleBtn = document.getElementById('birthday-toggle-btn');
+
+            // Start expanded
+            birthdayExpanded = true;
+            content.style.maxHeight = content.scrollHeight + 'px';
+            toggleBtn.textContent = '▲';
+        }
+
+        // Initialize birthdays on page load
+        window.addEventListener('load', function() {
+            loadBirthdaysLocal();
+            initBirthdaySection();
+            renderBirthdays();
+            checkBirthdaysToday();
+
+            // Check birthdays daily
+            setInterval(checkBirthdaysToday, 60000); // Check every minute
+
+            if (window.firebaseReady) {
+                loadBirthdaysFromCloud();
             }
         });
     </script>
