@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Gitesh Life Tracker v4.0</title>
+    <title>Gitesh Life Tracker v4.1</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='60' fill='white' font-weight='bold'>✓</text></svg>">
     <style>
         * {
@@ -904,8 +904,19 @@
                 overflow-wrap: break-word !important;
                 white-space: normal !important;
                 line-height: 1.3;
-                flex: 1;
+                flex: 1 1 auto;
                 min-width: 0;
+                max-width: 100%;
+            }
+
+            .checklist-item .item-text {
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+                white-space: normal !important;
+            }
+
+            .list-section .checklist .checklist-item .item-text {
+                word-break: normal !important;
             }
 
             .move-btn {
@@ -1078,7 +1089,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v4.0</span></h1>
+        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v4.1</span></h1>
         <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Auto-Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
