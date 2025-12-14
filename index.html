@@ -4248,12 +4248,25 @@
                 return;
             }
 
+            // First check if there's an image - if so, ONLY handle image
             let hasImage = false;
-
             for (let i = 0; i < items.length; i++) {
                 if (items[i].type && items[i].type.indexOf('image') !== -1) {
                     hasImage = true;
+                    break;
+                }
+            }
+
+            // If image detected, prevent ALL default behavior immediately
+            if (hasImage) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type && items[i].type.indexOf('image') !== -1) {
                     event.preventDefault();
+                    event.stopPropagation();
 
                     const file = items[i].getAsFile();
 
@@ -4332,12 +4345,17 @@
                     };
 
                     reader.readAsDataURL(file);
-                    return; // Exit after handling image
+                    break; // Exit loop after finding first image
                 }
             }
 
-            // If no image, handle as text paste
-            if (!hasImage) {
+            // If image was detected, don't process text
+            if (hasImage) {
+                return; // Exit completely - image is being processed
+            }
+
+            // Handle as text paste only if no image
+            {
                 // Prevent default paste behavior
                 event.preventDefault();
 
