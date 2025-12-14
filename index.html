@@ -6,9 +6,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="version" content="4.3-20250114-FINAL">
+    <meta name="version" content="4.4-20251214-FINAL">
     <meta name="force-reload" content="true">
-    <title>Gitesh Life Tracker v4.3 CLEAN</title>
+    <title>Gitesh Life Tracker v4.4 CLEAN</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='60' fill='white' font-weight='bold'>✓</text></svg>">
     <style>
         * {
@@ -1094,11 +1094,390 @@
                 padding: 12px 16px;
             }
         }
+
+        /* Attachment Styles */
+        .attach-btn {
+            background: transparent;
+            color: #666;
+            border: 1px solid transparent;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            opacity: 0;
+            transition: all 0.15s;
+            font-weight: 500;
+            margin-left: 4px;
+        }
+
+        .checklist-item:hover .attach-btn {
+            opacity: 1;
+        }
+
+        .attach-btn:hover {
+            background: #f0f0f0;
+            border-color: #999;
+            color: #333;
+        }
+
+        .attachments-container {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e8e8e8;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .attachment-item {
+            display: inline-flex;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            font-size: 11px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.15s;
+            max-width: 200px;
+        }
+
+        .attachment-item:hover {
+            background: #e9ecef;
+            border-color: #999;
+        }
+
+        .attachment-icon {
+            margin-right: 4px;
+            font-size: 12px;
+        }
+
+        .attachment-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .attachment-delete {
+            margin-left: 6px;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 10px;
+            opacity: 0.7;
+            transition: opacity 0.15s;
+        }
+
+        .attachment-delete:hover {
+            opacity: 1;
+        }
+
+        .attachment-thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #e0e0e0;
+            transition: all 0.15s;
+        }
+
+        .attachment-thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Documents Section */
+        .documents-section {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s;
+        }
+
+        .documents-section:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .documents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .documents-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .documents-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .documents-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .documents-list::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .documents-list::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .documents-list::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        .document-item {
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .document-item:hover {
+            background: #f5f5f5;
+            border-color: #ddd;
+        }
+
+        .document-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e0e7ff;
+            border-radius: 6px;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .document-icon.pdf { background: #fee2e2; color: #dc2626; }
+        .document-icon.doc { background: #dbeafe; color: #1e40af; }
+        .document-icon.xls { background: #d1fae5; color: #065f46; }
+        .document-icon.img { background: #fef3c7; color: #92400e; }
+        .document-icon.other { background: #e5e7eb; color: #4b5563; }
+
+        .document-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .document-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .document-name:hover {
+            color: #007bff;
+        }
+
+        .document-meta {
+            font-size: 10px;
+            color: #999;
+            display: flex;
+            gap: 10px;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .document-preview-btn,
+        .document-download-btn,
+        .document-delete-btn {
+            background: transparent;
+            border: 1px solid #e0e0e0;
+            color: #666;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+
+        .document-preview-btn:hover,
+        .document-download-btn:hover {
+            background: #f8f9fa;
+            border-color: #999;
+            color: #333;
+        }
+
+        .document-delete-btn {
+            color: #dc3545;
+            opacity: 0;
+        }
+
+        .document-item:hover .document-delete-btn {
+            opacity: 1;
+        }
+
+        .document-delete-btn:hover {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .upload-area {
+            border: 2px dashed #e0e0e0;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: #999;
+            background: #fafafa;
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: #f0f0ff;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: #999;
+        }
+
+        .upload-text {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .upload-hint {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .file-input-hidden {
+            display: none;
+        }
+
+        /* Image Preview Modal */
+        .preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .preview-modal.active {
+            display: flex;
+        }
+
+        .preview-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .preview-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 36px;
+            color: white;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .preview-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 768px) {
+            .attach-btn {
+                opacity: 1;
+                font-size: 16px;
+                padding: 6px 10px;
+            }
+
+            .attachment-item {
+                max-width: 150px;
+            }
+
+            .attachment-thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+
+            .document-item {
+                flex-wrap: wrap;
+            }
+
+            .document-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 8px;
+            }
+
+            .document-delete-btn {
+                opacity: 1;
+            }
+
+            .upload-area {
+                padding: 16px;
+            }
+
+            .upload-icon {
+                font-size: 28px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v4.3</span></h1>
+        <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v4.4</span></h1>
         <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Auto-Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
@@ -1287,6 +1666,40 @@
             </div>
         </div>
 
+        <!-- Documents Section -->
+        <div class="documents-section">
+            <div class="documents-header" onclick="toggleDocumentsSection()" style="cursor: pointer;" title="Click to expand/collapse">
+                <h3 class="documents-title">Documents <span id="documents-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="recommend-btn" onclick="event.stopPropagation(); clearAllDocuments()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                    <button class="recommend-btn" id="documents-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                </div>
+            </div>
+
+            <div id="documents-content" style="overflow: hidden; transition: max-height 0.3s ease-out;">
+                <div style="margin-bottom: 12px; padding-top: 8px;">
+                    <input type="text" id="documents-search" placeholder="Search documents..." style="width: 100%; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 12px; margin-bottom: 10px;" oninput="searchDocuments()">
+                </div>
+
+                <div class="upload-area" id="upload-area" onclick="document.getElementById('document-file-input').click()">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Click to upload or drag & drop</div>
+                    <div class="upload-hint">PDF, DOC, XLS, Images (Max 5MB per file)</div>
+                    <input type="file" id="document-file-input" class="file-input-hidden" onchange="handleDocumentUpload(event)" accept="*/*" multiple>
+                </div>
+
+                <div id="documents-list" class="documents-list">
+                    <div class="empty-state">No documents yet. Upload one above!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Preview Modal -->
+        <div id="preview-modal" class="preview-modal" onclick="closePreview()">
+            <span class="preview-close" onclick="closePreview()">×</span>
+            <img id="preview-image" class="preview-image" src="" alt="Preview" onclick="event.stopPropagation()">
+        </div>
+
         <div class="lists-container">
             <!-- Personal List -->
             <div class="list-section" data-list-type="personal">
@@ -1303,7 +1716,7 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="personal-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')" oninput="updateCharCount('personal')">
+                    <input type="text" id="personal-input" placeholder="Add goal(s) - paste text/images..." onkeypress="handleKeyPress(event, 'personal')" onpaste="handlePaste(event, 'personal')" oninput="updateCharCount('personal')">
                     <button class="add-btn" onclick="addItem('personal')">Add</button>
                 </div>
                 <div style="text-align: right; font-size: 10px; color: #999; margin-top: 4px;">
@@ -1338,7 +1751,7 @@
                 </div>
 
                 <div class="input-group">
-                    <input type="text" id="professional-input" placeholder="Add goal(s) - paste multiple lines for bulk add..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')" oninput="updateCharCount('professional')">
+                    <input type="text" id="professional-input" placeholder="Add goal(s) - paste text/images..." onkeypress="handleKeyPress(event, 'professional')" onpaste="handlePaste(event, 'professional')" oninput="updateCharCount('professional')">
                     <button class="add-btn" onclick="addItem('professional')">Add</button>
                 </div>
                 <div style="text-align: right; font-size: 10px; color: #999; margin-top: 4px;">
@@ -2924,13 +3337,44 @@
             }
 
             listElement.innerHTML = sortedGoals.map(goal => {
+                // Build attachments HTML
+                let attachmentsHtml = '';
+                if (goal.attachments && goal.attachments.length > 0) {
+                    const attachmentItems = goal.attachments.map(att => {
+                        const icon = getFileIcon(att.type);
+                        if (att.type === 'img') {
+                            return `
+                                <img src="${att.data}"
+                                     class="attachment-thumbnail"
+                                     onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')"
+                                     title="${escapeHtml(att.name)}"
+                                     alt="${escapeHtml(att.name)}">
+                            `;
+                        } else {
+                            return `
+                                <div class="attachment-item" onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')" title="${escapeHtml(att.name)}">
+                                    <span class="attachment-icon">${icon}</span>
+                                    <span class="attachment-name">${escapeHtml(att.name)}</span>
+                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment">×</span>
+                                </div>
+                            `;
+                        }
+                    }).join('');
+
+                    attachmentsHtml = `<div class="attachments-container">${attachmentItems}</div>`;
+                }
+
                 return `
-                <li class="checklist-item ${goal.completed ? 'completed' : ''}" data-id="${goal.id}" data-type="${type}">
-                    <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
-                    <input type="checkbox" ${goal.completed ? 'checked' : ''}
-                           onchange="toggleItem('${type}', '${goal.id}')">
-                    <span class="item-text" onclick="toggleDeleteButton(event)" ondblclick="editItem('${type}', '${goal.id}', this)" title="Click to show delete">${escapeHtml(goal.text)}</span>
-                    <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
+                <li class="checklist-item ${goal.completed ? 'completed' : ''}" data-id="${goal.id}" data-type="${type}" style="display: block;">
+                    <div style="display: flex; align-items: center;">
+                        <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
+                        <input type="checkbox" ${goal.completed ? 'checked' : ''}
+                               onchange="toggleItem('${type}', '${goal.id}')">
+                        <span class="item-text" onclick="toggleDeleteButton(event)" ondblclick="editItem('${type}', '${goal.id}', this)" title="Click to show delete">${escapeHtml(goal.text)}</span>
+                        <button class="attach-btn" onclick="handleItemAttachment('${type}', '${goal.id}')" title="Attach file">📎</button>
+                        <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
+                    </div>
+                    ${attachmentsHtml}
                 </li>
                 `;
             }).join('');
@@ -3002,65 +3446,135 @@
             }
         }
 
-        function handlePaste(event, type) {
-            // Prevent default paste behavior
-            event.preventDefault();
+        async function handlePaste(event, type) {
+            // Check if clipboard has image data
+            const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+            let hasImage = false;
 
-            // Get pasted text
-            const pastedText = (event.clipboardData || window.clipboardData).getData('text');
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    hasImage = true;
+                    event.preventDefault();
 
-            // Split by new lines and filter out empty lines
-            const lines = pastedText.split(/\r?\n/).filter(line => line.trim() !== '');
+                    const file = items[i].getAsFile();
 
-            if (lines.length === 0) return;
+                    // Create a checklist item with the pasted image
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        let base64Data = e.target.result;
+                        let fileSize = Math.round(base64Data.length * 0.75); // Approximate size
 
-            // If only one line, just set it in the input field
-            if (lines.length === 1) {
-                const input = document.getElementById(`${type}-input`);
-                input.value = lines[0].trim().toLowerCase();
-                return;
-            }
+                        // Check file size (5MB limit)
+                        if (fileSize > 5 * 1024 * 1024) {
+                            // Try to compress
+                            const compressed = await compressImage(base64Data, 5 * 1024 * 1024);
+                            if (!compressed) {
+                                alert('Image too large (max 5MB). Please use a smaller image.');
+                                return;
+                            }
+                            base64Data = compressed;
+                            fileSize = Math.round(base64Data.length * 0.75);
+                        }
 
-            // Multiple lines - add them all as separate goals
-            const goals = type === 'personal' ? personalGoals : professionalGoals;
+                        const goals = type === 'personal' ? personalGoals : professionalGoals;
+                        const timestamp = new Date().toLocaleString();
 
-            let skipped = 0;
-            let duplicates = 0;
-            lines.forEach(line => {
-                const text = line.trim().toLowerCase();
-                if (text && text.replace(/\s/g, '') !== '') {
-                    if (text.length > 200) {
-                        skipped++;
-                    } else if (goals.find(g => g.text === text)) {
-                        duplicates++;
-                    } else {
-                        goals.unshift({
+                        // Create goal with image attachment
+                        const newGoal = {
                             id: generateId(),
-                            text: text,
-                            completed: false
-                        });
-                    }
+                            text: `pasted image ${timestamp}`,
+                            completed: false,
+                            attachments: [{
+                                id: generateId(),
+                                name: `pasted-image-${Date.now()}.png`,
+                                type: 'img',
+                                size: fileSize,
+                                data: base64Data,
+                                uploadDate: new Date().toISOString()
+                            }]
+                        };
+
+                        saveUndoState();
+                        goals.unshift(newGoal);
+                        saveData(type);
+                        renderList(type);
+                        updatePageTitle();
+
+                        // Show success message
+                        const input = document.getElementById(`${type}-input`);
+                        const originalPlaceholder = input.placeholder;
+                        input.placeholder = '✓ Image pasted! Added to list';
+                        setTimeout(() => {
+                            input.placeholder = originalPlaceholder;
+                        }, 2000);
+                    };
+
+                    reader.readAsDataURL(file);
+                    return; // Exit after handling image
                 }
-            });
-
-            let message = '';
-            if (skipped > 0) {
-                message += `${skipped} goal(s) too long (max 200 chars). `;
-            }
-            if (duplicates > 0) {
-                message += `${duplicates} duplicate(s) skipped.`;
-            }
-            if (message) {
-                alert(message.trim());
             }
 
-            saveData(type);
-            renderList(type);
-            updatePageTitle();
+            // If no image, handle as text paste
+            if (!hasImage) {
+                // Prevent default paste behavior
+                event.preventDefault();
 
-            // Clear the input field
-            const input = document.getElementById(`${type}-input`);
-            input.value = '';
+                // Get pasted text
+                const pastedText = (event.clipboardData || window.clipboardData).getData('text');
+
+                // Split by new lines and filter out empty lines
+                const lines = pastedText.split(/\r?\n/).filter(line => line.trim() !== '');
+
+                if (lines.length === 0) return;
+
+                // If only one line, just set it in the input field
+                if (lines.length === 1) {
+                    const input = document.getElementById(`${type}-input`);
+                    input.value = lines[0].trim().toLowerCase();
+                    return;
+                }
+
+                // Multiple lines - add them all as separate goals
+                const goals = type === 'personal' ? personalGoals : professionalGoals;
+
+                let skipped = 0;
+                let duplicates = 0;
+                lines.forEach(line => {
+                    const text = line.trim().toLowerCase();
+                    if (text && text.replace(/\s/g, '') !== '') {
+                        if (text.length > 200) {
+                            skipped++;
+                        } else if (goals.find(g => g.text === text)) {
+                            duplicates++;
+                        } else {
+                            goals.unshift({
+                                id: generateId(),
+                                text: text,
+                                completed: false
+                            });
+                        }
+                    }
+                });
+
+                let message = '';
+                if (skipped > 0) {
+                    message += `${skipped} goal(s) too long (max 200 chars). `;
+                }
+                if (duplicates > 0) {
+                    message += `${duplicates} duplicate(s) skipped.`;
+                }
+                if (message) {
+                    alert(message.trim());
+                }
+
+                saveData(type);
+                renderList(type);
+                updatePageTitle();
+
+                // Clear the input field
+                const input = document.getElementById(`${type}-input`);
+                input.value = '';
+            }
         }
 
         // Stats functions
@@ -3801,6 +4315,550 @@
         });
 
         // Notes loading is now handled in main onFirebaseReady (line 1354)
+
+        // ============ FILE UTILITIES ============
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+
+        // Get file type category
+        function getFileType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            if (['pdf'].includes(ext)) return 'pdf';
+            if (['doc', 'docx', 'txt', 'rtf'].includes(ext)) return 'doc';
+            if (['xls', 'xlsx', 'csv'].includes(ext)) return 'xls';
+            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext)) return 'img';
+            return 'other';
+        }
+
+        // Get file icon based on type
+        function getFileIcon(type) {
+            const icons = {
+                'pdf': '📄',
+                'doc': '📝',
+                'xls': '📊',
+                'img': '🖼️',
+                'other': '📎'
+            };
+            return icons[type] || '📎';
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Compress image if needed
+        async function compressImage(dataUrl, maxSize = MAX_FILE_SIZE) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = function() {
+                    let width = img.width;
+                    let height = img.height;
+                    let quality = 0.9;
+
+                    // Calculate initial size
+                    let currentSize = Math.ceil((dataUrl.length * 3) / 4);
+
+                    // If already under max size, return as-is
+                    if (currentSize <= maxSize) {
+                        resolve(dataUrl);
+                        return;
+                    }
+
+                    // Reduce dimensions if needed
+                    const maxDimension = 1920;
+                    if (width > maxDimension || height > maxDimension) {
+                        if (width > height) {
+                            height = (height / width) * maxDimension;
+                            width = maxDimension;
+                        } else {
+                            width = (width / height) * maxDimension;
+                            height = maxDimension;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Try different quality levels
+                    let compressed = canvas.toDataURL('image/jpeg', quality);
+                    currentSize = Math.ceil((compressed.length * 3) / 4);
+
+                    while (currentSize > maxSize && quality > 0.1) {
+                        quality -= 0.1;
+                        compressed = canvas.toDataURL('image/jpeg', quality);
+                        currentSize = Math.ceil((compressed.length * 3) / 4);
+                    }
+
+                    if (currentSize > maxSize) {
+                        reject(new Error('Unable to compress image to acceptable size'));
+                    } else {
+                        resolve(compressed);
+                    }
+                };
+                img.onerror = () => reject(new Error('Failed to load image'));
+                img.src = dataUrl;
+            });
+        }
+
+        // Read file as base64
+        async function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(e);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ============ DOCUMENTS MANAGEMENT ============
+        let documents = [];
+        let documentsSearchTerm = '';
+        let documentIdCounter = Date.now();
+        let documentsExpanded = false; // Default collapsed
+
+        // Generate unique ID for documents
+        function generateDocumentId() {
+            return documentIdCounter++ + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Toggle documents section expand/collapse
+        function toggleDocumentsSection() {
+            documentsExpanded = !documentsExpanded;
+            const content = document.getElementById('documents-content');
+            const toggleBtn = document.getElementById('documents-toggle-btn');
+
+            if (documentsExpanded) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+                toggleBtn.textContent = '▼';
+            } else {
+                content.style.maxHeight = '0px';
+                toggleBtn.textContent = '▶';
+            }
+
+            // Save state
+            localStorage.setItem('documentsExpanded', documentsExpanded);
+        }
+
+        // Initialize documents section state
+        function initDocumentsSection() {
+            const saved = localStorage.getItem('documentsExpanded');
+            if (saved !== null) {
+                documentsExpanded = saved === 'true';
+            }
+
+            const content = document.getElementById('documents-content');
+            const toggleBtn = document.getElementById('documents-toggle-btn');
+
+            if (documentsExpanded) {
+                content.style.maxHeight = 'none';
+                toggleBtn.textContent = '▼';
+            } else {
+                content.style.maxHeight = '0px';
+                toggleBtn.textContent = '▶';
+            }
+        }
+
+        // Load documents from localStorage
+        function loadDocuments() {
+            const stored = localStorage.getItem('documents');
+            if (stored) {
+                try {
+                    documents = JSON.parse(stored);
+                } catch (error) {
+                    console.error('Error parsing documents:', error);
+                    documents = [];
+                }
+            }
+            renderDocuments();
+        }
+
+        // Save documents to localStorage
+        function saveDocumentsLocal() {
+            localStorage.setItem('documents', JSON.stringify(documents));
+        }
+
+        // Save documents to cloud
+        async function saveDocumentsToCloud() {
+            if (!window.firebaseReady || !window.db) return;
+
+            try {
+                const cloudDocId = getCloudDocId();
+                if (!cloudDocId) return;
+
+                const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const docRef = doc(window.db, 'users', cloudDocId);
+
+                await setDoc(docRef, {
+                    documents: documents
+                }, { merge: true });
+            } catch (error) {
+                console.error('Error saving documents to cloud:', error);
+            }
+        }
+
+        // Load documents from cloud
+        async function loadDocumentsFromCloud() {
+            if (!window.firebaseReady || !window.db) return;
+
+            try {
+                const cloudDocId = getCloudDocId();
+                if (!cloudDocId) return;
+
+                const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const docRef = doc(window.db, 'users', cloudDocId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists() && docSnap.data().documents) {
+                    documents = docSnap.data().documents;
+                    saveDocumentsLocal();
+                    renderDocuments();
+                }
+            } catch (error) {
+                console.error('Error loading documents from cloud:', error);
+            }
+        }
+
+        // Handle document upload
+        async function handleDocumentUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            for (let file of files) {
+                try {
+                    // Check file size
+                    if (file.size > MAX_FILE_SIZE) {
+                        alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
+                        continue;
+                    }
+
+                    // Read file
+                    let fileData = await readFileAsBase64(file);
+                    const fileType = getFileType(file.name);
+
+                    // Compress images if needed
+                    if (fileType === 'img') {
+                        try {
+                            fileData = await compressImage(fileData, MAX_FILE_SIZE);
+                        } catch (error) {
+                            console.error('Image compression failed:', error);
+                            alert(`Failed to compress image "${file.name}". Please try a smaller file.`);
+                            continue;
+                        }
+                    }
+
+                    // Create document object
+                    const newDocument = {
+                        id: generateDocumentId(),
+                        name: file.name,
+                        type: fileType,
+                        size: file.size,
+                        data: fileData,
+                        uploadDate: new Date().toISOString()
+                    };
+
+                    documents.unshift(newDocument);
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    alert(`Failed to upload "${file.name}".`);
+                }
+            }
+
+            saveDocumentsLocal();
+            saveDocumentsToCloud();
+            renderDocuments();
+
+            // Clear input
+            event.target.value = '';
+        }
+
+        // Delete document
+        function deleteDocument(id) {
+            if (!confirm('Delete this document?')) return;
+            documents = documents.filter(d => d.id !== id);
+            saveDocumentsLocal();
+            saveDocumentsToCloud();
+            renderDocuments();
+        }
+
+        // Download document
+        function downloadDocument(id) {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) return;
+
+            const link = document.createElement('a');
+            link.href = doc.data;
+            link.download = doc.name;
+            link.click();
+        }
+
+        // Preview document (images only)
+        function previewDocument(id) {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) return;
+
+            if (doc.type === 'img') {
+                const modal = document.getElementById('preview-modal');
+                const img = document.getElementById('preview-image');
+                img.src = doc.data;
+                modal.classList.add('active');
+            } else {
+                downloadDocument(id);
+            }
+        }
+
+        // Close preview modal
+        function closePreview() {
+            const modal = document.getElementById('preview-modal');
+            modal.classList.remove('active');
+        }
+
+        // Search documents
+        function searchDocuments() {
+            documentsSearchTerm = document.getElementById('documents-search').value.toLowerCase().trim();
+            renderDocuments();
+        }
+
+        // Clear all documents
+        function clearAllDocuments() {
+            if (documents.length === 0) {
+                alert('No documents to clear.');
+                return;
+            }
+
+            if (!confirm(`Delete all ${documents.length} documents?`)) return;
+
+            documents = [];
+            saveDocumentsLocal();
+            saveDocumentsToCloud();
+            renderDocuments();
+        }
+
+        // Render documents
+        function renderDocuments() {
+            const listElement = document.getElementById('documents-list');
+            const countElement = document.getElementById('documents-count');
+
+            // Update count badge
+            if (countElement) {
+                countElement.textContent = documents.length;
+            }
+
+            if (documents.length === 0) {
+                listElement.innerHTML = '<div class="empty-state">No documents yet. Upload one above!</div>';
+                return;
+            }
+
+            // Filter by search term
+            let filteredDocuments = documents;
+            if (documentsSearchTerm) {
+                filteredDocuments = documents.filter(d =>
+                    d.name.toLowerCase().includes(documentsSearchTerm)
+                );
+            }
+
+            if (filteredDocuments.length === 0 && documentsSearchTerm) {
+                listElement.innerHTML = '<div class="empty-state">No documents match your search</div>';
+                return;
+            }
+
+            listElement.innerHTML = filteredDocuments.map(doc => {
+                const uploadDate = new Date(doc.uploadDate).toLocaleDateString();
+                const icon = getFileIcon(doc.type);
+                const previewBtn = doc.type === 'img'
+                    ? `<button class="document-preview-btn" onclick="previewDocument('${doc.id}')">Preview</button>`
+                    : '';
+
+                return `
+                    <div class="document-item" data-id="${doc.id}">
+                        <div class="document-icon ${doc.type}">${icon}</div>
+                        <div class="document-info">
+                            <div class="document-name" onclick="previewDocument('${doc.id}')" title="${escapeHtml(doc.name)}">${escapeHtml(doc.name)}</div>
+                            <div class="document-meta">
+                                <span>${formatFileSize(doc.size)}</span>
+                                <span>${uploadDate}</span>
+                            </div>
+                        </div>
+                        <div class="document-actions">
+                            ${previewBtn}
+                            <button class="document-download-btn" onclick="downloadDocument('${doc.id}')">Download</button>
+                            <button class="document-delete-btn" onclick="deleteDocument('${doc.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update max-height if expanded
+            if (documentsExpanded) {
+                const content = document.getElementById('documents-content');
+                if (content) {
+                    setTimeout(() => {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    }, 10);
+                }
+            }
+        }
+
+        // Setup drag and drop for documents
+        function setupDocumentsDragDrop() {
+            const uploadArea = document.getElementById('upload-area');
+            if (!uploadArea) return;
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    // Create a fake event object to reuse handleDocumentUpload
+                    const fakeEvent = {
+                        target: { files: files, value: '' }
+                    };
+                    await handleDocumentUpload(fakeEvent);
+                }
+            });
+        }
+
+        // Initialize documents on page load
+        window.addEventListener('load', function() {
+            loadDocuments();
+            initDocumentsSection();
+            setupDocumentsDragDrop();
+
+            // If Firebase is ready, load from cloud
+            if (window.firebaseReady) {
+                loadDocumentsFromCloud();
+            }
+        });
+
+        // ============ CHECKLIST ITEM ATTACHMENTS ============
+        let attachmentIdCounter = Date.now();
+
+        // Generate unique ID for attachments
+        function generateAttachmentId() {
+            return attachmentIdCounter++ + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Handle attachment upload for checklist item
+        async function handleItemAttachment(type, goalId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '*/*';
+            input.multiple = true;
+
+            input.onchange = async (e) => {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+
+                const goals = type === 'personal' ? personalGoals : professionalGoals;
+                const goal = goals.find(g => g.id === goalId);
+                if (!goal) return;
+
+                // Initialize attachments array if it doesn't exist
+                if (!goal.attachments) {
+                    goal.attachments = [];
+                }
+
+                for (let file of files) {
+                    try {
+                        // Check file size
+                        if (file.size > MAX_FILE_SIZE) {
+                            alert(`File "${file.name}" is too large. Maximum size is 5MB.`);
+                            continue;
+                        }
+
+                        // Read file
+                        let fileData = await readFileAsBase64(file);
+                        const fileType = getFileType(file.name);
+
+                        // Compress images if needed
+                        if (fileType === 'img') {
+                            try {
+                                fileData = await compressImage(fileData, MAX_FILE_SIZE);
+                            } catch (error) {
+                                console.error('Image compression failed:', error);
+                                alert(`Failed to compress image "${file.name}". Please try a smaller file.`);
+                                continue;
+                            }
+                        }
+
+                        // Create attachment object
+                        const newAttachment = {
+                            id: generateAttachmentId(),
+                            name: file.name,
+                            type: fileType,
+                            size: file.size,
+                            data: fileData,
+                            uploadDate: new Date().toISOString()
+                        };
+
+                        goal.attachments.push(newAttachment);
+                    } catch (error) {
+                        console.error('Error uploading attachment:', error);
+                        alert(`Failed to upload "${file.name}".`);
+                    }
+                }
+
+                saveData(type);
+                renderList(type);
+            };
+
+            input.click();
+        }
+
+        // Delete attachment from checklist item
+        function deleteAttachment(type, goalId, attachmentId, event) {
+            event.stopPropagation();
+
+            if (!confirm('Delete this attachment?')) return;
+
+            const goals = type === 'personal' ? personalGoals : professionalGoals;
+            const goal = goals.find(g => g.id === goalId);
+            if (!goal || !goal.attachments) return;
+
+            goal.attachments = goal.attachments.filter(a => a.id !== attachmentId);
+
+            saveData(type);
+            renderList(type);
+        }
+
+        // Preview/download attachment
+        function viewAttachment(type, goalId, attachmentId) {
+            const goals = type === 'personal' ? personalGoals : professionalGoals;
+            const goal = goals.find(g => g.id === goalId);
+            if (!goal || !goal.attachments) return;
+
+            const attachment = goal.attachments.find(a => a.id === attachmentId);
+            if (!attachment) return;
+
+            if (attachment.type === 'img') {
+                const modal = document.getElementById('preview-modal');
+                const img = document.getElementById('preview-image');
+                img.src = attachment.data;
+                modal.classList.add('active');
+            } else {
+                // Download file
+                const link = document.createElement('a');
+                link.href = attachment.data;
+                link.download = attachment.name;
+                link.click();
+            }
+        }
 
         // ============ WEIGHT TRACKER ============
         let weightData = [];
