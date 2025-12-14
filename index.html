@@ -3052,6 +3052,12 @@
             } catch (error) {
                 console.error('Error saving to cloud:', error);
                 isSavingToCloud = false; // Clear flag on error
+
+                // Check if it's a document size error
+                if (error.message && error.message.includes('exceeds the maximum allowed size')) {
+                    alert('⚠️ Data too large for cloud sync!\n\nYour data (including images) exceeds Firestore\'s 1MB limit.\n\nSuggestions:\n• Delete some old items or images\n• Use smaller images\n• Your data is still saved locally');
+                }
+
                 const statusEl = document.getElementById('sync-status');
                 if (statusEl) {
                     statusEl.className = 'sync-status error';
@@ -4016,16 +4022,19 @@
                         let base64Data = e.target.result;
                         let fileSize = Math.round(base64Data.length * 0.75); // Approximate size
 
-                        // Check file size (5MB limit)
-                        if (fileSize > 5 * 1024 * 1024) {
-                            // Try to compress
-                            const compressed = await compressImage(base64Data, 5 * 1024 * 1024);
-                            if (!compressed) {
-                                alert('Image too large (max 5MB). Please use a smaller image.');
-                                return;
-                            }
+                        // Aggressive compression for Firestore 1MB limit (leave room for other data)
+                        const maxImageSize = 200 * 1024; // 200KB per image to stay under 1MB total doc size
+
+                        try {
+                            // Always compress pasted images to keep them small
+                            const compressed = await compressImage(base64Data, maxImageSize);
                             base64Data = compressed;
                             fileSize = Math.round(base64Data.length * 0.75);
+                            console.log(`📸 Image compressed to ${formatFileSize(fileSize)}`);
+                        } catch (compressionError) {
+                            alert('Image too large and cannot be compressed enough. Please use a smaller image or attach via the attach button.');
+                            console.error('Compression failed:', compressionError);
+                            return;
                         }
 
                         const goals = type === 'personal' ? personalGoals : professionalGoals;
