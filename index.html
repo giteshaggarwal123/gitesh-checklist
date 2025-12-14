@@ -3053,7 +3053,7 @@
 
                     for (const att of goal.attachments) {
                         if (att.type === 'img' && att.data && att.data.startsWith('data:')) {
-                            // Upload to storage and get URL
+                            // Only upload if it's a new image (has data but no URL)
                             const url = await uploadImageToStorage(att.data, att.id);
 
                             if (url) {
@@ -3061,15 +3061,18 @@
                                 attachmentsWithUrls.push({
                                     ...att,
                                     url: url,
-                                    data: undefined // Remove base64 data
+                                    data: undefined // Remove base64 data to save space
                                 });
                             } else {
-                                // Keep original if upload failed
+                                // Keep original if upload failed (will retry next sync)
                                 attachmentsWithUrls.push(att);
                             }
                         } else if (att.url) {
-                            // Already has URL, keep it
-                            attachmentsWithUrls.push(att);
+                            // Already has URL, just keep the URL (no data needed)
+                            attachmentsWithUrls.push({
+                                ...att,
+                                data: undefined // Remove data to save Firestore space
+                            });
                         } else {
                             // Other file types, keep as-is
                             attachmentsWithUrls.push(att);
@@ -3077,6 +3080,9 @@
                     }
 
                     goalCopy.attachments = attachmentsWithUrls;
+                } else {
+                    // No attachments, just copy the goal as-is
+                    goalCopy.attachments = [];
                 }
 
                 goalsWithUrls.push(goalCopy);
@@ -3106,9 +3112,10 @@
                 professionalGoals = deduplicateGoals(professionalGoals);
 
                 // Upload images to Storage and convert to URLs (avoids 1MB Firestore limit)
-                console.log('☁️ Uploading images to Storage...');
+                console.log(`☁️ Starting cloud save - ${personalGoals.length}P + ${professionalGoals.length}P goals`);
                 const personalForCloud = await uploadAttachmentsToStorage(personalGoals);
                 const professionalForCloud = await uploadAttachmentsToStorage(professionalGoals);
+                console.log('☁️ Images uploaded, saving to Firestore...');
 
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
@@ -3121,7 +3128,7 @@
                     statusEl.className = 'sync-status synced';
                     statusEl.textContent = 'Cloud Synced';
                 }
-                console.log(`💾 Saved to cloud [Doc: ${getCloudDocId()}] - ${personalGoals.length}P + ${professionalGoals.length}P = ${personalGoals.length + professionalGoals.length} total goals`);
+                console.log(`✅ CLOUD SAVE COMPLETE [Doc: ${getCloudDocId()}] - ${personalForCloud.length}P + ${professionalForCloud.length}P = ${personalForCloud.length + professionalForCloud.length} total goals`);
 
                 // Clear flag after a longer delay to ensure listener doesn't fire too soon
                 setTimeout(() => {
