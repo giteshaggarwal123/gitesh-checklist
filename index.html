@@ -817,10 +817,9 @@
                 font-size: 10px !important;
             }
 
-            .container > div:first-of-type > div:nth-child(2) button {
-                font-size: 10px !important;
-                padding: 5px 8px !important;
-                margin: 2px !important;
+            .container > div > div button:not(#change-global-rec):not([onclick*="getGlobalRecommendation"]) {
+                font-size: 11px !important;
+                padding: 6px 10px !important;
             }
 
             .lists-container {
@@ -1041,12 +1040,12 @@
 <body>
     <div class="container">
         <h1>Gitesh Life Tracker <span style="font-size: 12px; color: #999; font-weight: 400;">v4.0</span></h1>
-        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">☁️ Auto-Synced</span></p>
+        <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Auto-Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
                 <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 320px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; transition: border-color 0.2s;" oninput="handleSearch()">
-                <button onclick="getGlobalRecommendation()" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2); white-space: nowrap;" title="Get a smart recommendation from all your data" onmouseover="this.style.background='linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.3)'" onmouseout="this.style.background='linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(79, 70, 229, 0.2)'">✨ Recommend</button>
+                <button onclick="getGlobalRecommendation()" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2); white-space: nowrap;" title="Get a smart recommendation from all your data" onmouseover="this.style.background='linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.3)'" onmouseout="this.style.background='linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(79, 70, 229, 0.2)'">Recommend</button>
                 <button onclick="changeGlobalRecommendation()" id="change-global-rec" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; white-space: nowrap; display: none;" title="Get a different recommendation" onmouseover="this.style.background='#f8f9fa'; this.style.borderColor='#999'; this.style.color='#333'" onmouseout="this.style.background='#fff'; this.style.borderColor='#e0e0e0'; this.style.color='#666'">Change</button>
             </div>
 
@@ -1062,16 +1061,11 @@
                 </div>
             </div>
 
-            <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; padding: 4px 0;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
-                <button onclick="resetEverything()" style="background: #dc3545; color: white; border: 1px solid #dc3545; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Delete all data and start fresh">🗑️ Reset All</button>
-                <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Clear all completed goals">Clear Done</button>
-                <button onclick="cleanupDuplicates()" style="background: #10B981; color: white; border: 1px solid #10B981; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Remove duplicate goals">🧹 Fix Duplicates</button>
-                <button onclick="checkFirebaseData()" style="background: #F59E0B; color: white; border: 1px solid #F59E0B; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Check Firebase data">🔍 Debug</button>
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
                 <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Upload backup JSON">Import</button>
-                <button onclick="showHelp()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Keyboard shortcuts">?</button>
                 <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
             </div>
         </div>
@@ -2570,9 +2564,9 @@
             }
 
             // Weight tracking reminder if no recent entries
-            if (typeof weightLog !== 'undefined' && Array.isArray(weightLog)) {
+            if (typeof weightData !== 'undefined' && Array.isArray(weightData)) {
                 const today = new Date();
-                const recentEntry = weightLog.length > 0 ? new Date(weightLog[weightLog.length - 1].date) : null;
+                const recentEntry = weightData.length > 0 ? new Date(weightData[weightData.length - 1].date) : null;
                 if (!recentEntry || (today - recentEntry) / (1000 * 60 * 60 * 24) > 2) {
                     recommendations.push({
                         type: 'Weight Tracking',
