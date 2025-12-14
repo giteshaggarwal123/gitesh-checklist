@@ -2988,13 +2988,13 @@
                     const data = docSnap.data();
                     isLoadingFromCloud = true;
 
-                    // Merge cloud data with local images
-                    const cloudPersonalMerged = mergeCloudWithLocalImages(data.personal || [], personalGoals);
-                    const cloudProfessionalMerged = mergeCloudWithLocalImages(data.professional || [], professionalGoals);
+                    // Load images from chunks
+                    const cloudPersonalWithImages = await loadAttachmentsFromCloud(data.personal || []);
+                    const cloudProfessionalWithImages = await loadAttachmentsFromCloud(data.professional || []);
 
                     // MERGE instead of overwrite to prevent data loss
-                    const cloudPersonal = deduplicateGoals(cloudPersonalMerged);
-                    const cloudProfessional = deduplicateGoals(cloudProfessionalMerged);
+                    const cloudPersonal = deduplicateGoals(cloudPersonalWithImages);
+                    const cloudProfessional = deduplicateGoals(cloudProfessionalWithImages);
 
                     personalGoals = deduplicateGoals(mergeGoals(personalGoals, cloudPersonal));
                     professionalGoals = deduplicateGoals(mergeGoals(professionalGoals, cloudProfessional));
@@ -3031,26 +3031,17 @@
                     if (doc.exists() && !isLoadingFromCloud && !isSavingToCloud) {
                         const data = doc.data();
 
-                        console.log('🖼️ Before merge - Local goals with images:', {
-                            personal: personalGoals.filter(g => g.attachments?.some(a => a.type === 'img' && a.data)).length,
-                            professional: professionalGoals.filter(g => g.attachments?.some(a => a.type === 'img' && a.data)).length
-                        });
+                        // Load images from chunks
+                        const cloudPersonalWithImages = await loadAttachmentsFromCloud(data.personal || []);
+                        const cloudProfessionalWithImages = await loadAttachmentsFromCloud(data.professional || []);
 
-                        // Merge cloud data with local images (images stay in localStorage only)
-                        const cloudPersonalMerged = mergeCloudWithLocalImages(data.personal || [], personalGoals);
-                        const cloudProfessionalMerged = mergeCloudWithLocalImages(data.professional || [], professionalGoals);
-
-                        const cloudPersonal = deduplicateGoals(cloudPersonalMerged);
-                        const cloudProfessional = deduplicateGoals(cloudProfessionalMerged);
+                        const cloudPersonal = deduplicateGoals(cloudPersonalWithImages);
+                        const cloudProfessional = deduplicateGoals(cloudProfessionalWithImages);
 
                         console.log(`🔄 Listener UPDATING LOCAL DATA - Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
                         console.log(`🔄 Current local: ${personalGoals.length}P + ${professionalGoals.length}P`);
-                        console.log('🖼️ After merge - Goals with images:', {
-                            personal: cloudPersonal.filter(g => g.attachments?.some(a => a.type === 'img' && a.data)).length,
-                            professional: cloudProfessional.filter(g => g.attachments?.some(a => a.type === 'img' && a.data)).length
-                        });
 
-                        // Use cloud data merged with local images
+                        // Use cloud data with loaded images
                         personalGoals = cloudPersonal;
                         professionalGoals = cloudProfessional;
 
@@ -3154,7 +3145,7 @@
             }
         }
 
-        // Process attachments for cloud storage (strip images to avoid Firestore size limit)
+        // Process attachments for cloud storage (upload images as chunks to Firestore)
         async function processAttachmentsForCloud(goals) {
             const processedGoals = [];
 
@@ -3162,23 +3153,45 @@
                 const goalCopy = { ...goal };
 
                 if (goal.attachments && goal.attachments.length > 0) {
-                    // Keep attachment metadata but remove image data for cloud
-                    const processedAttachments = goal.attachments.map(att => {
-                        if (att.type === 'img') {
-                            // Keep metadata only, no image data in cloud
-                            return {
+                    const processedAttachments = [];
+
+                    for (const att of goal.attachments) {
+                        if (att.type === 'img' && att.data && att.data.startsWith('data:')) {
+                            // Upload image to chunks and wait for completion
+                            console.log(`📤 Uploading image ${att.id} to chunks...`);
+                            const chunkInfo = await uploadImageToChunks(att.data, att.id);
+
+                            if (chunkInfo) {
+                                // Store reference to chunks (no image data)
+                                processedAttachments.push({
+                                    id: att.id,
+                                    type: att.type,
+                                    name: att.name,
+                                    size: att.size,
+                                    uploadDate: att.uploadDate,
+                                    chunked: true,
+                                    totalChunks: chunkInfo.totalChunks
+                                });
+                                console.log(`✅ Image ${att.id} uploaded as ${chunkInfo.totalChunks} chunks`);
+                            } else {
+                                console.error(`❌ Failed to upload image ${att.id}`);
+                            }
+                        } else if (att.chunked && att.totalChunks) {
+                            // Already chunked, keep reference
+                            processedAttachments.push({
                                 id: att.id,
                                 type: att.type,
                                 name: att.name,
                                 size: att.size,
                                 uploadDate: att.uploadDate,
-                                cloudPlaceholder: true // Marker that actual data is in localStorage
-                            };
+                                chunked: true,
+                                totalChunks: att.totalChunks
+                            });
                         } else {
                             // Other file types, keep as-is
-                            return att;
+                            processedAttachments.push(att);
                         }
-                    });
+                    }
 
                     goalCopy.attachments = processedAttachments;
                 } else {
@@ -3188,43 +3201,56 @@
                 processedGoals.push(goalCopy);
             }
 
+            console.log('✅ All image chunks uploaded successfully');
             return processedGoals;
         }
 
-        // Merge cloud goals with local goals, preserving local images
-        function mergeCloudWithLocalImages(cloudGoals, localGoals) {
-            // Create a map of local goals by ID for quick lookup
-            const localGoalsMap = new Map();
-            localGoals.forEach(goal => {
-                localGoalsMap.set(goal.id, goal);
-            });
+        // Load attachments from cloud (reconstruct images from chunks)
+        async function loadAttachmentsFromCloud(goals) {
+            const goalsWithData = [];
 
-            // Start with all cloud goals
-            const mergedGoals = cloudGoals.map(cloudGoal => {
-                const localGoal = localGoalsMap.get(cloudGoal.id);
+            for (const goal of goals) {
+                const goalCopy = { ...goal };
 
-                if (localGoal && localGoal.attachments && localGoal.attachments.length > 0) {
-                    // If local has attachments with actual image data, keep ALL local attachments
-                    const hasLocalImages = localGoal.attachments.some(att => att.type === 'img' && att.data);
-                    if (hasLocalImages) {
-                        // Use cloud goal but completely replace attachments with local version
-                        return { ...cloudGoal, attachments: localGoal.attachments };
+                if (goal.attachments && goal.attachments.length > 0) {
+                    const attachmentsWithData = [];
+
+                    for (const att of goal.attachments) {
+                        if (att.chunked && att.totalChunks) {
+                            // Load image from chunks
+                            console.log(`📥 Loading image ${att.id} from ${att.totalChunks} chunks...`);
+                            const data = await loadImageFromChunks(att.id, att.totalChunks);
+
+                            if (data) {
+                                attachmentsWithData.push({
+                                    id: att.id,
+                                    type: att.type,
+                                    name: att.name,
+                                    size: att.size,
+                                    uploadDate: att.uploadDate,
+                                    data: data,
+                                    chunked: true,
+                                    totalChunks: att.totalChunks
+                                });
+                                console.log(`✅ Image ${att.id} loaded successfully`);
+                            } else {
+                                console.error(`❌ Failed to load image ${att.id}`);
+                            }
+                        } else {
+                            // Not chunked, keep as-is
+                            attachmentsWithData.push(att);
+                        }
                     }
+
+                    goalCopy.attachments = attachmentsWithData;
+                } else {
+                    goalCopy.attachments = [];
                 }
 
-                return cloudGoal;
-            });
+                goalsWithData.push(goalCopy);
+            }
 
-            // Add any local goals that aren't in cloud (newly added with images)
-            localGoals.forEach(localGoal => {
-                const existsInCloud = cloudGoals.some(cg => cg.id === localGoal.id);
-                if (!existsInCloud && localGoal.attachments && localGoal.attachments.length > 0) {
-                    // Local goal with images not yet in cloud
-                    mergedGoals.push(localGoal);
-                }
-            });
-
-            return mergedGoals;
+            return goalsWithData;
         }
 
         async function saveToCloud() {
@@ -3247,11 +3273,11 @@
                 personalGoals = deduplicateGoals(personalGoals);
                 professionalGoals = deduplicateGoals(professionalGoals);
 
-                // Process images as chunks (avoids 1MB Firestore limit)
+                // Upload images to Firestore chunks (cross-device sync)
                 console.log(`☁️ Starting cloud save - ${personalGoals.length}P + ${professionalGoals.length}P goals`);
                 const personalForCloud = await processAttachmentsForCloud(personalGoals);
                 const professionalForCloud = await processAttachmentsForCloud(professionalGoals);
-                console.log('☁️ Images chunked, saving to Firestore...');
+                console.log('☁️ All images uploaded to chunks, saving main document...');
 
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
