@@ -2302,6 +2302,7 @@
         try {
             const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
             const { getFirestore, doc, setDoc, getDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            const { getStorage, ref, uploadString, getDownloadURL, deleteObject } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js');
 
             // Firebase configuration
             const firebaseConfig = {
@@ -2317,13 +2318,19 @@
             // Initialize Firebase
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
+            const storage = getStorage(app);
 
             // Make Firebase available globally
             window.db = db;
+            window.storage = storage;
             window.firestoreDoc = doc;
             window.firestoreSetDoc = setDoc;
             window.firestoreGetDoc = getDoc;
             window.firestoreOnSnapshot = onSnapshot;
+            window.storageRef = ref;
+            window.storageUploadString = uploadString;
+            window.storageGetDownloadURL = getDownloadURL;
+            window.storageDeleteObject = deleteObject;
             window.firebaseReady = true;
 
             // Trigger load once Firebase is ready
@@ -2992,19 +2999,9 @@
                         console.log(`🔄 Listener UPDATING LOCAL DATA - Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
                         console.log(`🔄 Current local: ${personalGoals.length}P + ${professionalGoals.length}P`);
 
-                        // Merge cloud data with local attachments (attachments are local-only)
-                        const mergeAttachments = (cloudGoals, localGoals) => {
-                            return cloudGoals.map(cloudGoal => {
-                                const localGoal = localGoals.find(lg => lg.id === cloudGoal.id);
-                                if (localGoal && localGoal.attachments) {
-                                    return { ...cloudGoal, attachments: localGoal.attachments };
-                                }
-                                return cloudGoal;
-                            });
-                        };
-
-                        personalGoals = mergeAttachments(cloudPersonal, personalGoals);
-                        professionalGoals = mergeAttachments(cloudProfessional, professionalGoals);
+                        // Directly use cloud data (now includes attachment URLs from Storage)
+                        personalGoals = cloudPersonal;
+                        professionalGoals = cloudProfessional;
 
                         // Save to localStorage for offline access
                         localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
@@ -3020,6 +3017,72 @@
             } catch (error) {
                 console.error('Error loading from cloud:', error);
             }
+        }
+
+        // Upload image to Firebase Storage and return download URL
+        async function uploadImageToStorage(base64Data, attachmentId) {
+            if (!window.storage) return null;
+
+            try {
+                const userId = getUserId();
+                const storagePath = `users/${userId}/images/${attachmentId}`;
+                const storageReference = window.storageRef(window.storage, storagePath);
+
+                // Upload base64 string
+                await window.storageUploadString(storageReference, base64Data, 'data_url');
+
+                // Get download URL
+                const downloadURL = await window.storageGetDownloadURL(storageReference);
+                console.log(`☁️ Uploaded image to Storage: ${attachmentId}`);
+                return downloadURL;
+            } catch (error) {
+                console.error('Error uploading image to Storage:', error);
+                return null;
+            }
+        }
+
+        // Upload all attachments and convert to URLs
+        async function uploadAttachmentsToStorage(goals) {
+            const goalsWithUrls = [];
+
+            for (const goal of goals) {
+                const goalCopy = { ...goal };
+
+                if (goal.attachments && goal.attachments.length > 0) {
+                    const attachmentsWithUrls = [];
+
+                    for (const att of goal.attachments) {
+                        if (att.type === 'img' && att.data && att.data.startsWith('data:')) {
+                            // Upload to storage and get URL
+                            const url = await uploadImageToStorage(att.data, att.id);
+
+                            if (url) {
+                                // Replace data with URL
+                                attachmentsWithUrls.push({
+                                    ...att,
+                                    url: url,
+                                    data: undefined // Remove base64 data
+                                });
+                            } else {
+                                // Keep original if upload failed
+                                attachmentsWithUrls.push(att);
+                            }
+                        } else if (att.url) {
+                            // Already has URL, keep it
+                            attachmentsWithUrls.push(att);
+                        } else {
+                            // Other file types, keep as-is
+                            attachmentsWithUrls.push(att);
+                        }
+                    }
+
+                    goalCopy.attachments = attachmentsWithUrls;
+                }
+
+                goalsWithUrls.push(goalCopy);
+            }
+
+            return goalsWithUrls;
         }
 
         async function saveToCloud() {
@@ -3042,15 +3105,10 @@
                 personalGoals = deduplicateGoals(personalGoals);
                 professionalGoals = deduplicateGoals(professionalGoals);
 
-                // Strip attachments for cloud sync (keep them local only to avoid 1MB limit)
-                const personalForCloud = personalGoals.map(goal => {
-                    const { attachments, ...goalWithoutAttachments } = goal;
-                    return goalWithoutAttachments;
-                });
-                const professionalForCloud = professionalGoals.map(goal => {
-                    const { attachments, ...goalWithoutAttachments } = goal;
-                    return goalWithoutAttachments;
-                });
+                // Upload images to Storage and convert to URLs (avoids 1MB Firestore limit)
+                console.log('☁️ Uploading images to Storage...');
+                const personalForCloud = await uploadAttachmentsToStorage(personalGoals);
+                const professionalForCloud = await uploadAttachmentsToStorage(professionalGoals);
 
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
@@ -3892,9 +3950,10 @@
                     const attachmentItems = goal.attachments.map(att => {
                         const icon = getFileIcon(att.type);
                         if (att.type === 'img') {
+                            const imgSrc = att.url || att.data; // Use URL if available, otherwise base64
                             return `
                                 <div style="position: relative; display: inline-block;">
-                                    <img src="${att.data}"
+                                    <img src="${imgSrc}"
                                          class="attachment-thumbnail"
                                          onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')"
                                          title="${escapeHtml(att.name)}"
