@@ -784,12 +784,40 @@
             }
 
             #search-input {
-                font-size: 11px !important;
-                padding: 6px !important;
-                max-width: 100% !important;
+                font-size: 12px !important;
+                padding: 8px 10px !important;
+                max-width: 180px !important;
             }
 
-            #search-input + div button {
+            #search-input + button {
+                font-size: 11px !important;
+                padding: 8px 10px !important;
+                white-space: nowrap !important;
+            }
+
+            #change-global-rec {
+                font-size: 11px !important;
+                padding: 8px 10px !important;
+            }
+
+            #global-recommendation {
+                padding: 12px 14px !important;
+                margin-bottom: 8px !important;
+            }
+
+            #global-recommendation #rec-type {
+                font-size: 10px !important;
+            }
+
+            #global-recommendation #rec-content {
+                font-size: 13px !important;
+            }
+
+            #global-recommendation #rec-meta {
+                font-size: 10px !important;
+            }
+
+            .container > div:first-of-type > div:nth-child(2) button {
                 font-size: 10px !important;
                 padding: 5px 8px !important;
                 margin: 2px !important;
@@ -1016,11 +1044,30 @@
         <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">☁️ Auto-Synced</span></p>
 
         <div style="text-align: center; margin-bottom: 20px;">
-            <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; margin-bottom: 12px; transition: border-color 0.2s;" oninput="handleSearch()">
+            <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
+                <input type="text" id="search-input" placeholder="Search goals and notes..." style="width: 100%; max-width: 320px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; transition: border-color 0.2s;" oninput="handleSearch()">
+                <button onclick="getGlobalRecommendation()" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2); white-space: nowrap;" title="Get a smart recommendation from all your data" onmouseover="this.style.background='linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.3)'" onmouseout="this.style.background='linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(79, 70, 229, 0.2)'">✨ Recommend</button>
+                <button onclick="changeGlobalRecommendation()" id="change-global-rec" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; white-space: nowrap; display: none;" title="Get a different recommendation" onmouseover="this.style.background='#f8f9fa'; this.style.borderColor='#999'; this.style.color='#333'" onmouseout="this.style.background='#fff'; this.style.borderColor='#e0e0e0'; this.style.color='#666'">Change</button>
+            </div>
+
+            <!-- Global Recommendation Display -->
+            <div id="global-recommendation" style="display: none; background: linear-gradient(135deg, #f0f4ff 0%, #f8f5ff 100%); border: 2px solid var(--primary); padding: 16px 20px; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15); max-width: 600px; margin-left: auto; margin-right: auto;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                    <div style="flex: 1;">
+                        <div style="font-size: 11px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;" id="rec-type"></div>
+                        <div style="font-size: 15px; font-weight: 600; color: #1a1a1a; line-height: 1.4;" id="rec-content"></div>
+                        <div style="font-size: 12px; color: #666; margin-top: 4px;" id="rec-meta"></div>
+                    </div>
+                    <button onclick="dismissRecommendation()" style="background: transparent; color: #999; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 18px; line-height: 1; transition: all 0.15s;" title="Dismiss" onmouseover="this.style.color='#333'; this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.color='#999'; this.style.background='transparent'">×</button>
+                </div>
+            </div>
+
             <div style="display: flex; flex-wrap: nowrap; gap: 6px; justify-content: center; align-items: center; overflow-x: auto; padding: 4px 0;">
                 <button onclick="undo()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Undo last action (Ctrl+Z)">Undo</button>
                 <button onclick="resetEverything()" style="background: #dc3545; color: white; border: 1px solid #dc3545; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Delete all data and start fresh">🗑️ Reset All</button>
                 <button onclick="clearAllCompleted()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Clear all completed goals">Clear Done</button>
+                <button onclick="cleanupDuplicates()" style="background: #10B981; color: white; border: 1px solid #10B981; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Remove duplicate goals">🧹 Fix Duplicates</button>
+                <button onclick="checkFirebaseData()" style="background: #F59E0B; color: white; border: 1px solid #F59E0B; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Check Firebase data">🔍 Debug</button>
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
                 <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Upload backup JSON">Import</button>
@@ -1481,30 +1528,6 @@
             alert(debug);
         }
 
-        // Test sync function - adds a timestamped test goal
-        async function testSync() {
-            if (!window.firebaseReady || !window.db) {
-                alert('Firebase not ready. Please refresh the page.');
-                return;
-            }
-
-            const timestamp = new Date().toLocaleTimeString();
-            const testGoal = {
-                id: generateId(),
-                text: `sync test ${timestamp}`,
-                completed: false
-            };
-
-            personalGoals.push(testGoal);
-            localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
-            await saveToCloud();
-            renderList('personal');
-            updatePageTitle();
-            renderDashboard();
-
-            alert(`🧪 TEST SYNC\n\nAdded test goal: "${testGoal.text}"\n\nCheck if it appears on your other device within 2-3 seconds.\n\nIf it doesn't appear, your Sync IDs might be different!`);
-        }
-
         // Force sync function - gives user choice
         async function forceSync() {
             if (!window.firebaseReady || !window.db) {
@@ -1582,36 +1605,150 @@
             if (!confirm2) return;
 
             try {
-                // Clear localStorage
-                localStorage.clear();
+                console.log('🗑️ NUCLEAR RESET STARTING...');
 
-                // Clear cloud database
-                if (window.firebaseReady && window.db) {
-                    const cloudDocId = getCloudDocId();
-
-                    const docRef = window.firestoreDoc(window.db, 'goals', cloudDocId);
-                    await window.firestoreSetDoc(docRef, {
-                        personal: [],
-                        professional: [],
-                        lastUpdated: new Date().toISOString()
-                    });
-
-                    const habitsRef = window.firestoreDoc(window.db, 'habits', cloudDocId);
-                    await window.firestoreSetDoc(habitsRef, { habits: {} });
-
-                    const notesRef = window.firestoreDoc(window.db, 'notes', cloudDocId);
-                    await window.firestoreSetDoc(notesRef, { notes: [] });
-
-                    const weightRef = window.firestoreDoc(window.db, 'weight', cloudDocId);
-                    await window.firestoreSetDoc(weightRef, { weightData: [] });
+                // 1. Unsubscribe from real-time listener FIRST
+                if (goalsUnsubscribe) {
+                    console.log('🔌 Unsubscribing listener...');
+                    goalsUnsubscribe();
+                    goalsUnsubscribe = null;
                 }
 
-                alert('✅ Everything deleted!\n\nReloading app...');
-                location.reload();
+                // 2. Clear in-memory data
+                personalGoals = [];
+                professionalGoals = [];
+                console.log('💾 Memory cleared');
+
+                // 3. Clear ALL browser storage
+                localStorage.clear();
+                sessionStorage.clear();
+                console.log('🧹 Storage cleared');
+
+                // 4. Clear Firebase completely
+                if (window.firebaseReady && window.db) {
+                    const cloudDocId = getCloudDocId();
+                    console.log(`☁️ Clearing Firebase: ${cloudDocId}`);
+
+                    await window.firestoreSetDoc(
+                        window.firestoreDoc(window.db, 'goals', cloudDocId),
+                        { personal: [], professional: [], lastUpdated: new Date().toISOString() }
+                    );
+
+                    await window.firestoreSetDoc(
+                        window.firestoreDoc(window.db, 'habits', cloudDocId),
+                        { habits: {}, lastUpdated: new Date().toISOString() }
+                    );
+
+                    await window.firestoreSetDoc(
+                        window.firestoreDoc(window.db, 'notes', cloudDocId),
+                        { notes: [], lastUpdated: new Date().toISOString() }
+                    );
+
+                    await window.firestoreSetDoc(
+                        window.firestoreDoc(window.db, 'weight', cloudDocId),
+                        { weightData: [], lastUpdated: new Date().toISOString() }
+                    );
+
+                    console.log('✅ Firebase cleared!');
+
+                    // Wait for Firebase to sync
+                    await new Promise(r => setTimeout(r, 1500));
+                }
+
+                alert('✅ NUCLEAR RESET COMPLETE!\n\nEverything deleted from:\n• Memory\n• Local Storage\n• Firebase Cloud\n\nReloading...');
+
+                // Hard reload after delay
+                setTimeout(() => location.reload(true), 1000);
+
             } catch (error) {
-                console.error('Reset failed:', error);
-                alert('❌ Reset failed: ' + error.message);
+                console.error('❌ Reset failed:', error);
+                alert('❌ RESET FAILED!\n\n' + error.message + '\n\nCheck console (F12)');
             }
+        }
+
+        // DIAGNOSTIC: Check what's actually in Firebase
+        async function checkFirebaseData() {
+            if (!window.firebaseReady || !window.db) {
+                alert('❌ Firebase not ready!');
+                return;
+            }
+
+            try {
+                const cloudDocId = getCloudDocId();
+                const docRef = window.firestoreDoc(window.db, 'goals', cloudDocId);
+                const docSnap = await window.firestoreGetDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const cloudPersonal = (data.personal || []).length;
+                    const cloudProfessional = (data.professional || []).length;
+                    const cloudTotal = cloudPersonal + cloudProfessional;
+
+                    const localPersonal = personalGoals.length;
+                    const localProfessional = professionalGoals.length;
+                    const localTotal = localPersonal + localProfessional;
+
+                    const localStoragePersonal = JSON.parse(localStorage.getItem('personalGoals') || '[]').length;
+                    const localStorageProfessional = JSON.parse(localStorage.getItem('professionalGoals') || '[]').length;
+                    const localStorageTotal = localStoragePersonal + localStorageProfessional;
+
+                    alert(
+                        `🔍 DATA DIAGNOSTIC\n\n` +
+                        `Sync ID: ${cloudDocId}\n\n` +
+                        `☁️ FIREBASE CLOUD:\n` +
+                        `   Total: ${cloudTotal} goals\n` +
+                        `   Personal: ${cloudPersonal}\n` +
+                        `   Professional: ${cloudProfessional}\n\n` +
+                        `💾 IN-MEMORY (Current):\n` +
+                        `   Total: ${localTotal} goals\n` +
+                        `   Personal: ${localPersonal}\n` +
+                        `   Professional: ${localProfessional}\n\n` +
+                        `💿 LOCAL STORAGE:\n` +
+                        `   Total: ${localStorageTotal} goals\n` +
+                        `   Personal: ${localStoragePersonal}\n` +
+                        `   Professional: ${localStorageProfessional}\n\n` +
+                        `Last Updated: ${data.lastUpdated || 'Unknown'}`
+                    );
+                } else {
+                    alert(`❌ No Firebase data found for Sync ID: ${cloudDocId}`);
+                }
+            } catch (error) {
+                alert(`❌ Error checking Firebase:\n${error.message}`);
+                console.error(error);
+            }
+        }
+
+        // Clean up duplicates from current data and Firebase
+        async function cleanupDuplicates() {
+            const beforePersonal = personalGoals.length;
+            const beforeProfessional = professionalGoals.length;
+            const beforeTotal = beforePersonal + beforeProfessional;
+
+            // Deduplicate in-memory data
+            personalGoals = deduplicateGoals(personalGoals);
+            professionalGoals = deduplicateGoals(professionalGoals);
+
+            const afterPersonal = personalGoals.length;
+            const afterProfessional = professionalGoals.length;
+            const afterTotal = afterPersonal + afterProfessional;
+            const removed = beforeTotal - afterTotal;
+
+            // Save cleaned data
+            localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
+            localStorage.setItem('professionalGoals', JSON.stringify(professionalGoals));
+
+            // Save to cloud
+            if (window.firebaseReady && window.db) {
+                await saveToCloud();
+            }
+
+            // Re-render
+            renderList('personal');
+            renderList('professional');
+            updatePageTitle();
+            renderDashboard();
+
+            alert(`🧹 CLEANUP COMPLETE!\n\nBefore: ${beforeTotal} goals (${beforePersonal}P + ${beforeProfessional}P)\nAfter: ${afterTotal} goals (${afterPersonal}P + ${afterProfessional}P)\n\nRemoved ${removed} duplicates!`);
         }
 
         let goalsUnsubscribe = null; // Store listener unsubscribe function
@@ -1622,6 +1759,10 @@
         let personalGoals = JSON.parse(localStorage.getItem('personalGoals')) || [];
         let professionalGoals = JSON.parse(localStorage.getItem('professionalGoals')) || [];
         let idCounter = Date.now();
+
+        // Deduplicate on load to fix any existing duplicates
+        personalGoals = deduplicateGoals(personalGoals);
+        professionalGoals = deduplicateGoals(professionalGoals);
 
         // Generate unique ID with collision prevention
         function generateId() {
@@ -1718,8 +1859,8 @@
                 return;
             }
             const prevState = undoStack.pop();
-            personalGoals = prevState.personal;
-            professionalGoals = prevState.professional;
+            personalGoals = deduplicateGoals(prevState.personal);
+            professionalGoals = deduplicateGoals(prevState.professional);
             saveData('personal');
             saveData('professional');
             renderList('personal');
@@ -1771,19 +1912,41 @@
             renderList(type);
         }
 
-        // Merge goals from two sources (prevents data loss)
+        // Prefer cloud over local to prevent duplicates (cloud is source of truth)
         function mergeGoals(local, cloud) {
-            const merged = [...cloud];
-            const cloudIds = new Set(cloud.map(g => g.id));
+            // If cloud has data, use cloud as source of truth
+            if (cloud.length > 0) {
+                console.log(`☁️ Using cloud data (${cloud.length} goals) as source of truth`);
+                return cloud;
+            }
 
-            // Add local goals that don't exist in cloud
-            local.forEach(goal => {
-                if (!cloudIds.has(goal.id)) {
-                    merged.push(goal);
+            // If cloud is empty but local has data, upload local to cloud
+            if (local.length > 0) {
+                console.log(`📤 Cloud empty, using local data (${local.length} goals)`);
+                return local;
+            }
+
+            // Both empty
+            return [];
+        }
+
+        // Deduplicate goals array by ID AND text (keep first occurrence)
+        function deduplicateGoals(goals) {
+            const seenIds = new Set();
+            const seenTexts = new Set();
+            return goals.filter(goal => {
+                const normalizedText = goal.text.toLowerCase().trim();
+
+                // Check if we've seen this ID or text before
+                if (seenIds.has(goal.id) || seenTexts.has(normalizedText)) {
+                    console.log(`🗑️ Removing duplicate: "${goal.text}"`);
+                    return false;
                 }
-            });
 
-            return merged;
+                seenIds.add(goal.id);
+                seenTexts.add(normalizedText);
+                return true;
+            });
         }
 
         // Merge habits from two sources
@@ -1803,34 +1966,32 @@
             return merged;
         }
 
-        // Merge notes from two sources
+        // Merge notes from two sources (prefer cloud)
         function mergeNotes(local, cloud) {
-            const merged = [...cloud];
-            const cloudIds = new Set(cloud.map(n => n.id));
-
-            // Add local notes that don't exist in cloud
-            local.forEach(note => {
-                if (!cloudIds.has(note.id)) {
-                    merged.push(note);
-                }
-            });
-
-            return merged;
+            // Prefer cloud as source of truth
+            if (cloud.length > 0) {
+                console.log(`☁️ Using cloud notes (${cloud.length}) as source of truth`);
+                return cloud;
+            }
+            if (local.length > 0) {
+                console.log(`📤 Cloud empty, using local notes (${local.length})`);
+                return local;
+            }
+            return [];
         }
 
-        // Merge weight data from two sources
+        // Merge weight data from two sources (prefer cloud)
         function mergeWeightData(local, cloud) {
-            const merged = [...cloud];
-            const cloudDates = new Set(cloud.map(w => w.date));
-
-            // Add local weight entries that don't exist in cloud
-            local.forEach(entry => {
-                if (!cloudDates.has(entry.date)) {
-                    merged.push(entry);
-                }
-            });
-
-            return merged;
+            // Prefer cloud as source of truth
+            if (cloud.length > 0) {
+                console.log(`☁️ Using cloud weight data (${cloud.length}) as source of truth`);
+                return cloud;
+            }
+            if (local.length > 0) {
+                console.log(`📤 Cloud empty, using local weight data (${local.length})`);
+                return local;
+            }
+            return [];
         }
 
         // Cloud sync functions
@@ -1850,13 +2011,13 @@
                     isLoadingFromCloud = true;
 
                     // MERGE instead of overwrite to prevent data loss
-                    const cloudPersonal = data.personal || [];
-                    const cloudProfessional = data.professional || [];
+                    const cloudPersonal = deduplicateGoals(data.personal || []);
+                    const cloudProfessional = deduplicateGoals(data.professional || []);
 
-                    personalGoals = mergeGoals(personalGoals, cloudPersonal);
-                    professionalGoals = mergeGoals(professionalGoals, cloudProfessional);
+                    personalGoals = deduplicateGoals(mergeGoals(personalGoals, cloudPersonal));
+                    professionalGoals = deduplicateGoals(mergeGoals(professionalGoals, cloudProfessional));
 
-                    // Save merged data back to cloud
+                    // Save merged and deduplicated data back to cloud
                     await saveToCloud();
 
                     // Also save to localStorage as backup
@@ -1885,8 +2046,8 @@
                 goalsUnsubscribe = window.firestoreOnSnapshot(docRef, (doc) => {
                     if (doc.exists() && !isLoadingFromCloud) {
                         const data = doc.data();
-                        const cloudPersonal = data.personal || [];
-                        const cloudProfessional = data.professional || [];
+                        const cloudPersonal = deduplicateGoals(data.personal || []);
+                        const cloudProfessional = deduplicateGoals(data.professional || []);
 
                         console.log(`🔄 Listener fired! Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
 
@@ -1918,6 +2079,10 @@
                     statusEl.className = 'sync-status syncing';
                     statusEl.textContent = 'Syncing...';
                 }
+
+                // Deduplicate before saving to ensure clean data in cloud
+                personalGoals = deduplicateGoals(personalGoals);
+                professionalGoals = deduplicateGoals(professionalGoals);
 
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
@@ -2261,8 +2426,8 @@
 
                     if (confirm('This will replace your current goals, habits, notes, weight data and sync to cloud. Continue?')) {
                         saveUndoState(); // Allow undo
-                        personalGoals = data.personal || [];
-                        professionalGoals = data.professional || [];
+                        personalGoals = deduplicateGoals(data.personal || []);
+                        professionalGoals = deduplicateGoals(data.professional || []);
                         if (data.dailyHabits && typeof data.dailyHabits === 'object') {
                             dailyHabits = data.dailyHabits;
                             localStorage.setItem('dailyHabits', JSON.stringify(dailyHabits));
@@ -2335,6 +2500,147 @@
                 // Get a new recommendation
                 recommendGoal(type);
             }
+        }
+
+        // Global Recommendation System
+        let currentGlobalRecommendation = null;
+
+        function getGlobalRecommendation() {
+            const recommendations = [];
+
+            // Collect uncompleted personal goals
+            const uncompletedPersonal = personalGoals.filter(g => !g.completed);
+            uncompletedPersonal.forEach(goal => {
+                recommendations.push({
+                    type: 'Personal Goal',
+                    content: goal.text,
+                    meta: goal.priority ? `Priority: ${goal.priority}` : '',
+                    category: 'goal',
+                    priority: goal.priority === 'high' ? 3 : goal.priority === 'medium' ? 2 : 1,
+                    id: goal.id,
+                    listType: 'personal'
+                });
+            });
+
+            // Collect uncompleted professional goals
+            const uncompletedProfessional = professionalGoals.filter(g => !g.completed);
+            uncompletedProfessional.forEach(goal => {
+                recommendations.push({
+                    type: 'Professional Goal',
+                    content: goal.text,
+                    meta: goal.priority ? `Priority: ${goal.priority}` : '',
+                    category: 'goal',
+                    priority: goal.priority === 'high' ? 3 : goal.priority === 'medium' ? 2 : 1,
+                    id: goal.id,
+                    listType: 'professional'
+                });
+            });
+
+            // Collect uncompleted daily habits
+            if (dailyHabits && dailyHabits.habits) {
+                const today = new Date().toLocaleDateString();
+                Object.entries(dailyHabits.habits).forEach(([habitName, habitData]) => {
+                    const completedToday = habitData.completions && habitData.completions.includes(today);
+                    if (!completedToday) {
+                        recommendations.push({
+                            type: 'Daily Habit',
+                            content: habitName,
+                            meta: habitData.streak > 0 ? `Current streak: ${habitData.streak} days` : 'Start your streak today!',
+                            category: 'habit',
+                            priority: 2,
+                            habitName: habitName
+                        });
+                    }
+                });
+            }
+
+            // Collect recent notes as suggestions to review
+            if (notes && notes.length > 0) {
+                const recentNotes = notes.slice(0, 5); // Only consider 5 most recent notes
+                recentNotes.forEach(note => {
+                    recommendations.push({
+                        type: 'Review Note',
+                        content: note.text.length > 100 ? note.text.substring(0, 100) + '...' : note.text,
+                        meta: `Created: ${new Date(note.timestamp).toLocaleDateString()}`,
+                        category: 'note',
+                        priority: 1,
+                        noteId: note.id
+                    });
+                });
+            }
+
+            // Weight tracking reminder if no recent entries
+            if (typeof weightLog !== 'undefined' && Array.isArray(weightLog)) {
+                const today = new Date();
+                const recentEntry = weightLog.length > 0 ? new Date(weightLog[weightLog.length - 1].date) : null;
+                if (!recentEntry || (today - recentEntry) / (1000 * 60 * 60 * 24) > 2) {
+                    recommendations.push({
+                        type: 'Weight Tracking',
+                        content: 'Log your weight to track progress',
+                        meta: recentEntry ? `Last logged: ${recentEntry.toLocaleDateString()}` : 'No entries yet',
+                        category: 'weight',
+                        priority: 1
+                    });
+                }
+            }
+
+            if (recommendations.length === 0) {
+                alert('No recommendations available! Add some goals, habits, or notes to get started.');
+                return;
+            }
+
+            // Smart prioritization: weight by priority and randomness
+            // Higher priority items have better chance but not guaranteed
+            const weightedRecommendations = [];
+            recommendations.forEach(rec => {
+                const weight = rec.priority || 1;
+                for (let i = 0; i < weight; i++) {
+                    weightedRecommendations.push(rec);
+                }
+            });
+
+            // Select random recommendation from weighted pool
+            const randomIndex = Math.floor(Math.random() * weightedRecommendations.length);
+            const selected = weightedRecommendations[randomIndex];
+
+            // Store for "Change" functionality
+            currentGlobalRecommendation = selected;
+
+            // Display the recommendation
+            displayGlobalRecommendation(selected);
+        }
+
+        function changeGlobalRecommendation() {
+            getGlobalRecommendation();
+        }
+
+        function displayGlobalRecommendation(rec) {
+            const recDiv = document.getElementById('global-recommendation');
+            const recType = document.getElementById('rec-type');
+            const recContent = document.getElementById('rec-content');
+            const recMeta = document.getElementById('rec-meta');
+            const changeBtn = document.getElementById('change-global-rec');
+
+            recType.textContent = rec.type;
+            recContent.textContent = rec.content;
+            recMeta.textContent = rec.meta;
+
+            recDiv.style.display = 'block';
+            changeBtn.style.display = 'inline-block';
+
+            // Scroll to recommendation smoothly
+            setTimeout(() => {
+                recDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function dismissRecommendation() {
+            const recDiv = document.getElementById('global-recommendation');
+            const changeBtn = document.getElementById('change-global-rec');
+
+            recDiv.style.display = 'none';
+            changeBtn.style.display = 'none';
+            currentGlobalRecommendation = null;
         }
 
         function addItem(type) {
@@ -2480,6 +2786,14 @@
 
         function renderList(type) {
             const listElement = document.getElementById(`${type}-list`);
+
+            // Deduplicate goals to fix any duplicate entries
+            if (type === 'personal') {
+                personalGoals = deduplicateGoals(personalGoals);
+            } else {
+                professionalGoals = deduplicateGoals(professionalGoals);
+            }
+
             const goals = type === 'personal' ? personalGoals : professionalGoals;
 
             // Update counter
