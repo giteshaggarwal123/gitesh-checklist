@@ -4533,7 +4533,7 @@
         });
 
         // ============ DAILY HABITS TRACKER ============
-        const HABITS = ['water', 'workout', 'temple', 'meditation', 'noBadHabits', 'learning', 'protein', 'skincare', 'supplements'];
+        const HABITS = ['icefacial', 'workout', 'temple', 'meditation', 'noBadHabits', 'learning', 'protein', 'skincare', 'supplements'];
         let dailyHabits = {};
 
         // Get today's date as string (YYYY-MM-DD)
@@ -7126,6 +7126,21 @@
             }
         }
 
+        function removeWaterGlass() {
+            const today = getTodayDateWater();
+            if (!waterData[today]) {
+                waterData[today] = { glasses: 0, log: [] };
+            }
+
+            if (waterData[today].glasses > 0) {
+                waterData[today].glasses--;
+                waterData[today].log.pop(); // Remove last log entry
+
+                saveWaterData();
+                renderWaterTracker();
+            }
+        }
+
         function resetWater() {
             if (confirm('Reset today\'s water tracker?')) {
                 const today = getTodayDateWater();
@@ -7171,6 +7186,7 @@
             glassesContainer.innerHTML = '';
             for (let i = 0; i < 8; i++) {
                 const isFilled = i < glasses;
+                const isLastFilled = i === glasses - 1; // Only last filled glass can be undone
                 const glass = document.createElement('button');
                 glass.className = 'habit-btn';
                 glass.style.cssText = `
@@ -7182,13 +7198,15 @@
                     gap: 4px;
                     background: ${isFilled ? 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)' : 'white'};
                     border: 2px solid ${isFilled ? '#3b82f6' : '#e8e8e8'};
-                    cursor: ${isFilled ? 'default' : 'pointer'};
+                    cursor: pointer;
                     transition: all 0.2s ease;
+                    position: relative;
                 `;
 
                 glass.innerHTML = `
                     <div style="font-size: 24px;">${isFilled ? '💧' : '🥛'}</div>
                     <div style="font-size: 10px; font-weight: 600; color: ${isFilled ? '#1e3a8a' : '#9ca3af'};">Glass ${i + 1}</div>
+                    ${isLastFilled ? '<div style="position: absolute; top: 4px; right: 4px; font-size: 10px; color: #ef4444;">×</div>' : ''}
                 `;
 
                 if (!isFilled) {
@@ -7201,6 +7219,22 @@
                         this.style.borderColor = '#e8e8e8';
                         this.style.transform = 'translateY(0)';
                     };
+                } else if (isLastFilled) {
+                    // Only last filled glass can be removed
+                    glass.onclick = removeWaterGlass;
+                    glass.onmouseover = function() {
+                        this.style.borderColor = '#ef4444';
+                        this.style.transform = 'translateY(-2px)';
+                        this.style.opacity = '0.8';
+                    };
+                    glass.onmouseout = function() {
+                        this.style.borderColor = '#3b82f6';
+                        this.style.transform = 'translateY(0)';
+                        this.style.opacity = '1';
+                    };
+                } else {
+                    // Other filled glasses are not clickable
+                    glass.style.cursor = 'default';
                 }
 
                 glassesContainer.appendChild(glass);
