@@ -207,6 +207,7 @@
             border: 1px solid transparent;
             border-radius: 6px;
             transition: all 0.15s;
+            min-width: 0;
         }
 
         .checklist-item:hover {
@@ -231,7 +232,8 @@
         }
 
         .item-text {
-            flex: 1;
+            flex: 1 1 0;
+            min-width: 0;
             font-size: 14px;
             color: #333;
             cursor: pointer;
@@ -2899,15 +2901,12 @@
             }
 
             listElement.innerHTML = sortedGoals.map(goal => {
-                const priorityIcon = goal.priority === 'high' ? '🔴' : (goal.priority === 'low' ? '🟢' : '⚪');
-                const priorityLabel = goal.priority === 'high' ? 'High' : (goal.priority === 'low' ? 'Low' : 'Med');
                 return `
                 <li class="checklist-item ${goal.completed ? 'completed' : ''}" data-id="${goal.id}" data-type="${type}">
                     <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
                     <input type="checkbox" ${goal.completed ? 'checked' : ''}
                            onchange="toggleItem('${type}', '${goal.id}')">
                     <span class="item-text" ondblclick="editItem('${type}', '${goal.id}', this)" title="Double-click to edit">${escapeHtml(goal.text)}</span>
-                    <span style="font-size: 10px; color: #666; margin-left: 6px; padding: 2px 6px; border-radius: 4px; background: #f5f5f5;" title="${priorityLabel} priority">${priorityIcon}</span>
                     <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
                 </li>
                 `;
