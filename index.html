@@ -1843,10 +1843,23 @@
         </div>
         <p class="subtitle">Double-click goals to edit • Use → button to move between lists • <span id="sync-status" class="sync-status synced">Auto-Synced</span></p>
 
+        <div id="quick-add-popup" class="password-overlay" style="display: none;">
+            <div class="password-container">
+                <div class="password-title">Quick Add Goal</div>
+                <input type="text" id="quick-add-input" class="password-input" placeholder="Enter goal...">
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 16px;">
+                    <button class="password-button" onclick="quickAddItemFromPopup('personal')">Personal</button>
+                    <button class="password-button" onclick="quickAddItemFromPopup('professional')">Professional</button>
+                </div>
+                <button class="action-btn" onclick="hideQuickAddPopup()" style="margin-top: 24px;">Close</button>
+            </div>
+        </div>
+
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 12px; flex-wrap: wrap;">
                 <input type="text" id="search-input" placeholder="Search goals, notes, and documents..." style="flex: 1 1 auto; max-width: 320px; min-width: 200px; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; transition: border-color 0.2s;" oninput="handleSearch()">
                 <button onclick="getGlobalRecommendation()" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.2); white-space: nowrap;" title="Get a smart recommendation from all your data" onmouseover="this.style.background='linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(79, 70, 229, 0.3)'" onmouseout="this.style.background='linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(79, 70, 229, 0.2)'">Recommend</button>
+                <button onclick="showQuickAddPopup()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Quick Add</button>
                 <button onclick="changeGlobalRecommendation()" id="change-global-rec" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; white-space: nowrap; display: none;" title="Get a different recommendation" onmouseover="this.style.background='#f8f9fa'; this.style.borderColor='#999'; this.style.color='#333'" onmouseout="this.style.background='#fff'; this.style.borderColor='#e0e0e0'; this.style.color='#666'">Change</button>
             </div>
 
@@ -2162,9 +2175,8 @@
                     <h2>Personal <span id="personal-badge" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600;">0</span></h2>
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('personal')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
-                        <button class="recommend-btn" onclick="quickAddItem('personal')" title="Quick Add" style="margin-right: 5px;">+</button>
-                        <button class="recommend-btn" onclick="recommendGoal('personal')">Recommend</button>
-                    </div>
+                        <button class="recommend-btn" onclick="showQuickAddPopup()" title="Quick Add" style="margin-right: 5px;">+</button>
+                        <button class="recommend-btn" onclick="getGlobalRecommendation()">Recommend</button>                    </div>
                 </div>
 
                 <div class="recommendation empty" id="personal-recommendation">
@@ -2198,9 +2210,8 @@
                     <h2>Professional <span id="professional-badge" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600;">0</span></h2>
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('professional')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
-                        <button class="recommend-btn" onclick="quickAddItem('professional')" title="Quick Add" style="margin-right: 5px;">+</button>
-                        <button class="recommend-btn" onclick="recommendGoal('professional')">Recommend</button>
-                    </div>
+                        <button class="recommend-btn" onclick="showQuickAddPopup()" title="Quick Add" style="margin-right: 5px;">+</button>
+                        <button class="recommend-btn" onclick="getGlobalRecommendation()">Recommend</button>                    </div>
                 </div>
 
                 <div class="recommendation empty" id="professional-recommendation">
@@ -3768,30 +3779,7 @@
             event.target.value = '';
         }
 
-        function recommendGoal(type) {
-            const goals = type === 'personal' ? personalGoals : professionalGoals;
-            const uncompletedGoals = goals.filter(g => !g.completed);
 
-            const recElement = document.getElementById(`${type}-recommendation`);
-
-            if (uncompletedGoals.length === 0) {
-                recElement.innerHTML = '<span class="empty">Add some goals first to get recommendations!</span>';
-                recElement.classList.add('empty');
-                return;
-            }
-
-            const randomIndex = Math.floor(Math.random() * uncompletedGoals.length);
-            const recommendedGoal = uncompletedGoals[randomIndex];
-
-            recElement.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
-                    <input type="checkbox" onchange="completeRecommendation('${type}', '${recommendedGoal.id}')" style="width: 18px; height: 18px; cursor: pointer;">
-                    <span style="font-weight: 600; color: #1a1a1a;">${escapeHtml(recommendedGoal.text)}</span>
-                </div>
-                <button class="change-btn" onclick="recommendGoal('${type}')">Change</button>
-            `;
-            recElement.classList.remove('empty');
-        }
 
         function completeRecommendation(type, goalId) {
             const goals = type === 'personal' ? personalGoals : professionalGoals;
@@ -3814,80 +3802,28 @@
         function getGlobalRecommendation() {
             const recommendations = [];
 
-            // Collect uncompleted personal goals
-            const uncompletedPersonal = personalGoals.filter(g => !g.completed);
-            uncompletedPersonal.forEach(goal => {
-                recommendations.push({
-                    type: 'Personal Goal',
-                    content: goal.text,
-                    meta: goal.priority ? `Priority: ${goal.priority}` : '',
-                    category: 'goal',
-                    priority: goal.priority === 'high' ? 3 : goal.priority === 'medium' ? 2 : 1,
-                    id: goal.id,
-                    listType: 'personal'
-                });
-            });
-
-            // Collect uncompleted professional goals
-            const uncompletedProfessional = professionalGoals.filter(g => !g.completed);
-            uncompletedProfessional.forEach(goal => {
-                recommendations.push({
-                    type: 'Professional Goal',
-                    content: goal.text,
-                    meta: goal.priority ? `Priority: ${goal.priority}` : '',
-                    category: 'goal',
-                    priority: goal.priority === 'high' ? 3 : goal.priority === 'medium' ? 2 : 1,
-                    id: goal.id,
-                    listType: 'professional'
-                });
-            });
-
-            // Collect uncompleted daily habits
-            if (dailyHabits && dailyHabits.habits) {
-                const today = new Date().toLocaleDateString();
-                Object.entries(dailyHabits.habits).forEach(([habitName, habitData]) => {
-                    const completedToday = habitData.completions && habitData.completions.includes(today);
-                    if (!completedToday) {
-                        recommendations.push({
-                            type: 'Daily Habit',
-                            content: habitName,
-                            meta: habitData.streak > 0 ? `Current streak: ${habitData.streak} days` : 'Start your streak today!',
-                            category: 'habit',
-                            priority: 2,
-                            habitName: habitName
-                        });
-                    }
-                });
+            // Collect all possible recommendations
+            const personalUncompleted = personalGoals.filter(g => !g.completed);
+            if (personalUncompleted.length > 0) {
+                recommendations.push({ type: 'personal', items: personalUncompleted });
             }
 
-            // Collect recent notes as suggestions to review
-            if (notes && notes.length > 0) {
-                const recentNotes = notes.slice(0, 5); // Only consider 5 most recent notes
-                recentNotes.forEach(note => {
-                    recommendations.push({
-                        type: 'Review Note',
-                        content: note.text.length > 100 ? note.text.substring(0, 100) + '...' : note.text,
-                        meta: `Created: ${new Date(note.timestamp).toLocaleDateString()}`,
-                        category: 'note',
-                        priority: 1,
-                        noteId: note.id
-                    });
-                });
+            const professionalUncompleted = professionalGoals.filter(g => !g.completed);
+            if (professionalUncompleted.length > 0) {
+                recommendations.push({ type: 'professional', items: professionalUncompleted });
             }
 
-            // Weight tracking reminder if no recent entries
-            if (typeof weightData !== 'undefined' && Array.isArray(weightData)) {
-                const today = new Date();
-                const recentEntry = weightData.length > 0 ? new Date(weightData[weightData.length - 1].date) : null;
-                if (!recentEntry || (today - recentEntry) / (1000 * 60 * 60 * 24) > 2) {
-                    recommendations.push({
-                        type: 'Weight Tracking',
-                        content: 'Log your weight to track progress',
-                        meta: recentEntry ? `Last logged: ${recentEntry.toLocaleDateString()}` : 'No entries yet',
-                        category: 'weight',
-                        priority: 1
-                    });
-                }
+            const habits = getHabitRecommendations();
+            if (habits.length > 0) {
+                recommendations.push({ type: 'habit', items: habits });
+            }
+
+            if (notes.length > 0) {
+                recommendations.push({ type: 'note', items: notes });
+            }
+
+            if (weightData.length > 0) {
+                recommendations.push({ type: 'weight', items: [{ text: 'Log your weight for today' }] });
             }
 
             if (recommendations.length === 0) {
@@ -3895,53 +3831,44 @@
                 return;
             }
 
-            // BALANCED RECOMMENDATION SYSTEM
-            // Separate goals by type for balanced selection
-            const personalGoalRecs = recommendations.filter(r => r.listType === 'personal');
-            const professionalGoalRecs = recommendations.filter(r => r.listType === 'professional');
-            const otherRecs = recommendations.filter(r => r.category !== 'goal');
+            // Randomly select a type
+            const randomTypeIndex = Math.floor(Math.random() * recommendations.length);
+            const selectedType = recommendations[randomTypeIndex];
 
-            // Create balanced pool - ensure equal representation from personal and professional
-            const balancedPool = [];
-            
-            // Add equal number of personal and professional goals (up to 3 each)
-            const maxGoalsPerType = Math.min(3, personalGoalRecs.length, professionalGoalRecs.length);
-            
-            // Randomly select from personal goals
-            const shuffledPersonal = [...personalGoalRecs].sort(() => Math.random() - 0.5);
-            for (let i = 0; i < maxGoalsPerType; i++) {
-                balancedPool.push(shuffledPersonal[i]);
+            // Randomly select an item from that type
+            const randomItemIndex = Math.floor(Math.random() * selectedType.items.length);
+            const selectedItem = selectedType.items[randomItemIndex];
+
+            let recommendation;
+            if (selectedType.type === 'personal' || selectedType.type === 'professional') {
+                recommendation = {
+                    category: 'goal',
+                    listType: selectedType.type,
+                    content: selectedItem.text,
+                    meta: `From your ${selectedType.type} goals`
+                };
+            } else if (selectedType.type === 'habit') {
+                recommendation = {
+                    category: 'habit',
+                    content: selectedItem.text,
+                    meta: 'A suggested daily habit'
+                };
+            } else if (selectedType.type === 'note') {
+                recommendation = {
+                    category: 'note',
+                    content: selectedItem.content,
+                    meta: `From your notes`
+                };
+            } else if (selectedType.type === 'weight') {
+                recommendation = {
+                    category: 'weight',
+                    content: selectedItem.text,
+                    meta: 'A suggestion for your weight tracker'
+                };
             }
-            
-            // Randomly select from professional goals
-            const shuffledProfessional = [...professionalGoalRecs].sort(() => Math.random() - 0.5);
-            for (let i = 0; i < maxGoalsPerType; i++) {
-                balancedPool.push(shuffledProfessional[i]);
-            }
-            
-            // Add other recommendations (habits, notes, weight)
-            balancedPool.push(...otherRecs);
 
-            // Apply priority weighting but with randomness
-            const weightedRecommendations = [];
-            balancedPool.forEach(rec => {
-                const weight = rec.priority || 1;
-                // Reduce weight difference to ensure more randomness
-                const adjustedWeight = 1 + (weight - 1) * 0.5;
-                for (let i = 0; i < adjustedWeight; i++) {
-                    weightedRecommendations.push(rec);
-                }
-            });
-
-            // Select random recommendation from balanced pool
-            const randomIndex = Math.floor(Math.random() * weightedRecommendations.length);
-            const selected = weightedRecommendations[randomIndex];
-
-            // Store for "Change" functionality
-            currentGlobalRecommendation = selected;
-
-            // Display the recommendation
-            displayGlobalRecommendation(selected);
+            currentGlobalRecommendation = recommendation;
+            displayGlobalRecommendation(recommendation);
         }
 
         function changeGlobalRecommendation() {
@@ -3977,22 +3904,17 @@
             currentGlobalRecommendation = null;
         }
 
-        function addItem(type) {
-            const input = document.getElementById(`${type}-input`);
-            const text = input.value.trim().toLowerCase();
-            const priority = 'medium';
-
-            // Check for empty or whitespace-only
-            if (text === '' || text.replace(/\s/g, '') === '') {
-                if (input.value.trim() !== '') {
-                    alert('Goal cannot be only whitespace.');
-                }
-                input.value = '';
+        function quickAddItem(type) {
+            const text = prompt(`Quick add ${type} goal:`);
+            if (!text || text.trim() === '') {
                 return;
             }
 
+            const trimmedText = text.trim().toLowerCase();
+            const priority = 'medium';
+
             // Validate text length
-            if (text.length > 200) {
+            if (trimmedText.length > 200) {
                 alert('Goal is too long! Please keep it under 200 characters.');
                 return;
             }
@@ -4000,16 +3922,15 @@
             const goals = type === 'personal' ? personalGoals : professionalGoals;
 
             // Check for duplicates
-            const duplicate = goals.find(g => g.text === text);
+            const duplicate = goals.find(g => g.text === trimmedText);
             if (duplicate) {
                 alert('This goal already exists! Please enter a different goal.');
-                input.value = '';
                 return;
             }
 
             goals.unshift({
                 id: generateId(),
-                text: text,
+                text: trimmedText,
                 completed: false,
                 priority: priority
             });
@@ -4017,8 +3938,31 @@
             saveData(type);
             renderList(type);
             updatePageTitle();
-            input.value = '';
-            updateCharCount(type); // Reset character counter
+            updateCharCount(type);
+        }
+
+        function addItem(type, text = '') {
+            const input = document.getElementById(`${type}-input`);
+            const value = text || input.value.trim();
+
+            if (value) {
+                const goals = type === 'personal' ? personalGoals : professionalGoals;
+                const now = new Date();
+                const newGoal = {
+                    id: 'goal_' + now.getTime() + '_' + Math.random().toString(36).substr(2, 9),
+                    text: value,
+                    completed: false,
+                    createdAt: now.toISOString(),
+                    updatedAt: now.toISOString()
+                };
+                goals.unshift(newGoal);
+                saveData(type);
+                renderList(type);
+
+                if (!text) {
+                    input.value = '';
+                }
+            }
         }
 
         function quickAddItem(type) {
@@ -6521,6 +6465,25 @@
                 loadWeightFromCloud();
             }
         });
+
+        function showQuickAddPopup() {
+            document.getElementById('quick-add-popup').style.display = 'flex';
+            document.getElementById('quick-add-input').focus();
+        }
+
+        function hideQuickAddPopup() {
+            document.getElementById('quick-add-popup').style.display = 'none';
+            document.getElementById('quick-add-input').value = '';
+        }
+
+        function quickAddItemFromPopup(type) {
+            const input = document.getElementById('quick-add-input');
+            const text = input.value.trim();
+            if (text) {
+                addItem(type, text);
+                hideQuickAddPopup();
+            }
+        }
 
         // ===== INDIAN DATE/TIME DISPLAY =====
         function updateIndianDateTime() {
