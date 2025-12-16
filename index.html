@@ -2162,6 +2162,7 @@
                     <h2>Personal <span id="personal-badge" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600;">0</span></h2>
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('personal')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
+                        <button class="recommend-btn" onclick="quickAddItem('personal')" title="Quick Add" style="margin-right: 5px;">+</button>
                         <button class="recommend-btn" onclick="recommendGoal('personal')">Recommend</button>
                     </div>
                 </div>
@@ -2197,6 +2198,7 @@
                     <h2>Professional <span id="professional-badge" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600;">0</span></h2>
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('professional')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
+                        <button class="recommend-btn" onclick="quickAddItem('professional')" title="Quick Add" style="margin-right: 5px;">+</button>
                         <button class="recommend-btn" onclick="recommendGoal('professional')">Recommend</button>
                     </div>
                 </div>
@@ -2334,7 +2336,7 @@
 
         try {
             const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
-            const { getFirestore, doc, setDoc, getDoc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+            const { getFirestore, doc, setDoc, getDoc, onSnapshot, deleteDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
             const { getStorage, ref, uploadString, getDownloadURL, deleteObject } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js');
 
             // Firebase configuration
@@ -2360,6 +2362,7 @@
             window.firestoreSetDoc = setDoc;
             window.firestoreGetDoc = getDoc;
             window.firestoreOnSnapshot = onSnapshot;
+            window.firestoreDeleteDoc = deleteDoc;
             window.storageRef = ref;
             window.storageUploadString = uploadString;
             window.storageGetDownloadURL = getDownloadURL;
@@ -3892,17 +3895,45 @@
                 return;
             }
 
-            // Smart prioritization: weight by priority and randomness
-            // Higher priority items have better chance but not guaranteed
+            // BALANCED RECOMMENDATION SYSTEM
+            // Separate goals by type for balanced selection
+            const personalGoalRecs = recommendations.filter(r => r.listType === 'personal');
+            const professionalGoalRecs = recommendations.filter(r => r.listType === 'professional');
+            const otherRecs = recommendations.filter(r => r.category !== 'goal');
+
+            // Create balanced pool - ensure equal representation from personal and professional
+            const balancedPool = [];
+            
+            // Add equal number of personal and professional goals (up to 3 each)
+            const maxGoalsPerType = Math.min(3, personalGoalRecs.length, professionalGoalRecs.length);
+            
+            // Randomly select from personal goals
+            const shuffledPersonal = [...personalGoalRecs].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < maxGoalsPerType; i++) {
+                balancedPool.push(shuffledPersonal[i]);
+            }
+            
+            // Randomly select from professional goals
+            const shuffledProfessional = [...professionalGoalRecs].sort(() => Math.random() - 0.5);
+            for (let i = 0; i < maxGoalsPerType; i++) {
+                balancedPool.push(shuffledProfessional[i]);
+            }
+            
+            // Add other recommendations (habits, notes, weight)
+            balancedPool.push(...otherRecs);
+
+            // Apply priority weighting but with randomness
             const weightedRecommendations = [];
-            recommendations.forEach(rec => {
+            balancedPool.forEach(rec => {
                 const weight = rec.priority || 1;
-                for (let i = 0; i < weight; i++) {
+                // Reduce weight difference to ensure more randomness
+                const adjustedWeight = 1 + (weight - 1) * 0.5;
+                for (let i = 0; i < adjustedWeight; i++) {
                     weightedRecommendations.push(rec);
                 }
             });
 
-            // Select random recommendation from weighted pool
+            // Select random recommendation from balanced pool
             const randomIndex = Math.floor(Math.random() * weightedRecommendations.length);
             const selected = weightedRecommendations[randomIndex];
 
@@ -3988,6 +4019,43 @@
             updatePageTitle();
             input.value = '';
             updateCharCount(type); // Reset character counter
+        }
+
+        function quickAddItem(type) {
+            const text = prompt(`Quick add ${type} goal:`);
+            if (!text || text.trim() === '') {
+                return;
+            }
+
+            const trimmedText = text.trim().toLowerCase();
+            const priority = 'medium';
+
+            // Validate text length
+            if (trimmedText.length > 200) {
+                alert('Goal is too long! Please keep it under 200 characters.');
+                return;
+            }
+
+            const goals = type === 'personal' ? personalGoals : professionalGoals;
+
+            // Check for duplicates
+            const duplicate = goals.find(g => g.text === trimmedText);
+            if (duplicate) {
+                alert('This goal already exists! Please enter a different goal.');
+                return;
+            }
+
+            goals.unshift({
+                id: generateId(),
+                text: trimmedText,
+                completed: false,
+                priority: priority
+            });
+
+            saveData(type);
+            renderList(type);
+            updatePageTitle();
+            updateCharCount(type);
         }
 
         function toggleItem(type, id) {
