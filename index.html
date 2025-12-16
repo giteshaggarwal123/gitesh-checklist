@@ -2039,7 +2039,7 @@
             <div class="notes-header" onclick="toggleNotesSection()" style="cursor: pointer;" title="Click to expand/collapse">
                 <h3 class="notes-title">Quick Notes <span id="notes-count" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="recommend-btn" onclick="event.stopPropagation(); clearAllNotes()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                    <button class="action-btn" onclick="event.stopPropagation(); clearAllNotes()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
                     <button class="recommend-btn" id="notes-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
                 </div>
             </div>
@@ -2068,7 +2068,7 @@
             <div class="documents-header" onclick="toggleDocumentsSection()" style="cursor: pointer;" title="Click to expand/collapse">
                 <h3 class="documents-title">Documents <span id="documents-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="recommend-btn" onclick="event.stopPropagation(); clearAllDocuments()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                    <button class="action-btn" onclick="event.stopPropagation(); clearAllDocuments()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
                     <button class="recommend-btn" id="documents-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
                 </div>
             </div>
@@ -2096,7 +2096,7 @@
             <div class="birthday-header" onclick="toggleBirthdaySection()" style="cursor: pointer;" title="Click to expand/collapse">
                 <h3 class="birthday-title">Birthday Tracker <span id="birthday-count" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #9f1239; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="recommend-btn" onclick="event.stopPropagation(); clearAllBirthdays()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                    <button class="action-btn" onclick="event.stopPropagation(); clearAllBirthdays()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
                     <button class="recommend-btn" id="birthday-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
                 </div>
             </div>
@@ -2121,7 +2121,7 @@
             <div class="reminders-header" onclick="toggleRemindersSection()" style="cursor: pointer;" title="Click to expand/collapse">
                 <h3 class="reminders-title">Reminders <span id="reminders-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="recommend-btn" onclick="event.stopPropagation(); clearAllReminders()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
+                    <button class="action-btn" onclick="event.stopPropagation(); clearAllReminders()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
                     <button class="recommend-btn" id="reminders-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
                 </div>
             </div>
@@ -3823,8 +3823,13 @@
             }
 
             if (weightData.length > 0) {
-                recommendations.push({ type: 'weight', items: [{ text: 'Log your weight for today' }] });
+                const lastEntry = weightData[0];
+                const today = getTodayDate();
+                if (lastEntry.date !== today) {
+                    recommendations.push({ type: 'weight', items: [{ text: 'Log your weight for today' }] });
+                }
             }
+
 
             if (recommendations.length === 0) {
                 alert('No recommendations available! Add some goals, habits, or notes to get started.');
@@ -3894,6 +3899,20 @@
                 recDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
         }
+
+        function completeRecommendation(type, goalId) {
+            const goals = type === 'personal' ? personalGoals : professionalGoals;
+            const goal = goals.find(g => g.id === goalId);
+            if (goal) {
+                goal.completed = true;
+                saveData(type);
+                renderList(type);
+            }
+            // Get a new recommendation
+            getGlobalRecommendation();
+        }
+
+
 
         function dismissRecommendation() {
             const recDiv = document.getElementById('global-recommendation');
