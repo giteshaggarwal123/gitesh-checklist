@@ -2384,9 +2384,14 @@
     <script>
         // ONE DATABASE FOR ALL DEVICES - Personal app for Gitesh
         function getUserId() {
-            // FIXED ID - same on ALL devices (mobile, desktop, any browser)
-            // This ensures ONE database with same data everywhere
-            return 'GITESH_MAIN_DB';
+            // Read from localStorage if user ever set a custom sync ID; default to the shared ID
+            const stored = localStorage.getItem('userId');
+            if (stored && stored.trim().length >= 4) {
+                return stored.trim().toUpperCase();
+            }
+            const fallback = 'GITESH_MAIN_DB';
+            localStorage.setItem('userId', fallback);
+            return fallback;
         }
 
         function setSyncId(newId) {
@@ -2890,22 +2895,25 @@
             renderList(type);
         }
 
-        // Prefer cloud over local to prevent duplicates (cloud is source of truth)
-        function mergeGoals(local, cloud) {
-            // If cloud has data, use cloud as source of truth
-            if (cloud.length > 0) {
-                console.log(`☁️ Using cloud data (${cloud.length} goals) as source of truth`);
-                return cloud;
+        // Merge goals from local and cloud; keep unique IDs and prefer latest by timestamp/id order
+        function mergeGoals(local = [], cloud = []) {
+            const byId = new Map();
+
+            function add(goals, source) {
+                if (!Array.isArray(goals)) return;
+                goals.forEach(goal => {
+                    if (!goal || !goal.id) return;
+                    // Prefer local when IDs conflict (assume local is newer offline change)
+                    if (!byId.has(goal.id) || source === 'local') {
+                        byId.set(goal.id, goal);
+                    }
+                });
             }
 
-            // If cloud is empty but local has data, upload local to cloud
-            if (local.length > 0) {
-                console.log(`📤 Cloud empty, using local data (${local.length} goals)`);
-                return local;
-            }
+            add(cloud, 'cloud');
+            add(local, 'local');
 
-            // Both empty
-            return [];
+            return Array.from(byId.values());
         }
 
         // Deduplicate goals array by ID AND text (keep first occurrence)
@@ -2944,32 +2952,59 @@
             return merged;
         }
 
-        // Merge notes from two sources (prefer cloud)
-        function mergeNotes(local, cloud) {
-            // Prefer cloud as source of truth
-            if (cloud.length > 0) {
-                console.log(`☁️ Using cloud notes (${cloud.length}) as source of truth`);
-                return cloud;
+        // Merge notes from two sources (prefer newest by timestamp)
+        function mergeNotes(local = [], cloud = []) {
+            const byId = new Map();
+
+            function add(list) {
+                if (!Array.isArray(list)) return;
+                list.forEach(note => {
+                    if (!note || !note.id) return;
+                    const existing = byId.get(note.id);
+                    const existingTs = existing ? new Date(existing.timestamp || 0).getTime() : -Infinity;
+                    const incomingTs = new Date(note.timestamp || 0).getTime();
+                    if (!existing || incomingTs >= existingTs) {
+                        byId.set(note.id, note);
+                    }
+                });
             }
-            if (local.length > 0) {
-                console.log(`📤 Cloud empty, using local notes (${local.length})`);
-                return local;
-            }
-            return [];
+
+            add(local);
+            add(cloud);
+
+            return Array.from(byId.values()).sort((a, b) => {
+                const ta = new Date(a.timestamp || 0).getTime();
+                const tb = new Date(b.timestamp || 0).getTime();
+                return tb - ta;
+            });
         }
 
-        // Merge weight data from two sources (prefer cloud)
-        function mergeWeightData(local, cloud) {
-            // Prefer cloud as source of truth
-            if (cloud.length > 0) {
-                console.log(`☁️ Using cloud weight data (${cloud.length}) as source of truth`);
-                return cloud;
+        // Merge weight data from two sources (preserve newest per date)
+        function mergeWeightData(local = [], cloud = []) {
+            const byDate = new Map();
+
+            function addEntries(list, source) {
+                if (!Array.isArray(list)) return;
+                list.forEach(entry => {
+                    if (!entry || !entry.date) return;
+                    const existing = byDate.get(entry.date);
+                    const existingTs = existing ? new Date(existing.timestamp || existing.date).getTime() : -Infinity;
+                    const incomingTs = new Date(entry.timestamp || entry.date).getTime();
+
+                    // Keep the most recently updated entry for each date
+                    if (!existing || (Number.isFinite(incomingTs) && incomingTs > existingTs)) {
+                        byDate.set(entry.date, entry);
+                    }
+                });
             }
-            if (local.length > 0) {
-                console.log(`📤 Cloud empty, using local weight data (${local.length})`);
-                return local;
-            }
-            return [];
+
+            // Add local first, then cloud so cloud wins on same timestamp, but newer timestamp always wins
+            addEntries(local, 'local');
+            addEntries(cloud, 'cloud');
+
+            const merged = Array.from(byDate.values());
+            merged.sort((a, b) => new Date(b.date) - new Date(a.date));
+            return merged;
         }
 
         // Cloud sync functions
@@ -3041,9 +3076,9 @@
                         console.log(`🔄 Listener UPDATING LOCAL DATA - Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
                         console.log(`🔄 Current local: ${personalGoals.length}P + ${professionalGoals.length}P`);
 
-                        // Use cloud data with loaded images
-                        personalGoals = cloudPersonal;
-                        professionalGoals = cloudProfessional;
+                        // Merge to keep any offline/local additions
+                        personalGoals = deduplicateGoals(mergeGoals(personalGoals, cloudPersonal));
+                        professionalGoals = deduplicateGoals(mergeGoals(professionalGoals, cloudProfessional));
 
                         // Save to localStorage for offline access
                         localStorage.setItem('personalGoals', JSON.stringify(personalGoals));
@@ -3420,8 +3455,8 @@
                     'noBadHabits': 'No Smoking',
                     'learning': 'Learning',
                     'protein': 'No Fap/Porn',
-                    'posture': 'Posture',
-                    'sleep': 'Sleep'
+                    'skincare': 'Skincare',
+                    'supplements': 'Supplements'
                 };
                 document.getElementById('dashboard-streak-subtitle').textContent = habitDisplayNames[bestStreakHabit] || bestStreakHabit;
             } else {
@@ -3618,6 +3653,10 @@
                 dailyHabits: dailyHabits,
                 notes: notes,
                 weightData: weightData,
+                reminders: reminders,
+                birthdays: birthdays,
+                documents: documents,
+                waterTracker: waterData,
                 exportDate: new Date().toISOString()
             };
             const jsonStr = JSON.stringify(data, null, 2);
@@ -3663,7 +3702,7 @@
                         return;
                     }
 
-                    if (confirm('This will replace your current goals, habits, notes, weight data and sync to cloud. Continue?')) {
+                    if (confirm('This will replace your current goals, habits, notes, weight data, reminders, birthdays, documents, and water tracker, then sync to cloud. Continue?')) {
                         saveUndoState(); // Allow undo
                         personalGoals = deduplicateGoals(data.personal || []);
                         professionalGoals = deduplicateGoals(data.professional || []);
@@ -3685,6 +3724,31 @@
                             saveWeightLocal();
                             saveWeightToCloud();
                             renderWeightTracker();
+                        }
+                        if (data.reminders && Array.isArray(data.reminders)) {
+                            reminders = data.reminders;
+                            saveRemindersLocal();
+                            saveRemindersToCloud();
+                            renderReminders();
+                            checkReminders();
+                        }
+                        if (data.birthdays && Array.isArray(data.birthdays)) {
+                            birthdays = data.birthdays;
+                            saveBirthdaysLocal();
+                            saveBirthdaysToCloud();
+                            renderBirthdays();
+                            checkBirthdaysToday();
+                        }
+                        if (data.documents && Array.isArray(data.documents)) {
+                            documents = data.documents;
+                            saveDocumentsLocal();
+                            saveDocumentsToCloud();
+                            renderDocuments();
+                        }
+                        if (data.waterTracker && typeof data.waterTracker === 'object') {
+                            waterData = data.waterTracker;
+                            saveWaterData();
+                            renderWaterTracker();
                         }
                         saveData('personal');
                         saveData('professional');
@@ -4937,7 +5001,7 @@
                 window.firestoreOnSnapshot(docRef, (doc) => {
                     if (doc.exists()) {
                         const data = doc.data();
-                        notes = data.notes || [];
+                        notes = mergeNotes(notes, data.notes || []);
 
                         // Save to localStorage for offline access
                         saveNotesLocal();
@@ -5276,6 +5340,29 @@
         let documentIdCounter = Date.now();
         let documentsExpanded = false; // Default collapsed
 
+        // Merge documents (prefer latest upload/rename time)
+        function mergeDocuments(local = [], cloud = []) {
+            const byId = new Map();
+
+            function add(list) {
+                if (!Array.isArray(list)) return;
+                list.forEach(doc => {
+                    if (!doc || !doc.id) return;
+                    const existing = byId.get(doc.id);
+                    const existingTs = existing ? new Date(existing.uploadDate || existing.updatedAt || 0).getTime() : -Infinity;
+                    const incomingTs = new Date(doc.uploadDate || doc.updatedAt || 0).getTime();
+                    if (!existing || incomingTs >= existingTs) {
+                        byId.set(doc.id, doc);
+                    }
+                });
+            }
+
+            add(local);
+            add(cloud);
+
+            return Array.from(byId.values()).sort((a, b) => new Date(b.uploadDate || 0) - new Date(a.uploadDate || 0));
+        }
+
         // Generate unique ID for documents
         function generateDocumentId() {
             return documentIdCounter++ + '_' + Math.random().toString(36).substr(2, 9);
@@ -5369,10 +5456,21 @@
                 const docSnap = await getDoc(docRef);
 
                 if (docSnap.exists() && docSnap.data().documents) {
-                    documents = docSnap.data().documents;
+                    documents = mergeDocuments(documents, docSnap.data().documents);
                     saveDocumentsLocal();
                     renderDocuments();
                 }
+
+                // realtime updates
+                window.firestoreOnSnapshot(docRef, (snap) => {
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        documents = mergeDocuments(documents, data.documents || []);
+                        saveDocumentsLocal();
+                        renderDocuments();
+                        console.log('🔄 Documents synced from cloud');
+                    }
+                });
             } catch (error) {
                 console.error('Error loading documents from cloud:', error);
             }
@@ -5881,9 +5979,9 @@
 
                 // Listen for real-time updates
                 window.firestoreOnSnapshot(docRef, (doc) => {
-                    if (doc.exists()) {
-                        const data = doc.data();
-                        weightData = data.weightData || [];
+                if (doc.exists()) {
+                    const data = doc.data();
+                    weightData = mergeWeightData(weightData, data.weightData || []);
 
                         // Load height and target weight from cloud
                         if (data.height) {
@@ -6047,6 +6145,7 @@
                     changePrevEl.style.color = prevChange > 0 ? '#dc2626' : prevChange < 0 ? '#15803d' : '#666';
                     changePrevEl.parentElement.style.background = prevChange > 0 ? '#fee2e2' : prevChange < 0 ? '#f0fdf4' : '#f8f9fa';
                     changePrevEl.parentElement.style.borderColor = prevChange > 0 ? '#fecaca' : prevChange < 0 ? '#dcfce7' : '#e8e8e8';
+                    changePrevEl.style.fontSize = ''; // reset to default
                 } else {
                     document.getElementById('weight-change-prev').textContent = 'First entry';
                     document.getElementById('weight-change-prev').style.fontSize = '11px';
@@ -6384,6 +6483,29 @@
         let birthdays = [];
         let birthdayExpanded = false;
 
+        // Merge birthdays (prefer latest updatedAt/createdAt)
+        function mergeBirthdays(local = [], cloud = []) {
+            const byId = new Map();
+
+            function add(list) {
+                if (!Array.isArray(list)) return;
+                list.forEach(item => {
+                    if (!item || item.id === undefined || item.id === null) return;
+                    const existing = byId.get(item.id);
+                    const existingTs = existing ? new Date(existing.updatedAt || existing.createdAt || existing.date || 0).getTime() : -Infinity;
+                    const incomingTs = new Date(item.updatedAt || item.createdAt || item.date || 0).getTime();
+                    if (!existing || incomingTs >= existingTs) {
+                        byId.set(item.id, item);
+                    }
+                });
+            }
+
+            add(local);
+            add(cloud);
+
+            return Array.from(byId.values()).sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+        }
+
         // Load birthdays from localStorage
         function loadBirthdaysLocal() {
             const stored = localStorage.getItem('birthdays');
@@ -6431,13 +6553,24 @@
                     if (doc.exists()) {
                         const data = doc.data();
                         if (data.birthdays) {
-                            birthdays = data.birthdays;
+                            birthdays = mergeBirthdays(birthdays, data.birthdays);
                             saveBirthdaysLocal();
                             renderBirthdays();
                             checkBirthdaysToday();
                             console.log('✅ Birthdays loaded from cloud');
                         }
                     }
+
+                    window.firestoreOnSnapshot(userDocRef, (snap) => {
+                        if (snap.exists()) {
+                            const data = snap.data();
+                            birthdays = mergeBirthdays(birthdays, data.birthdays || []);
+                            saveBirthdaysLocal();
+                            renderBirthdays();
+                            checkBirthdaysToday();
+                            console.log('🔄 Birthdays synced from cloud');
+                        }
+                    });
                 } catch (error) {
                     console.error('Error loading birthdays from cloud:', error);
                 }
@@ -6456,10 +6589,13 @@
                 return;
             }
 
+            const nowIso = new Date().toISOString();
             birthdays.push({
                 id: Date.now(),
                 name: name,
-                date: date
+                date: date,
+                createdAt: nowIso,
+                updatedAt: nowIso
             });
 
             // Sort by month/day
@@ -6613,10 +6749,10 @@
 
             if (birthdayExpanded) {
                 content.style.maxHeight = content.scrollHeight + 'px';
-                toggleBtn.textContent = '▲';
+                toggleBtn.textContent = '▼';
             } else {
                 content.style.maxHeight = '0';
-                toggleBtn.textContent = '▼';
+                toggleBtn.textContent = '▶';
             }
         }
 
@@ -6641,7 +6777,7 @@
             // Start collapsed
             birthdayExpanded = false;
             content.style.maxHeight = '0';
-            toggleBtn.textContent = '▼';
+            toggleBtn.textContent = '▶';
         }
 
         // Initialize birthdays on page load
@@ -6662,6 +6798,29 @@
         // ===== REMINDERS SECTION =====
         let reminders = [];
         let remindersExpanded = false;
+
+        // Merge reminders (prefer latest updatedAt/createdAt)
+        function mergeReminders(local = [], cloud = []) {
+            const byId = new Map();
+
+            function add(list) {
+                if (!Array.isArray(list)) return;
+                list.forEach(item => {
+                    if (!item || item.id === undefined || item.id === null) return;
+                    const existing = byId.get(item.id);
+                    const existingTs = existing ? new Date(existing.updatedAt || existing.createdAt || existing.dueDate || 0).getTime() : -Infinity;
+                    const incomingTs = new Date(item.updatedAt || item.createdAt || item.dueDate || 0).getTime();
+                    if (!existing || incomingTs >= existingTs) {
+                        byId.set(item.id, item);
+                    }
+                });
+            }
+
+            add(local);
+            add(cloud);
+
+            return Array.from(byId.values()).sort((a, b) => new Date(a.dueDate || 0) - new Date(b.dueDate || 0));
+        }
 
         // Load reminders from localStorage
         function loadRemindersLocal() {
@@ -6710,13 +6869,25 @@
                     if (doc.exists()) {
                         const data = doc.data();
                         if (data.reminders) {
-                            reminders = data.reminders;
+                            reminders = mergeReminders(reminders, data.reminders);
                             saveRemindersLocal();
                             renderReminders();
                             checkReminders();
                             console.log('✅ Reminders loaded from cloud');
                         }
                     }
+
+                    // realtime updates
+                    window.firestoreOnSnapshot(userDocRef, (snap) => {
+                        if (snap.exists()) {
+                            const data = snap.data();
+                            reminders = mergeReminders(reminders, data.reminders || []);
+                            saveRemindersLocal();
+                            renderReminders();
+                            checkReminders();
+                            console.log('🔄 Reminders synced from cloud');
+                        }
+                    });
                 } catch (error) {
                     console.error('Error loading reminders from cloud:', error);
                 }
@@ -6767,6 +6938,7 @@
                 return;
             }
 
+            const nowIso = new Date().toISOString();
             reminders.push({
                 id: Date.now(),
                 name: name,
@@ -6774,7 +6946,8 @@
                 type: type,
                 dueDate: dueDate,
                 amount: amount,
-                createdAt: new Date().toISOString()
+                createdAt: nowIso,
+                updatedAt: nowIso
             });
 
             // Sort by due date
@@ -6806,6 +6979,7 @@
             const reminder = reminders.find(r => r.id === id);
             if (reminder) {
                 reminder.dueDate = calculateNextDueDate(reminder.dueDate, reminder.frequency);
+                reminder.updatedAt = new Date().toISOString();
                 reminders.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
                 saveRemindersLocal();
                 saveRemindersToCloud();
@@ -7037,10 +7211,10 @@
 
             if (remindersExpanded) {
                 content.style.maxHeight = content.scrollHeight + 'px';
-                toggleBtn.textContent = '▲';
+                toggleBtn.textContent = '▼';
             } else {
                 content.style.maxHeight = '0';
-                toggleBtn.textContent = '▼';
+                toggleBtn.textContent = '▶';
             }
         }
 
@@ -7065,7 +7239,7 @@
             // Start collapsed
             remindersExpanded = false;
             content.style.maxHeight = '0';
-            toggleBtn.textContent = '▼';
+            toggleBtn.textContent = '▶';
         }
 
         // Initialize reminders on page load
@@ -7299,4 +7473,5 @@
         });
     </script>
 </body>
+</html>
 </html>
