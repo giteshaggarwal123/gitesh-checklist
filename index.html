@@ -7459,9 +7459,9 @@
                 `;
 
                 glass.innerHTML = `
-                    <div style="font-size: 24px;">${isFilled ? '=�ƺ' : '=�Ѣ'}</div>
+                    <div style="font-size: 24px;">${isFilled ? '💧' : '🥤'}</div>
                     <div style="font-size: 10px; font-weight: 600; color: ${isFilled ? '#1e3a8a' : '#9ca3af'};">Glass ${i + 1}</div>
-                    ${isLastFilled ? '<div style="position: absolute; top: 4px; right: 4px; font-size: 10px; color: #ef4444;">+�</div>' : ''}
+                    ${isLastFilled ? '<div style="position: absolute; top: 4px; right: 4px; font-size: 10px; color: #ef4444;">×</div>' : ''}
                 `;
 
                 if (!isFilled) {
@@ -7499,7 +7499,7 @@
             if (waterData[today].log && waterData[today].log.length > 0) {
                 logList.innerHTML = waterData[today].log.map((entry, index) => `
                     <div style="padding: 6px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f3f4f6;">
-                        <span>=�ƺ Glass ${index + 1}</span>
+                        <span>💧 Glass ${index + 1}</span>
                         <span style="color: #9ca3af;">${entry.time}</span>
                     </div>
                 `).join('');
