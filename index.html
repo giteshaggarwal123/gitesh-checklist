@@ -1880,7 +1880,7 @@
                 <button onclick="showStats()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;">Stats</button>
                 <button onclick="exportData()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Download backup JSON">Export</button>
                 <button onclick="document.getElementById('import-file').click()" style="background: #fff; color: #666; border: 1px solid #e0e0e0; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; white-space: nowrap;" title="Upload backup JSON">Import</button>
-                <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+                <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)" aria-label="Import JSON file">
             </div>
         </div>
 
@@ -1927,7 +1927,7 @@
                 <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e8e8e8;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <h4 style="font-size: 12px; font-weight: 600; color: #374151; margin: 0;">Today's Log</h4>
-                        <button class="recommend-btn" onclick="toggleWaterLog()" id="water-log-toggle" style="font-size: 10px; padding: 4px 8px;">💧</button>
+                        <button class="recommend-btn" onclick="toggleWaterLog()" id="water-log-toggle" title="Toggle water log" style="font-size: 10px; padding: 4px 8px;">💧</button>
                     </div>
                     <div id="water-log-list" style="font-size: 11px; color: #64748b; max-height: 120px; overflow-y: auto;"></div>
                 </div>
@@ -1984,7 +1984,7 @@
         <div class="weight-tracker">
             <div class="weight-header">
                 <h3 class="weight-title">Weight Tracker <span id="weight-count" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #065f46; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0 logs</span></h3>
-                <button class="recommend-btn" onclick="toggleWeightSection()" id="weight-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                <button class="recommend-btn" onclick="toggleWeightSection()" id="weight-toggle-btn" title="Toggle weight tracker" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
             </div>
 
             <div id="weight-content" style="overflow: hidden; transition: max-height 0.3s ease-out;">
@@ -2040,7 +2040,7 @@
                 <h3 class="notes-title">Quick Notes <span id="notes-count" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="action-btn" onclick="event.stopPropagation(); clearAllNotes()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
-                    <button class="recommend-btn" id="notes-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                    <button class="recommend-btn" id="notes-toggle-btn" title="Toggle notes section" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
                 </div>
             </div>
 
@@ -2069,7 +2069,7 @@
                 <h3 class="documents-title">Documents <span id="documents-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="action-btn" onclick="event.stopPropagation(); clearAllDocuments()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
-                    <button class="recommend-btn" id="documents-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                    <button class="recommend-btn" id="documents-toggle-btn" title="Toggle documents section" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
                 </div>
             </div>
 
@@ -2082,7 +2082,7 @@
                     <div class="upload-icon">📤</div>
                     <div class="upload-text">Click to upload or drag & drop</div>
                     <div class="upload-hint">PDF, DOC, XLS, Images (Max 5MB per file)</div>
-                    <input type="file" id="document-file-input" class="file-input-hidden" onchange="handleDocumentUpload(event)" accept="*/*" multiple>
+                    <input type="file" id="document-file-input" class="file-input-hidden" onchange="handleDocumentUpload(event)" accept="*/*" multiple aria-label="Upload documents">
                 </div>
 
                 <div id="documents-list" class="documents-list">
@@ -2097,7 +2097,7 @@
                 <h3 class="birthday-title">Birthday Tracker <span id="birthday-count" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #9f1239; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="action-btn" onclick="event.stopPropagation(); clearAllBirthdays()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
-                    <button class="recommend-btn" id="birthday-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                    <button class="recommend-btn" id="birthday-toggle-btn" title="Toggle birthday tracker" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
                 </div>
             </div>
 
@@ -2122,7 +2122,7 @@
                 <h3 class="reminders-title">Reminders <span id="reminders-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="action-btn" onclick="event.stopPropagation(); clearAllReminders()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
-                    <button class="recommend-btn" id="reminders-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
+                    <button class="recommend-btn" id="reminders-toggle-btn" title="Toggle reminders section" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">▼</button>
                 </div>
             </div>
 
@@ -2806,7 +2806,7 @@
         function showCompletionAnimation() {
             // Create celebration element
             const celebration = document.createElement('div');
-            celebration.innerHTML = 'ℹ️';
+            celebration.innerHTML = '🎉';
             celebration.style.position = 'fixed';
             celebration.style.top = '50%';
             celebration.style.left = '50%';
@@ -3352,7 +3352,7 @@
 
                 // Check if it's a document size error
                 if (error.message && error.message.includes('exceeds the maximum allowed size')) {
-                    alert('✓n× Data too large for cloud sync!\n\nYour data (including images) exceeds Firestore\'s 1MB limit.\n\nSuggestions:\n✓ Delete some old items or images\n✓ Use smaller images\n✓ Your data is still saved locally');
+                    alert('⚠️ Data too large for cloud sync!\n\nYour data (including images) exceeds Firestore\'s 1MB limit.\n\nSuggestions:\n• Delete some old items or images\n• Use smaller images\n• Your data is still saved locally');
                 }
 
                 const statusEl = document.getElementById('sync-status');
