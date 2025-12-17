@@ -6,10 +6,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="version" content="4.4-20251214-FINAL">
+    <meta name="version" content="4.5-20251217-FIXED">
     <meta name="force-reload" content="true">
-    <title>Gitesh Life Tracker v4.4 CLEAN</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='60' fill='white' font-weight='bold'>G£Ù</text></svg>">
+    <title>Gitesh Life Tracker v4.5 FIXED</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><text x='50' y='50' text-anchor='middle' dominant-baseline='central' font-size='60' fill='white' font-weight='bold'>‚úì</text></svg>">
     <style>
         * {
             margin: 0;
@@ -1841,7 +1841,7 @@
         <div style="text-align: center; margin-bottom: 8px;">
             <div id="indian-datetime" style="font-size: 13px; color: #666; font-weight: 500;"></div>
         </div>
-        <p class="subtitle">Double-click goals to edit G«Û Use GÂ∆ button to move between lists G«Û <span id="sync-status" class="sync-status synced">Auto-Synced</span></p>
+        <p class="subtitle">Double-click goals to edit ‚úì Use ‚úì button to move between lists ‚úì <span id="sync-status" class="sync-status synced">Auto-Synced</span></p>
 
         <div id="quick-add-popup" class="password-overlay" style="display: none;">
             <div class="password-container">
@@ -1871,7 +1871,7 @@
                         <div style="font-size: 15px; font-weight: 600; color: #1a1a1a; line-height: 1.4;" id="rec-content"></div>
                         <div style="font-size: 12px; color: #666; margin-top: 4px;" id="rec-meta"></div>
                     </div>
-                    <button onclick="dismissRecommendation()" style="background: transparent; color: #999; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 18px; line-height: 1; transition: all 0.15s;" title="Dismiss" onmouseover="this.style.color='#333'; this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.color='#999'; this.style.background='transparent'">+˘</button>
+                    <button onclick="dismissRecommendation()" style="background: transparent; color: #999; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 18px; line-height: 1; transition: all 0.15s;" title="Dismiss" onmouseover="this.style.color='#333'; this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.color='#999'; this.style.background='transparent'">√ó</button>
                 </div>
             </div>
 
@@ -1927,7 +1927,7 @@
                 <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e8e8e8;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <h4 style="font-size: 12px; font-weight: 600; color: #374151; margin: 0;">Today's Log</h4>
-                        <button class="recommend-btn" onclick="toggleWaterLog()" id="water-log-toggle" style="font-size: 10px; padding: 4px 8px;">G˚+</button>
+                        <button class="recommend-btn" onclick="toggleWaterLog()" id="water-log-toggle" style="font-size: 10px; padding: 4px 8px;">üíß</button>
                     </div>
                     <div id="water-log-list" style="font-size: 11px; color: #64748b; max-height: 120px; overflow-y: auto;"></div>
                 </div>
@@ -1942,39 +1942,39 @@
             </div>
             <div class="habits-grid" role="group" aria-label="Daily habits tracker">
                 <button class="habit-btn" onclick="toggleHabit('icefacial')" id="habit-icefacial" aria-label="Ice Facial daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">Ice Facial <span class="habit-streak" id="streak-icefacial"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('workout')" id="habit-workout" aria-label="10k steps daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">10K Steps <span class="habit-streak" id="streak-workout"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('temple')" id="habit-temple" aria-label="Temple visit daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">Temple Visit <span class="habit-streak" id="streak-temple"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('meditation')" id="habit-meditation" aria-label="Meditation daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">Meditation <span class="habit-streak" id="streak-meditation"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('noBadHabits')" id="habit-noBadHabits" aria-label="No smoking daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">No Smoking <span class="habit-streak" id="streak-noBadHabits"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('learning')" id="habit-learning" aria-label="Audiobook or learning daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">Audiobook / Learning <span class="habit-streak" id="streak-learning"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('protein')" id="habit-protein" aria-label="No fap or porn daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">No Fap / Porn <span class="habit-streak" id="streak-protein"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('skincare')" id="habit-skincare" aria-label="Skincare daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">Skincare <span class="habit-streak" id="streak-skincare"></span></span>
                 </button>
                 <button class="habit-btn" onclick="toggleHabit('supplements')" id="habit-supplements" aria-label="Supplements daily habit">
-                    <span class="habit-check" aria-hidden="true">G£Ù</span>
+                    <span class="habit-check" aria-hidden="true">‚úì</span>
                     <span class="habit-text">Supplements <span class="habit-streak" id="streak-supplements"></span></span>
                 </button>
             </div>
@@ -1984,7 +1984,7 @@
         <div class="weight-tracker">
             <div class="weight-header">
                 <h3 class="weight-title">Weight Tracker <span id="weight-count" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); color: #065f46; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0 logs</span></h3>
-                <button class="recommend-btn" onclick="toggleWeightSection()" id="weight-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">G˚+</button>
+                <button class="recommend-btn" onclick="toggleWeightSection()" id="weight-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">‚ñº</button>
             </div>
 
             <div id="weight-content" style="overflow: hidden; transition: max-height 0.3s ease-out;">
@@ -2040,7 +2040,7 @@
                 <h3 class="notes-title">Quick Notes <span id="notes-count" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="action-btn" onclick="event.stopPropagation(); clearAllNotes()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
-                    <button class="recommend-btn" id="notes-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">G˚+</button>
+                    <button class="recommend-btn" id="notes-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">‚ñº</button>
                 </div>
             </div>
 
@@ -2069,7 +2069,7 @@
                 <h3 class="documents-title">Documents <span id="documents-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="action-btn" onclick="event.stopPropagation(); clearAllDocuments()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
-                    <button class="recommend-btn" id="documents-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">G˚+</button>
+                    <button class="recommend-btn" id="documents-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">‚ñº</button>
                 </div>
             </div>
 
@@ -2079,7 +2079,7 @@
                 </div>
 
                 <div class="upload-area" id="upload-area" onclick="document.getElementById('document-file-input').click()">
-                    <div class="upload-icon">=ÉÙ¸</div>
+                    <div class="upload-icon">üì§</div>
                     <div class="upload-text">Click to upload or drag & drop</div>
                     <div class="upload-hint">PDF, DOC, XLS, Images (Max 5MB per file)</div>
                     <input type="file" id="document-file-input" class="file-input-hidden" onchange="handleDocumentUpload(event)" accept="*/*" multiple>
@@ -2097,7 +2097,7 @@
                 <h3 class="birthday-title">Birthday Tracker <span id="birthday-count" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); color: #9f1239; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="action-btn" onclick="event.stopPropagation(); clearAllBirthdays()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
-                    <button class="recommend-btn" id="birthday-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">G˚+</button>
+                    <button class="recommend-btn" id="birthday-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">‚ñº</button>
                 </div>
             </div>
 
@@ -2122,7 +2122,7 @@
                 <h3 class="reminders-title">Reminders <span id="reminders-count" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af; padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0</span></h3>
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <button class="action-btn" onclick="event.stopPropagation(); clearAllReminders()" style="font-size: 10px; padding: 5px 10px;">Clear All</button>
-                    <button class="recommend-btn" id="reminders-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">G˚+</button>
+                    <button class="recommend-btn" id="reminders-toggle-btn" style="font-size: 12px; padding: 5px 10px; font-weight: 600;">‚ñº</button>
                 </div>
             </div>
 
@@ -2164,7 +2164,7 @@
 
         <!-- Image Preview Modal -->
         <div id="preview-modal" class="preview-modal" onclick="closePreview()">
-            <span class="preview-close" onclick="closePreview()">+˘</span>
+            <span class="preview-close" onclick="closePreview()">+ÔøΩ</span>
             <img id="preview-image" class="preview-image" src="" alt="Preview" onclick="event.stopPropagation()">
         </div>
 
@@ -2421,11 +2421,11 @@
         function showSyncId() {
             const currentId = getUserId();
             const change = confirm(
-                `=Éˆ‰ YOUR SYNC CODE: ${currentId}\n\n` +
-                `=ÉÙ¶ MOBILE: Enter "${currentId}"\n` +
-                `=É∆+ DESKTOP: Enter "${currentId}"\n\n` +
+                `‚ÑπÔ∏è YOUR SYNC CODE: ${currentId}\n\n` +
+                `‚ÑπÔ∏è MOBILE: Enter "${currentId}"\n` +
+                `üíª DESKTOP: Enter "${currentId}"\n\n` +
                 `Same code = Same data on all devices!\n\n` +
-                `Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸Gˆ¸\n\n` +
+                `‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì\n\n` +
                 `Click OK to CHANGE your sync code\n` +
                 `Click CANCEL to keep it`
             );
@@ -2434,14 +2434,14 @@
                 const newId = prompt(
                     `Enter NEW sync code (4+ characters):\n\n` +
                     `Current: ${currentId}\n\n` +
-                    `G‹·n+≈ Warning: Changing this will point to\n` +
+                    `‚úìn+ÔøΩ Warning: Changing this will point to\n` +
                     `different data in the cloud!`,
                     currentId
                 );
 
                 if (newId && newId.trim().length >= 4 && newId !== currentId) {
                     localStorage.setItem('userId', newId.trim().toUpperCase());
-                    alert(`G£‡ Sync code changed to: ${newId.trim().toUpperCase()}\n\nReloading app...`);
+                    alert(`‚úì Sync code changed to: ${newId.trim().toUpperCase()}\n\nReloading app...`);
                     location.reload();
                 }
             }
@@ -2486,21 +2486,21 @@
                 cloudTotal = 'Firebase not ready';
             }
 
-            const debug = `=ÉˆÏ SYNC DEBUG INFO\n\n` +
-                `=ÉÙ¶ Current Device:\n` +
+            const debug = `‚ÑπÔ∏è SYNC DEBUG INFO\n\n` +
+                `‚ÑπÔ∏è Current Device:\n` +
                 `Sync ID: ${getUserId()}\n` +
                 `Cloud Doc ID: ${getCloudDocId()}\n\n` +
-                `=ÉÙË Goals Count:\n` +
+                `‚ÑπÔ∏è Goals Count:\n` +
                 `In Memory: ${total} (${personal}P + ${professional}P)\n` +
                 `In LocalStorage: ${localPersonal + localProfessional} (${localPersonal}P + ${localProfessional}P)\n` +
-                `Gˇ¸n+≈ In Cloud: ${cloudTotal} (${cloudPersonal}P + ${cloudProfessional}P)\n\n` +
-                `=Éˆ— Firebase Status:\n` +
-                `Firebase Ready: ${window.firebaseReady ? 'G£‡ YES' : 'G•Ó NO'}\n` +
-                `Firebase DB: ${window.db ? 'G£‡ Connected' : 'G•Ó Not Connected'}\n` +
-                `Online: ${navigator.onLine ? 'G£‡ YES' : 'G•Ó NO'}\n\n` +
-                `G•˘ MISMATCH DETECTED!\n` +
+                `‚úìn+ÔøΩ In Cloud: ${cloudTotal} (${cloudPersonal}P + ${cloudProfessional}P)\n\n` +
+                `‚ÑπÔ∏è Firebase Status:\n` +
+                `Firebase Ready: ${window.firebaseReady ? '‚úì YES' : '‚úì NO'}\n` +
+                `Firebase DB: ${window.db ? '‚úì Connected' : '‚úì Not Connected'}\n` +
+                `Online: ${navigator.onLine ? '‚úì YES' : '‚úì NO'}\n\n` +
+                `‚úì MISMATCH DETECTED!\n` +
                 `Your devices have DIFFERENT Sync IDs!\n\n` +
-                `=É∆Ì TO FIX:\n` +
+                `‚ÑπÔ∏è TO FIX:\n` +
                 `1. Open BOTH devices side-by-side\n` +
                 `2. Pick ONE Sync ID to use\n` +
                 `3. Click "Sync ID" button on BOTH devices\n` +
@@ -2518,22 +2518,22 @@
             }
 
             const choice = confirm(
-                `=Éˆ‰ FORCE SYNC\n\n` +
+                `‚ÑπÔ∏è FORCE SYNC\n\n` +
                 `Current device has ${personalGoals.length + professionalGoals.length} goals.\n\n` +
                 `Click OK to:\n` +
-                `G£‡ UPLOAD local data to cloud (overwrite cloud)\n\n` +
+                `‚úì UPLOAD local data to cloud (overwrite cloud)\n\n` +
                 `Click CANCEL to:\n` +
-                `GºÁn+≈ DOWNLOAD cloud data (overwrite local)`
+                `‚úìn+ÔøΩ DOWNLOAD cloud data (overwrite local)`
             );
 
             if (choice) {
                 // Upload to cloud
-                console.log('=É‹« FORCE UPLOAD - Uploading local data to cloud...');
+                console.log('‚ÑπÔ∏è FORCE UPLOAD - Uploading local data to cloud...');
                 await saveToCloud();
-                alert('G£‡ Local data uploaded to cloud!\n\nNow open other device and click Force Sync GÂ∆ CANCEL to download.');
+                alert('‚úì Local data uploaded to cloud!\n\nNow open other device and click Force Sync ‚úì CANCEL to download.');
             } else {
                 // Download from cloud
-                console.log('GºÁn+≈ FORCE DOWNLOAD - Downloading cloud data...');
+                console.log('‚úìn+ÔøΩ FORCE DOWNLOAD - Downloading cloud data...');
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 const docSnap = await window.firestoreGetDoc(docRef);
 
@@ -2550,9 +2550,9 @@
                     updatePageTitle();
                     renderDashboard();
 
-                    alert(`G£‡ Downloaded ${personalGoals.length + professionalGoals.length} goals from cloud!\n\nNow both devices should show same data.`);
+                    alert(`‚úì Downloaded ${personalGoals.length + professionalGoals.length} goals from cloud!\n\nNow both devices should show same data.`);
                 } else {
-                    alert('G•Ó No cloud data found. Upload from other device first.');
+                    alert('‚úì No cloud data found. Upload from other device first.');
                 }
             }
         }
@@ -2565,13 +2565,13 @@
         // RESET EVERYTHING - Clear all data and start fresh
         async function resetEverything() {
             const confirm1 = confirm(
-                'G‹·n+≈ RESET EVERYTHING?\n\n' +
+                '‚úìn+ÔøΩ RESET EVERYTHING?\n\n' +
                 'This will DELETE:\n' +
-                'G«Û All goals (personal & professional)\n' +
-                'G«Û All habits\n' +
-                'G«Û All notes\n' +
-                'G«Û All weight data\n' +
-                'G«Û Cloud database\n\n' +
+                '‚úì All goals (personal & professional)\n' +
+                '‚úì All habits\n' +
+                '‚úì All notes\n' +
+                '‚úì All weight data\n' +
+                '‚úì Cloud database\n\n' +
                 'This CANNOT be undone!\n\n' +
                 'Click OK to continue, CANCEL to abort.'
             );
@@ -2579,7 +2579,7 @@
             if (!confirm1) return;
 
             const confirm2 = confirm(
-                'G‹·n+≈ FINAL WARNING!\n\n' +
+                '‚úìn+ÔøΩ FINAL WARNING!\n\n' +
                 'Are you ABSOLUTELY SURE?\n\n' +
                 'All your data will be permanently deleted!'
             );
@@ -2587,11 +2587,11 @@
             if (!confirm2) return;
 
             try {
-                console.log('=É˘Ên+≈ NUCLEAR RESET STARTING...');
+                console.log('‚ö†Ô∏è NUCLEAR RESET STARTING...');
 
                 // 1. Unsubscribe from real-time listener FIRST
                 if (goalsUnsubscribe) {
-                    console.log('=ÉˆÓ Unsubscribing listener...');
+                    console.log('‚ÑπÔ∏è Unsubscribing listener...');
                     goalsUnsubscribe();
                     goalsUnsubscribe = null;
                 }
@@ -2599,17 +2599,17 @@
                 // 2. Clear in-memory data
                 personalGoals = [];
                 professionalGoals = [];
-                console.log('=É∆+ Memory cleared');
+                console.log('üíª Memory cleared');
 
                 // 3. Clear ALL browser storage
                 localStorage.clear();
                 sessionStorage.clear();
-                console.log('=É∫¶ Storage cleared');
+                console.log('‚ÑπÔ∏è Storage cleared');
 
                 // 4. Clear Firebase completely
                 if (window.firebaseReady && window.db) {
                     const cloudDocId = getCloudDocId();
-                    console.log(`Gˇ¸n+≈ Clearing Firebase: ${cloudDocId}`);
+                    console.log(`‚úìn+ÔøΩ Clearing Firebase: ${cloudDocId}`);
 
                     await window.firestoreSetDoc(
                         window.firestoreDoc(window.db, 'goals', cloudDocId),
@@ -2631,27 +2631,27 @@
                         { weightData: [], lastUpdated: new Date().toISOString() }
                     );
 
-                    console.log('G£‡ Firebase cleared!');
+                    console.log('‚úì Firebase cleared!');
 
                     // Wait for Firebase to sync
                     await new Promise(r => setTimeout(r, 1500));
                 }
 
-                alert('G£‡ NUCLEAR RESET COMPLETE!\n\nEverything deleted from:\nG«Û Memory\nG«Û Local Storage\nG«Û Firebase Cloud\n\nReloading...');
+                alert('‚úì NUCLEAR RESET COMPLETE!\n\nEverything deleted from:\n‚úì Memory\n‚úì Local Storage\n‚úì Firebase Cloud\n\nReloading...');
 
                 // Hard reload after delay
                 setTimeout(() => location.reload(true), 1000);
 
             } catch (error) {
-                console.error('G•Ó Reset failed:', error);
-                alert('G•Ó RESET FAILED!\n\n' + error.message + '\n\nCheck console (F12)');
+                console.error('‚ùå Reset failed:', error);
+                alert('‚ùå RESET FAILED!\n\n' + error.message + '\n\nCheck console (F12)');
             }
         }
 
         // DIAGNOSTIC: Check what's actually in Firebase
         async function checkFirebaseData() {
             if (!window.firebaseReady || !window.db) {
-                alert('G•Ó Firebase not ready!');
+                alert('‚úì Firebase not ready!');
                 return;
             }
 
@@ -2675,27 +2675,27 @@
                     const localStorageTotal = localStoragePersonal + localStorageProfessional;
 
                     alert(
-                        `=ÉˆÏ DATA DIAGNOSTIC\n\n` +
+                        `‚ÑπÔ∏è DATA DIAGNOSTIC\n\n` +
                         `Sync ID: ${cloudDocId}\n\n` +
-                        `Gˇ¸n+≈ FIREBASE CLOUD:\n` +
+                        `‚úìn+ÔøΩ FIREBASE CLOUD:\n` +
                         `   Total: ${cloudTotal} goals\n` +
                         `   Personal: ${cloudPersonal}\n` +
                         `   Professional: ${cloudProfessional}\n\n` +
-                        `=É∆+ IN-MEMORY (Current):\n` +
+                        `üíª IN-MEMORY (Current):\n` +
                         `   Total: ${localTotal} goals\n` +
                         `   Personal: ${localPersonal}\n` +
                         `   Professional: ${localProfessional}\n\n` +
-                        `=É∆+ LOCAL STORAGE:\n` +
+                        `üíª LOCAL STORAGE:\n` +
                         `   Total: ${localStorageTotal} goals\n` +
                         `   Personal: ${localStoragePersonal}\n` +
                         `   Professional: ${localStorageProfessional}\n\n` +
                         `Last Updated: ${data.lastUpdated || 'Unknown'}`
                     );
                 } else {
-                    alert(`G•Ó No Firebase data found for Sync ID: ${cloudDocId}`);
+                    alert(`‚úì No Firebase data found for Sync ID: ${cloudDocId}`);
                 }
             } catch (error) {
-                alert(`G•Ó Error checking Firebase:\n${error.message}`);
+                alert(`‚úì Error checking Firebase:\n${error.message}`);
                 console.error(error);
             }
         }
@@ -2730,7 +2730,7 @@
             updatePageTitle();
             renderDashboard();
 
-            alert(`=É∫¶ CLEANUP COMPLETE!\n\nBefore: ${beforeTotal} goals (${beforePersonal}P + ${beforeProfessional}P)\nAfter: ${afterTotal} goals (${afterPersonal}P + ${afterProfessional}P)\n\nRemoved ${removed} duplicates!`);
+            alert(`‚ÑπÔ∏è CLEANUP COMPLETE!\n\nBefore: ${beforeTotal} goals (${beforePersonal}P + ${beforeProfessional}P)\nAfter: ${afterTotal} goals (${afterPersonal}P + ${afterProfessional}P)\n\nRemoved ${removed} duplicates!`);
         }
 
         let goalsUnsubscribe = null; // Store listener unsubscribe function
@@ -2806,7 +2806,7 @@
         function showCompletionAnimation() {
             // Create celebration element
             const celebration = document.createElement('div');
-            celebration.innerHTML = '=ÉƒÎ';
+            celebration.innerHTML = '‚ÑπÔ∏è';
             celebration.style.position = 'fixed';
             celebration.style.top = '50%';
             celebration.style.left = '50%';
@@ -2939,7 +2939,7 @@
 
                 // Check if we've seen this ID or text before
                 if (seenIds.has(goal.id) || seenTexts.has(normalizedText)) {
-                    console.log(`=É˘Ên+≈ Removing duplicate: "${goal.text}"`);
+                    console.log(`‚ö†Ô∏è Removing duplicate: "${goal.text}"`);
                     return false;
                 }
 
@@ -3059,7 +3059,7 @@
                     renderList('professional');
                     updatePageTitle();
                     isLoadingFromCloud = false;
-                    console.log('G£‡ Loaded and merged from cloud');
+                    console.log('‚úì Loaded and merged from cloud');
                 } else {
                     // No cloud data, upload current local data
                     await saveToCloud();
@@ -3067,15 +3067,15 @@
 
                 // Unsubscribe from old listener before creating new one
                 if (goalsUnsubscribe) {
-                    console.log('=ÉˆÓ Unsubscribing from old listener');
+                    console.log('‚ÑπÔ∏è Unsubscribing from old listener');
                     goalsUnsubscribe();
                     goalsUnsubscribe = null;
                 }
 
                 // Listen for real-time updates (store unsubscribe function)
-                console.log(`=ÉÊÈ Setting up real-time listener for doc: ${currentDocId}`);
+                console.log(`‚ÑπÔ∏è Setting up real-time listener for doc: ${currentDocId}`);
                 goalsUnsubscribe = window.firestoreOnSnapshot(docRef, async (doc) => {
-                    console.log(`=Éˆˆ Listener triggered - isLoadingFromCloud: ${isLoadingFromCloud}, isSavingToCloud: ${isSavingToCloud}`);
+                    console.log(`‚ÑπÔ∏è Listener triggered - isLoadingFromCloud: ${isLoadingFromCloud}, isSavingToCloud: ${isSavingToCloud}`);
 
                     if (doc.exists() && !isLoadingFromCloud && !isSavingToCloud) {
                         const data = doc.data();
@@ -3087,8 +3087,8 @@
                         const cloudPersonal = deduplicateGoals(cloudPersonalWithImages);
                         const cloudProfessional = deduplicateGoals(cloudProfessionalWithImages);
 
-                        console.log(`=Éˆ‰ Listener UPDATING LOCAL DATA - Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
-                        console.log(`=Éˆ‰ Current local: ${personalGoals.length}P + ${professionalGoals.length}P`);
+                        console.log(`‚ÑπÔ∏è Listener UPDATING LOCAL DATA - Received ${cloudPersonal.length}P + ${cloudProfessional.length}P = ${cloudPersonal.length + cloudProfessional.length} goals from cloud`);
+                        console.log(`‚ÑπÔ∏è Current local: ${personalGoals.length}P + ${professionalGoals.length}P`);
 
                         // Merge to keep any offline/local additions
                         personalGoals = deduplicateGoals(mergeGoals(personalGoals, cloudPersonal));
@@ -3102,7 +3102,7 @@
                         renderList('professional');
                         updatePageTitle();
                         renderDashboard();
-                        console.log('G£‡ UI updated with cloud data');
+                        console.log('‚úì UI updated with cloud data');
                     }
                 });
             } catch (error) {
@@ -3124,7 +3124,7 @@
                     chunks.push(base64Data.substring(i, i + CHUNK_SIZE));
                 }
 
-                console.log(`=ÉÙ™ Splitting image ${attachmentId} into ${chunks.length} chunks`);
+                console.log(`‚ÑπÔ∏è Splitting image ${attachmentId} into ${chunks.length} chunks`);
 
                 // Save each chunk to Firestore
                 for (let i = 0; i < chunks.length; i++) {
@@ -3139,7 +3139,7 @@
                     });
                 }
 
-                console.log(`Gˇ¸n+≈ Uploaded ${chunks.length} chunks for image: ${attachmentId}`);
+                console.log(`‚úìn+ÔøΩ Uploaded ${chunks.length} chunks for image: ${attachmentId}`);
                 return { chunked: true, totalChunks: chunks.length };
             } catch (error) {
                 console.error('Error uploading image chunks:', error);
@@ -3170,7 +3170,7 @@
 
                 // Reassemble the full base64 string
                 const fullData = chunks.join('');
-                console.log(`=ÉÙ™ Reassembled image ${attachmentId} from ${chunks.length} chunks`);
+                console.log(`‚ÑπÔ∏è Reassembled image ${attachmentId} from ${chunks.length} chunks`);
                 return fullData;
             } catch (error) {
                 console.error('Error loading image chunks:', error);
@@ -3188,7 +3188,7 @@
                     const chunkDocRef = window.firestoreDoc(window.db, 'image-chunks', `${userId}_${attachmentId}_chunk${i}`);
                     await window.firestoreDeleteDoc(chunkDocRef);
                 }
-                console.log(`=É˘Ên+≈ Deleted ${totalChunks} chunks for image: ${attachmentId}`);
+                console.log(`‚ö†Ô∏è Deleted ${totalChunks} chunks for image: ${attachmentId}`);
             } catch (error) {
                 console.error('Error deleting image chunks:', error);
             }
@@ -3207,7 +3207,7 @@
                     for (const att of goal.attachments) {
                         if (att.type === 'img' && att.data && att.data.startsWith('data:')) {
                             // Upload image to chunks and wait for completion
-                            console.log(`=ÉÙÒ Uploading image ${att.id} to chunks...`);
+                            console.log(`‚ÑπÔ∏è Uploading image ${att.id} to chunks...`);
                             const chunkInfo = await uploadImageToChunks(att.data, att.id);
 
                             if (chunkInfo) {
@@ -3221,9 +3221,9 @@
                                     chunked: true,
                                     totalChunks: chunkInfo.totalChunks
                                 });
-                                console.log(`G£‡ Image ${att.id} uploaded as ${chunkInfo.totalChunks} chunks`);
+                                console.log(`‚úì Image ${att.id} uploaded as ${chunkInfo.totalChunks} chunks`);
                             } else {
-                                console.error(`G•Ó Failed to upload image ${att.id}`);
+                                console.error(`‚ùå Failed to upload image ${att.id}`);
                             }
                         } else if (att.chunked && att.totalChunks) {
                             // Already chunked, keep reference
@@ -3250,7 +3250,7 @@
                 processedGoals.push(goalCopy);
             }
 
-            console.log('G£‡ All image chunks uploaded successfully');
+            console.log('‚úì All image chunks uploaded successfully');
             return processedGoals;
         }
 
@@ -3267,7 +3267,7 @@
                     for (const att of goal.attachments) {
                         if (att.chunked && att.totalChunks) {
                             // Load image from chunks
-                            console.log(`=ÉÙ— Loading image ${att.id} from ${att.totalChunks} chunks...`);
+                            console.log(`‚ÑπÔ∏è Loading image ${att.id} from ${att.totalChunks} chunks...`);
                             const data = await loadImageFromChunks(att.id, att.totalChunks);
 
                             if (data) {
@@ -3281,9 +3281,9 @@
                                     chunked: true,
                                     totalChunks: att.totalChunks
                                 });
-                                console.log(`G£‡ Image ${att.id} loaded successfully`);
+                                console.log(`‚úì Image ${att.id} loaded successfully`);
                             } else {
-                                console.error(`G•Ó Failed to load image ${att.id}`);
+                                console.error(`‚ùå Failed to load image ${att.id}`);
                             }
                         } else {
                             // Not chunked, keep as-is
@@ -3323,10 +3323,10 @@
                 professionalGoals = deduplicateGoals(professionalGoals);
 
                 // Upload images to Firestore chunks (cross-device sync)
-                console.log(`Gˇ¸n+≈ Starting cloud save - ${personalGoals.length}P + ${professionalGoals.length}P goals`);
+                console.log(`‚úìn+ÔøΩ Starting cloud save - ${personalGoals.length}P + ${professionalGoals.length}P goals`);
                 const personalForCloud = await processAttachmentsForCloud(personalGoals);
                 const professionalForCloud = await processAttachmentsForCloud(professionalGoals);
-                console.log('Gˇ¸n+≈ All images uploaded to chunks, saving main document...');
+                console.log('‚úìn+ÔøΩ All images uploaded to chunks, saving main document...');
 
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
@@ -3339,12 +3339,12 @@
                     statusEl.className = 'sync-status synced';
                     statusEl.textContent = 'Cloud Synced';
                 }
-                console.log(`G£‡ CLOUD SAVE COMPLETE [Doc: ${getCloudDocId()}] - ${personalForCloud.length}P + ${professionalForCloud.length}P = ${personalForCloud.length + professionalForCloud.length} total goals`);
+                console.log(`‚úì CLOUD SAVE COMPLETE [Doc: ${getCloudDocId()}] - ${personalForCloud.length}P + ${professionalForCloud.length}P = ${personalForCloud.length + professionalForCloud.length} total goals`);
 
                 // Clear flag after a longer delay to ensure listener doesn't fire too soon (especially for chunked images)
                 setTimeout(() => {
                     isSavingToCloud = false;
-                    console.log('G£‡ isSavingToCloud flag cleared - listener can now update');
+                    console.log('‚úì isSavingToCloud flag cleared - listener can now update');
                 }, 5000); // 5 seconds to allow time for chunked image uploads
             } catch (error) {
                 console.error('Error saving to cloud:', error);
@@ -3352,7 +3352,7 @@
 
                 // Check if it's a document size error
                 if (error.message && error.message.includes('exceeds the maximum allowed size')) {
-                    alert('G‹·n+≈ Data too large for cloud sync!\n\nYour data (including images) exceeds Firestore\'s 1MB limit.\n\nSuggestions:\nG«Û Delete some old items or images\nG«Û Use smaller images\nG«Û Your data is still saved locally');
+                    alert('‚úìn+ÔøΩ Data too large for cloud sync!\n\nYour data (including images) exceeds Firestore\'s 1MB limit.\n\nSuggestions:\n‚úì Delete some old items or images\n‚úì Use smaller images\n‚úì Your data is still saved locally');
                 }
 
                 const statusEl = document.getElementById('sync-status');
@@ -3431,7 +3431,7 @@
             } else {
                 goalsSubtitle = `${completedGoals} completed`;
                 if (activeGoals > 0) {
-                    goalsSubtitle += ` G«Û ${activeGoals} active`;
+                    goalsSubtitle += ` ‚úì ${activeGoals} active`;
                 }
             }
             document.getElementById('dashboard-goals-subtitle').innerHTML = goalsSubtitle;
@@ -3518,7 +3518,7 @@
             const currentVersion = localStorage.getItem('appVersion');
 
             if (currentVersion !== appVersion) {
-                console.log('=Éˆ‰ Migrating to v' + appVersion + ' - Clearing old data...');
+                console.log('‚ÑπÔ∏è Migrating to v' + appVersion + ' - Clearing old data...');
 
                 // Clear all localStorage except userId
                 const userId = localStorage.getItem('userId');
@@ -3531,7 +3531,7 @@
                 professionalGoals = [];
 
                 // Force reload to get fresh state
-                console.log('G£‡ Migration complete - reloading...');
+                console.log('‚úì Migration complete - reloading...');
                 setTimeout(() => location.reload(), 100);
                 return;
             }
@@ -3550,14 +3550,14 @@
 
             // Show version and sync info on load (for debugging)
             console.log(`
-GÚˆGÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ˘
-GÚÊ   Gitesh Life Tracker v4.3 LOADED     GÚÊ
-GÚ·GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ˙
-GÚÊ  Sync ID: ${getUserId()}
-GÚÊ  Goals: ${personalGoals.length}P + ${professionalGoals.length}P = ${personalGoals.length + professionalGoals.length} total
-GÚÊ  Firebase: ${window.firebaseReady ? 'G£‡ Ready' : 'G•Ó Not Ready'}
-GÚÊ  Online: ${navigator.onLine ? 'G£‡ YES' : 'G•Ó NO'}
-GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ•
+‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì
+‚úì   Gitesh Life Tracker v4.3 LOADED     ‚úì
+‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì
+‚úì  Sync ID: ${getUserId()}
+‚úì  Goals: ${personalGoals.length}P + ${professionalGoals.length}P = ${personalGoals.length + professionalGoals.length} total
+‚úì  Firebase: ${window.firebaseReady ? '‚úì Ready' : '‚úì Not Ready'}
+‚úì  Online: ${navigator.onLine ? '‚úì YES' : '‚úì NO'}
+‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚úì‚Çπ
             `);
 
             // If Firebase is already ready, load from cloud
@@ -3577,12 +3577,12 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
             // Visibility change listener - sync when tab becomes visible
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden && window.firebaseReady && navigator.onLine) {
-                    console.log('=ÉÊ¸n+≈ Tab became visible, checking for updates...');
+                    console.log('‚ö†Ô∏è Tab became visible, checking for updates...');
                     // Don't call loadFromCloud() here as the listener should auto-update
                     // Just trigger a manual check by calling manualSync in background
                     setTimeout(() => {
                         if (window.firebaseReady) {
-                            console.log('=Éˆ‰ Auto-syncing after visibility change');
+                            console.log('‚ÑπÔ∏è Auto-syncing after visibility change');
                             loadFromCloud();
                         }
                     }, 500); // Small delay to avoid rapid syncs
@@ -3598,7 +3598,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                         const goalId = listItem.getAttribute('data-id');
                         const goalType = listItem.getAttribute('data-type');
                         if (goalId && goalType) {
-                            console.log(`=É˘Ên+≈ Delete clicked via event delegation: ${goalType} - ${goalId}`);
+                            console.log(`‚ö†Ô∏è Delete clicked via event delegation: ${goalType} - ${goalId}`);
                             deleteItem(goalType, goalId);
                         }
                     }
@@ -3611,7 +3611,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                         const goalId = listItem.getAttribute('data-id');
                         const goalType = listItem.getAttribute('data-type');
                         if (goalId && goalType) {
-                            console.log(`GÂˆn+≈ Move clicked via event delegation: ${goalType} - ${goalId}`);
+                            console.log(`‚úìn+ÔøΩ Move clicked via event delegation: ${goalType} - ${goalId}`);
                             moveItem(goalType, goalId);
                         }
                     }
@@ -3887,7 +3887,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
             const recMeta = document.getElementById('rec-meta');
             const changeBtn = document.getElementById('change-global-rec');
 
-            recType.textContent = rec.type;
+            recType.textContent = rec.category;
             recContent.textContent = rec.content;
             recMeta.textContent = rec.meta;
 
@@ -4236,7 +4236,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                                          onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')"
                                          title="${escapeHtml(att.name)}"
                                          alt="${escapeHtml(att.name)}">
-                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment" style="position: absolute; top: -4px; right: -4px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">+˘</span>
+                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment" style="position: absolute; top: -4px; right: -4px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">+ÔøΩ</span>
                                 </div>
                             `;
                         } else {
@@ -4244,7 +4244,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                                 <div class="attachment-item" onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')" title="${escapeHtml(att.name)}">
                                     <span class="attachment-icon">${icon}</span>
                                     <span class="attachment-name">${escapeHtml(att.name)}</span>
-                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment">+˘</span>
+                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment">+ÔøΩ</span>
                                 </div>
                             `;
                         }
@@ -4256,11 +4256,11 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                 return `
                 <li class="checklist-item ${goal.completed ? 'completed' : ''}" data-id="${goal.id}" data-type="${type}" style="display: block;">
                     <div style="display: flex; align-items: center;">
-                        <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? 'GÂ∆' : 'GÂ…'}</button>
+                        <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '‚úì' : '‚úì'}</button>
                         <input type="checkbox" ${goal.completed ? 'checked' : ''}
                                onchange="toggleItem('${type}', '${goal.id}')">
                         <span class="item-text" onclick="toggleDeleteButton(event)" ondblclick="editItem('${type}', '${goal.id}', this)" title="Click to show delete">${linkifyText(goal.text)}</span>
-                        <button class="attach-btn" onclick="handleItemAttachment('${type}', '${goal.id}')" title="Attach file">=ÉÙƒ</button>
+                        <button class="attach-btn" onclick="handleItemAttachment('${type}', '${goal.id}')" title="Attach file">‚ÑπÔ∏è</button>
                         <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
                     </div>
                     ${attachmentsHtml}
@@ -4402,7 +4402,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                                 const compressed = await compressImage(base64Data, maxImageSize);
                                 base64Data = compressed;
                                 fileSize = Math.round(base64Data.length * 0.75);
-                                console.log(`=ÉÙ+ Image compressed to ${formatFileSize(fileSize)}`);
+                                console.log(`üíª Image compressed to ${formatFileSize(fileSize)}`);
                             } catch (compressionError) {
                                 alert('Image too large and cannot be compressed enough. Please use a smaller image.');
                                 console.error('Compression failed:', compressionError);
@@ -4428,25 +4428,25 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                             }]
                         };
 
-                        console.log('=ÉÙ+ Image pasted - adding to goals array');
-                        console.log('=ÉÙ+ Goals before:', goals.length);
+                        console.log('üíª Image pasted - adding to goals array');
+                        console.log('üíª Goals before:', goals.length);
 
                         saveUndoState();
                         goals.unshift(newGoal);
 
-                        console.log('=ÉÙ+ Goals after unshift:', goals.length);
-                        console.log('=ÉÙ+ Image goal:', newGoal);
+                        console.log('üíª Goals after unshift:', goals.length);
+                        console.log('üíª Image goal:', newGoal);
 
                         saveData(type);
                         renderList(type);
                         updatePageTitle();
 
-                        console.log('=ÉÙ+ Image saved and rendered');
+                        console.log('üíª Image saved and rendered');
 
                         // Show success message
                         const input = document.getElementById(`${type}-input`);
                         const originalPlaceholder = input.placeholder;
-                        input.placeholder = 'G£Ù Image pasted! Added to list';
+                        input.placeholder = '‚úì Image pasted! Added to list';
                         setTimeout(() => {
                             input.placeholder = originalPlaceholder;
                         }, 2000);
@@ -4754,7 +4754,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
                     saveHabitsLocal();
                     renderHabits();
-                    console.log('G£‡ Loaded and merged habits from cloud');
+                    console.log('‚úì Loaded and merged habits from cloud');
                 } else {
                     // No cloud data, upload current local data
                     await saveHabitsToCloud();
@@ -4780,7 +4780,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                         saveHabitsLocal();
 
                         renderHabits();
-                        console.log('=Éˆ‰ Habits synced from cloud');
+                        console.log('‚ÑπÔ∏è Habits synced from cloud');
                     }
                 });
             } catch (error) {
@@ -4866,7 +4866,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                     if (streakEl) {
                         const streak = calculateStreak(habitName);
                         if (streak > 0) {
-                            streakEl.textContent = `=Éˆ—${streak}`;
+                            streakEl.textContent = `‚ÑπÔ∏è${streak}`;
                         } else {
                             streakEl.textContent = '';
                         }
@@ -4936,10 +4936,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (notesExpanded) {
                 content.style.maxHeight = content.scrollHeight + 'px';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             } else {
                 content.style.maxHeight = '0px';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             }
 
             // Save state
@@ -4958,10 +4958,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (notesExpanded) {
                 content.style.maxHeight = 'none';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             } else {
                 content.style.maxHeight = '0px';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             }
         }
 
@@ -5023,7 +5023,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
                     saveNotesLocal();
                     renderNotes();
-                    console.log('G£‡ Loaded and merged notes from cloud');
+                    console.log('‚úì Loaded and merged notes from cloud');
                 } else {
                     await saveNotesToCloud();
                 }
@@ -5038,7 +5038,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                         saveNotesLocal();
 
                         renderNotes();
-                        console.log('=Éˆ‰ Notes synced from cloud');
+                        console.log('‚ÑπÔ∏è Notes synced from cloud');
                     }
                 });
             } catch (error) {
@@ -5280,13 +5280,13 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
         // Get file icon based on type
         function getFileIcon(type) {
             const icons = {
-                'pdf': '=ÉÙ‰',
-                'doc': '=ÉÙ•',
-                'xls': '=ÉÙË',
-                'img': '=É˚+n+≈',
-                'other': '=ÉÙƒ'
+                'pdf': 'üìÑ',
+                'doc': 'üìù',
+                'xls': 'üìä',
+                'img': 'üñºÔ∏è',
+                'other': 'üìé'
             };
-            return icons[type] || '=ÉÙƒ';
+            return icons[type] || 'üìé';
         }
 
         // Format file size
@@ -5407,10 +5407,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (documentsExpanded) {
                 content.style.maxHeight = content.scrollHeight + 'px';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             } else {
                 content.style.maxHeight = '0px';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             }
 
             // Save state
@@ -5429,10 +5429,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (documentsExpanded) {
                 content.style.maxHeight = 'none';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             } else {
                 content.style.maxHeight = '0px';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             }
         }
 
@@ -5499,7 +5499,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                         documents = mergeDocuments(documents, data.documents || []);
                         saveDocumentsLocal();
                         renderDocuments();
-                        console.log('=Éˆ‰ Documents synced from cloud');
+                        console.log('‚ÑπÔ∏è Documents synced from cloud');
                     }
                 });
             } catch (error) {
@@ -6003,7 +6003,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
                     saveWeightLocal();
                     renderWeightTracker();
-                    console.log('G£‡ Loaded and merged weight from cloud');
+                    console.log('‚úì Loaded and merged weight from cloud');
                 } else {
                     await saveWeightToCloud();
                 }
@@ -6033,7 +6033,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                         saveWeightLocal();
 
                         renderWeightTracker();
-                        console.log('=Éˆ‰ Weight synced from cloud');
+                        console.log('‚ÑπÔ∏è Weight synced from cloud');
                     }
                 });
             } catch (error) {
@@ -6049,10 +6049,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (weightExpanded) {
                 content.style.maxHeight = content.scrollHeight + 'px';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             } else {
                 content.style.maxHeight = '0px';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             }
 
             localStorage.setItem('weightExpanded', weightExpanded);
@@ -6070,10 +6070,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (weightExpanded) {
                 content.style.maxHeight = 'none';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             } else {
                 content.style.maxHeight = '0px';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             }
 
             // Load height and target weight
@@ -6585,7 +6585,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                         birthdays: birthdays,
                         lastModified: new Date().toISOString()
                     }, { merge: true });
-                    console.log('G£‡ Birthdays saved to cloud');
+                    console.log('‚úì Birthdays saved to cloud');
                 } catch (error) {
                     console.error('Error saving birthdays to cloud:', error);
                 }
@@ -6607,7 +6607,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                             saveBirthdaysLocal();
                             renderBirthdays();
                             checkBirthdaysToday();
-                            console.log('G£‡ Birthdays loaded from cloud');
+                            console.log('‚úì Birthdays loaded from cloud');
                         }
                     }
 
@@ -6618,7 +6618,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                             saveBirthdaysLocal();
                             renderBirthdays();
                             checkBirthdaysToday();
-                            console.log('=Éˆ‰ Birthdays synced from cloud');
+                            console.log('‚ÑπÔ∏è Birthdays synced from cloud');
                         }
                     });
                 } catch (error) {
@@ -6761,14 +6761,14 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
                 let daysInfo = '';
                 if (isToday(birthday.date)) {
-                    daysInfo = ' G«Û Today!';
+                    daysInfo = ' ‚úì Today!';
                 } else if (isUpcoming(birthday.date)) {
                     const today = new Date();
                     const bday = new Date(birthday.date);
                     bday.setFullYear(today.getFullYear());
                     if (bday < today) bday.setFullYear(today.getFullYear() + 1);
                     const days = Math.ceil((bday - today) / (1000 * 60 * 60 * 24));
-                    daysInfo = ` G«Û In ${days} day${days > 1 ? 's' : ''}`;
+                    daysInfo = ` ‚úì In ${days} day${days > 1 ? 's' : ''}`;
                 }
 
                 return `
@@ -6799,10 +6799,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (birthdayExpanded) {
                 content.style.maxHeight = content.scrollHeight + 'px';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             } else {
                 content.style.maxHeight = '0';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             }
         }
 
@@ -6827,7 +6827,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
             // Start collapsed
             birthdayExpanded = false;
             content.style.maxHeight = '0';
-            toggleBtn.textContent = 'G˚¶';
+            toggleBtn.textContent = '‚úì';
         }
 
         // Initialize birthdays on page load
@@ -6901,7 +6901,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                         reminders: reminders,
                         lastModified: new Date().toISOString()
                     }, { merge: true });
-                    console.log('G£‡ Reminders saved to cloud');
+                    console.log('‚úì Reminders saved to cloud');
                 } catch (error) {
                     console.error('Error saving reminders to cloud:', error);
                 }
@@ -6923,7 +6923,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                             saveRemindersLocal();
                             renderReminders();
                             checkReminders();
-                            console.log('G£‡ Reminders loaded from cloud');
+                            console.log('‚úì Reminders loaded from cloud');
                         }
                     }
 
@@ -6935,7 +6935,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                             saveRemindersLocal();
                             renderReminders();
                             checkReminders();
-                            console.log('=Éˆ‰ Reminders synced from cloud');
+                            console.log('‚ÑπÔ∏è Reminders synced from cloud');
                         }
                     });
                 } catch (error) {
@@ -7069,11 +7069,11 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                     message += `${overdue.length} overdue reminder${overdue.length > 1 ? 's' : ''}`;
                 }
                 if (dueToday.length > 0) {
-                    if (message) message += ' G«Û ';
+                    if (message) message += ' ‚úì ';
                     message += `${dueToday.length} due today`;
                 }
                 if (dueSoon.length > 0) {
-                    if (message) message += ' G«Û ';
+                    if (message) message += ' ‚úì ';
                     message += `${dueSoon.length} due within 7 days`;
                 }
 
@@ -7167,19 +7167,19 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
             if (totalLiabilities > 0) {
                 totalsHTML += `<div style="background: white; padding: 6px 8px; border-radius: 6px; border: 1px solid #fca5a5;">
                     <div style="color: #991b1b; font-weight: 600;">Liabilities</div>
-                    <div style="color: #dc2626; font-weight: 700; font-size: 13px;">GÈ¶${totalLiabilities.toLocaleString('en-IN')}</div>
+                    <div style="color: #dc2626; font-weight: 700; font-size: 13px;">‚Çπ${totalLiabilities.toLocaleString('en-IN')}</div>
                 </div>`;
             }
             if (totalInvestments > 0) {
                 totalsHTML += `<div style="background: white; padding: 6px 8px; border-radius: 6px; border: 1px solid #93c5fd;">
                     <div style="color: #1e3a8a; font-weight: 600;">Investments</div>
-                    <div style="color: #2563eb; font-weight: 700; font-size: 13px;">GÈ¶${totalInvestments.toLocaleString('en-IN')}</div>
+                    <div style="color: #2563eb; font-weight: 700; font-size: 13px;">‚Çπ${totalInvestments.toLocaleString('en-IN')}</div>
                 </div>`;
             }
             if (totalExpenses > 0) {
                 totalsHTML += `<div style="background: white; padding: 6px 8px; border-radius: 6px; border: 1px solid #fde047;">
                     <div style="color: #713f12; font-weight: 600;">Expenses</div>
-                    <div style="color: #ca8a04; font-weight: 700; font-size: 13px;">GÈ¶${totalExpenses.toLocaleString('en-IN')}</div>
+                    <div style="color: #ca8a04; font-weight: 700; font-size: 13px;">‚Çπ${totalExpenses.toLocaleString('en-IN')}</div>
                 </div>`;
             }
             totalsHTML += '</div></div>';
@@ -7199,13 +7199,13 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
                 if (isOverdue(reminder.dueDate)) {
                     statusClass = 'overdue';
-                    daysInfo = ` G«Û ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''} overdue`;
+                    daysInfo = ` ‚úì ${Math.abs(diffDays)} day${Math.abs(diffDays) > 1 ? 's' : ''} overdue`;
                 } else if (isDueSoon(reminder.dueDate)) {
                     statusClass = 'due-soon';
                     if (diffDays === 0) {
-                        daysInfo = ' G«Û Due today';
+                        daysInfo = ' ‚úì Due today';
                     } else {
-                        daysInfo = ` G«Û Due in ${diffDays} day${diffDays > 1 ? 's' : ''}`;
+                        daysInfo = ` ‚úì Due in ${diffDays} day${diffDays > 1 ? 's' : ''}`;
                     }
                 }
 
@@ -7224,7 +7224,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                 }
 
                 const typeBadge = `<span style="background: ${typeBadgeBg}; color: ${typeBadgeColor}; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase;">${type}</span>`;
-                const amountText = reminder.amount ? ` G«Û GÈ¶${reminder.amount.toLocaleString('en-IN')}` : '';
+                const amountText = reminder.amount ? ` ‚úì ‚Çπ${reminder.amount.toLocaleString('en-IN')}` : '';
 
                 return `
                     <div class="reminder-item ${statusClass}">
@@ -7261,10 +7261,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (remindersExpanded) {
                 content.style.maxHeight = content.scrollHeight + 'px';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             } else {
                 content.style.maxHeight = '0';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             }
         }
 
@@ -7289,7 +7289,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
             // Start collapsed
             remindersExpanded = false;
             content.style.maxHeight = '0';
-            toggleBtn.textContent = 'G˚¶';
+            toggleBtn.textContent = '‚úì';
         }
 
         // Initialize reminders on page load
@@ -7412,10 +7412,10 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
 
             if (waterLogExpanded) {
                 container.style.maxHeight = '200px';
-                toggleBtn.textContent = 'G˚¶';
+                toggleBtn.textContent = '‚úì';
             } else {
                 container.style.maxHeight = '0';
-                toggleBtn.textContent = 'G˚+';
+                toggleBtn.textContent = '‚ñº';
             }
         }
 
@@ -7459,9 +7459,9 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
                 `;
 
                 glass.innerHTML = `
-                    <div style="font-size: 24px;">${isFilled ? '=É∆∫' : '=É—¢'}</div>
+                    <div style="font-size: 24px;">${isFilled ? '=ÔøΩ∆∫' : '=ÔøΩ—¢'}</div>
                     <div style="font-size: 10px; font-weight: 600; color: ${isFilled ? '#1e3a8a' : '#9ca3af'};">Glass ${i + 1}</div>
-                    ${isLastFilled ? '<div style="position: absolute; top: 4px; right: 4px; font-size: 10px; color: #ef4444;">+˘</div>' : ''}
+                    ${isLastFilled ? '<div style="position: absolute; top: 4px; right: 4px; font-size: 10px; color: #ef4444;">+ÔøΩ</div>' : ''}
                 `;
 
                 if (!isFilled) {
@@ -7499,7 +7499,7 @@ GÚ‹GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ…GÚ
             if (waterData[today].log && waterData[today].log.length > 0) {
                 logList.innerHTML = waterData[today].log.map((entry, index) => `
                     <div style="padding: 6px 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f3f4f6;">
-                        <span>=É∆∫ Glass ${index + 1}</span>
+                        <span>=ÔøΩ∆∫ Glass ${index + 1}</span>
                         <span style="color: #9ca3af;">${entry.time}</span>
                     </div>
                 `).join('');
