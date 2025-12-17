@@ -2164,7 +2164,7 @@
 
         <!-- Image Preview Modal -->
         <div id="preview-modal" class="preview-modal" onclick="closePreview()">
-            <span class="preview-close" onclick="closePreview()">+�</span>
+            <span class="preview-close" onclick="closePreview()">×</span>
             <img id="preview-image" class="preview-image" src="" alt="Preview" onclick="event.stopPropagation()">
         </div>
 
@@ -2434,7 +2434,7 @@
                 const newId = prompt(
                     `Enter NEW sync code (4+ characters):\n\n` +
                     `Current: ${currentId}\n\n` +
-                    `✓n+� Warning: Changing this will point to\n` +
+                    `✓n× Warning: Changing this will point to\n` +
                     `different data in the cloud!`,
                     currentId
                 );
@@ -2493,7 +2493,7 @@
                 `ℹ️ Goals Count:\n` +
                 `In Memory: ${total} (${personal}P + ${professional}P)\n` +
                 `In LocalStorage: ${localPersonal + localProfessional} (${localPersonal}P + ${localProfessional}P)\n` +
-                `✓n+� In Cloud: ${cloudTotal} (${cloudPersonal}P + ${cloudProfessional}P)\n\n` +
+                `✓n× In Cloud: ${cloudTotal} (${cloudPersonal}P + ${cloudProfessional}P)\n\n` +
                 `ℹ️ Firebase Status:\n` +
                 `Firebase Ready: ${window.firebaseReady ? '✓ YES' : '✓ NO'}\n` +
                 `Firebase DB: ${window.db ? '✓ Connected' : '✓ Not Connected'}\n` +
@@ -2523,7 +2523,7 @@
                 `Click OK to:\n` +
                 `✓ UPLOAD local data to cloud (overwrite cloud)\n\n` +
                 `Click CANCEL to:\n` +
-                `✓n+� DOWNLOAD cloud data (overwrite local)`
+                `✓n× DOWNLOAD cloud data (overwrite local)`
             );
 
             if (choice) {
@@ -2533,7 +2533,7 @@
                 alert('✓ Local data uploaded to cloud!\n\nNow open other device and click Force Sync ✓ CANCEL to download.');
             } else {
                 // Download from cloud
-                console.log('✓n+� FORCE DOWNLOAD - Downloading cloud data...');
+                console.log('✓n× FORCE DOWNLOAD - Downloading cloud data...');
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 const docSnap = await window.firestoreGetDoc(docRef);
 
@@ -2565,7 +2565,7 @@
         // RESET EVERYTHING - Clear all data and start fresh
         async function resetEverything() {
             const confirm1 = confirm(
-                '✓n+� RESET EVERYTHING?\n\n' +
+                '✓n× RESET EVERYTHING?\n\n' +
                 'This will DELETE:\n' +
                 '✓ All goals (personal & professional)\n' +
                 '✓ All habits\n' +
@@ -2579,7 +2579,7 @@
             if (!confirm1) return;
 
             const confirm2 = confirm(
-                '✓n+� FINAL WARNING!\n\n' +
+                '✓n× FINAL WARNING!\n\n' +
                 'Are you ABSOLUTELY SURE?\n\n' +
                 'All your data will be permanently deleted!'
             );
@@ -2609,7 +2609,7 @@
                 // 4. Clear Firebase completely
                 if (window.firebaseReady && window.db) {
                     const cloudDocId = getCloudDocId();
-                    console.log(`✓n+� Clearing Firebase: ${cloudDocId}`);
+                    console.log(`✓n× Clearing Firebase: ${cloudDocId}`);
 
                     await window.firestoreSetDoc(
                         window.firestoreDoc(window.db, 'goals', cloudDocId),
@@ -2677,7 +2677,7 @@
                     alert(
                         `ℹ️ DATA DIAGNOSTIC\n\n` +
                         `Sync ID: ${cloudDocId}\n\n` +
-                        `✓n+� FIREBASE CLOUD:\n` +
+                        `✓n× FIREBASE CLOUD:\n` +
                         `   Total: ${cloudTotal} goals\n` +
                         `   Personal: ${cloudPersonal}\n` +
                         `   Professional: ${cloudProfessional}\n\n` +
@@ -3139,7 +3139,7 @@
                     });
                 }
 
-                console.log(`✓n+� Uploaded ${chunks.length} chunks for image: ${attachmentId}`);
+                console.log(`✓n× Uploaded ${chunks.length} chunks for image: ${attachmentId}`);
                 return { chunked: true, totalChunks: chunks.length };
             } catch (error) {
                 console.error('Error uploading image chunks:', error);
@@ -3323,10 +3323,10 @@
                 professionalGoals = deduplicateGoals(professionalGoals);
 
                 // Upload images to Firestore chunks (cross-device sync)
-                console.log(`✓n+� Starting cloud save - ${personalGoals.length}P + ${professionalGoals.length}P goals`);
+                console.log(`✓n× Starting cloud save - ${personalGoals.length}P + ${professionalGoals.length}P goals`);
                 const personalForCloud = await processAttachmentsForCloud(personalGoals);
                 const professionalForCloud = await processAttachmentsForCloud(professionalGoals);
-                console.log('✓n+� All images uploaded to chunks, saving main document...');
+                console.log('✓n× All images uploaded to chunks, saving main document...');
 
                 const docRef = window.firestoreDoc(window.db, 'goals', getCloudDocId());
                 await window.firestoreSetDoc(docRef, {
@@ -3352,7 +3352,7 @@
 
                 // Check if it's a document size error
                 if (error.message && error.message.includes('exceeds the maximum allowed size')) {
-                    alert('✓n+� Data too large for cloud sync!\n\nYour data (including images) exceeds Firestore\'s 1MB limit.\n\nSuggestions:\n✓ Delete some old items or images\n✓ Use smaller images\n✓ Your data is still saved locally');
+                    alert('✓n× Data too large for cloud sync!\n\nYour data (including images) exceeds Firestore\'s 1MB limit.\n\nSuggestions:\n✓ Delete some old items or images\n✓ Use smaller images\n✓ Your data is still saved locally');
                 }
 
                 const statusEl = document.getElementById('sync-status');
@@ -3611,7 +3611,7 @@
                         const goalId = listItem.getAttribute('data-id');
                         const goalType = listItem.getAttribute('data-type');
                         if (goalId && goalType) {
-                            console.log(`✓n+� Move clicked via event delegation: ${goalType} - ${goalId}`);
+                            console.log(`✓n× Move clicked via event delegation: ${goalType} - ${goalId}`);
                             moveItem(goalType, goalId);
                         }
                     }
@@ -3798,6 +3798,21 @@
 
         // Global Recommendation System
         let currentGlobalRecommendation = null;
+
+        function getHabitRecommendations() {
+            const habitsList = [
+                'Complete ice facial routine',
+                'Walk 10,000 steps today',
+                'Visit temple for meditation',
+                'Practice 10 minutes of meditation',
+                'Avoid smoking today',
+                'Listen to an audiobook or learn something new',
+                'Maintain no fap/porn streak',
+                'Complete skincare routine',
+                'Take your daily supplements'
+            ];
+            return habitsList.map(text => ({ text }));
+        }
 
         function getGlobalRecommendation() {
             const recommendations = [];
@@ -4236,7 +4251,7 @@
                                          onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')"
                                          title="${escapeHtml(att.name)}"
                                          alt="${escapeHtml(att.name)}">
-                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment" style="position: absolute; top: -4px; right: -4px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">+�</span>
+                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment" style="position: absolute; top: -4px; right: -4px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.3);">×</span>
                                 </div>
                             `;
                         } else {
@@ -4244,7 +4259,7 @@
                                 <div class="attachment-item" onclick="viewAttachment('${type}', '${goal.id}', '${att.id}')" title="${escapeHtml(att.name)}">
                                     <span class="attachment-icon">${icon}</span>
                                     <span class="attachment-name">${escapeHtml(att.name)}</span>
-                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment">+�</span>
+                                    <span class="attachment-delete" onclick="deleteAttachment('${type}', '${goal.id}', '${att.id}', event)" title="Delete attachment">×</span>
                                 </div>
                             `;
                         }
