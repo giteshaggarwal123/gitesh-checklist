@@ -2176,7 +2176,7 @@
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('personal')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
                         <button class="recommend-btn" onclick="showQuickAddPopup()" title="Quick Add" style="margin-right: 5px;">+</button>
-                        <button class="recommend-btn" onclick="getGlobalRecommendation()">Recommend</button>                    </div>
+                        <button class="recommend-btn" onclick="recommendGoal('personal')">Recommend</button>                    </div>
                 </div>
 
                 <div class="recommendation empty" id="personal-recommendation">
@@ -2211,7 +2211,7 @@
                     <div>
                         <button class="recommend-btn" onclick="toggleSort('professional')" title="Sort alphabetically" style="margin-right: 5px;">A-Z</button>
                         <button class="recommend-btn" onclick="showQuickAddPopup()" title="Quick Add" style="margin-right: 5px;">+</button>
-                        <button class="recommend-btn" onclick="getGlobalRecommendation()">Recommend</button>                    </div>
+                        <button class="recommend-btn" onclick="recommendGoal('professional')">Recommend</button>                    </div>
                 </div>
 
                 <div class="recommendation empty" id="professional-recommendation">
@@ -3796,6 +3796,26 @@
             }
         }
 
+        // List-specific Recommendation System
+        function recommendGoal(type) {
+            const goals = type === 'personal' ? personalGoals : professionalGoals;
+            const uncompleted = goals.filter(g => !g.completed);
+            const recDiv = document.getElementById(`${type}-recommendation`);
+
+            if (uncompleted.length === 0) {
+                recDiv.innerHTML = '<span>No pending goals. Add some or mark existing as incomplete!</span>';
+                recDiv.classList.add('empty');
+                return;
+            }
+
+            const randomGoal = uncompleted[Math.floor(Math.random() * uncompleted.length)];
+            recDiv.innerHTML = `
+                <span>${randomGoal.text}</span>
+                <button class="change-btn" onclick="recommendGoal('${type}')">Change</button>
+            `;
+            recDiv.classList.remove('empty');
+        }
+
         // Global Recommendation System
         let currentGlobalRecommendation = null;
 
@@ -4275,7 +4295,7 @@
                         <input type="checkbox" ${goal.completed ? 'checked' : ''}
                                onchange="toggleItem('${type}', '${goal.id}')">
                         <span class="item-text" onclick="toggleDeleteButton(event)" ondblclick="editItem('${type}', '${goal.id}', this)" title="Click to show delete">${linkifyText(goal.text)}</span>
-                        <button class="attach-btn" onclick="handleItemAttachment('${type}', '${goal.id}')" title="Attach file">ℹ️</button>
+                        <button class="attach-btn" onclick="handleItemAttachment('${type}', '${goal.id}')" title="Attach file">📎</button>
                         <button class="delete-btn" onclick="deleteItem('${type}', '${goal.id}')">Delete</button>
                     </div>
                     ${attachmentsHtml}
