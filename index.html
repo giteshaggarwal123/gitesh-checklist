@@ -1997,3 +1997,78 @@
                     <input type="number" id="weight-input" placeholder="Enter weight (kg)" step="0.1" min="0" max="300" onkeypress="handleWeightKeyPress(event)" style="flex: 1; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
                     <button class="add-btn" onclick="addWeight()" style="padding: 10px 18px;">Log Weight</button>
                 </div>
+<script>
+        /*
+         * ===================================================================
+         * PASSWORD PROTECTION
+         * ===================================================================
+         */
+        const PASSWORD_KEY = 'gitesh_life_tracker_password';
+        const UNLOCK_TIMESTAMP_KEY = 'gitesh_life_tracker_unlocked_timestamp';
+        let IS_UNLOCKED = false;
+
+        function handlePasswordKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkPassword();
+            }
+        }
+
+        function checkPassword() {
+            const passwordInput = document.getElementById('password-input');
+            const passwordError = document.getElementById('password-error');
+            const enteredPassword = passwordInput.value;
+
+            // The password is the current date in DDMMYYYY format.
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            const correctPassword = `${day}${month}${year}`;
+
+            if (enteredPassword === correctPassword) {
+                unlockApp();
+            } else {
+                passwordError.style.display = 'block';
+                passwordInput.style.borderColor = '#dc3545';
+                passwordInput.focus();
+                // Vibrate for 200ms if the API is available
+                if (navigator.vibrate) {
+                    navigator.vibrate(200);
+                }
+            }
+        }
+
+        function unlockApp() {
+            const passwordOverlay = document.getElementById('password-overlay');
+            const mainContent = document.getElementById('main-content');
+            passwordOverlay.style.display = 'none';
+            mainContent.style.display = 'block';
+            IS_UNLOCKED = true;
+
+            const now = new Date().getTime();
+            localStorage.setItem(UNLOCK_TIMESTAMP_KEY, now);
+
+            // This will initialize all the data and render the app
+            initialize();
+        }
+
+        function checkLockStatus() {
+            const unlockedTimestamp = localStorage.getItem(UNLOCK_TIMESTAMP_KEY);
+            const now = new Date().getTime();
+            const twoHours = 2 * 60 * 60 * 1000;
+
+            if (unlockedTimestamp && (now - unlockedTimestamp < twoHours)) {
+                unlockApp();
+                return;
+            }
+
+            // If not unlocked or timestamp expired, show password screen.
+            const passwordOverlay = document.getElementById('password-overlay');
+            passwordOverlay.style.display = 'flex';
+        }
+
+        // Check lock status on page load.
+        checkLockStatus();
+    </script>
+</body>
+</html>
