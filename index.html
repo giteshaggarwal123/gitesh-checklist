@@ -3810,7 +3810,7 @@
 
             const randomGoal = uncompleted[Math.floor(Math.random() * uncompleted.length)];
             recDiv.innerHTML = `
-                <span>${randomGoal.text}</span>
+                <span style="font-weight: 600;">${randomGoal.text}</span>
                 <button class="change-btn" onclick="recommendGoal('${type}')">Change</button>
             `;
             recDiv.classList.remove('empty');
@@ -3935,20 +3935,6 @@
             }, 100);
         }
 
-        function completeRecommendation(type, goalId) {
-            const goals = type === 'personal' ? personalGoals : professionalGoals;
-            const goal = goals.find(g => g.id === goalId);
-            if (goal) {
-                goal.completed = true;
-                saveData(type);
-                renderList(type);
-            }
-            // Get a new recommendation
-            getGlobalRecommendation();
-        }
-
-
-
         function dismissRecommendation() {
             const recDiv = document.getElementById('global-recommendation');
             const changeBtn = document.getElementById('change-global-rec');
@@ -4017,43 +4003,6 @@
                     input.value = '';
                 }
             }
-        }
-
-        function quickAddItem(type) {
-            const text = prompt(`Quick add ${type} goal:`);
-            if (!text || text.trim() === '') {
-                return;
-            }
-
-            const trimmedText = text.trim().toLowerCase();
-            const priority = 'medium';
-
-            // Validate text length
-            if (trimmedText.length > 200) {
-                alert('Goal is too long! Please keep it under 200 characters.');
-                return;
-            }
-
-            const goals = type === 'personal' ? personalGoals : professionalGoals;
-
-            // Check for duplicates
-            const duplicate = goals.find(g => g.text === trimmedText);
-            if (duplicate) {
-                alert('This goal already exists! Please enter a different goal.');
-                return;
-            }
-
-            goals.unshift({
-                id: generateId(),
-                text: trimmedText,
-                completed: false,
-                priority: priority
-            });
-
-            saveData(type);
-            renderList(type);
-            updatePageTitle();
-            updateCharCount(type);
         }
 
         function toggleItem(type, id) {
@@ -4291,7 +4240,7 @@
                 return `
                 <li class="checklist-item ${goal.completed ? 'completed' : ''}" data-id="${goal.id}" data-type="${type}" style="display: block;">
                     <div style="display: flex; align-items: center;">
-                        <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '✓' : '✓'}</button>
+                        <button class="move-btn" onclick="moveItem('${type}', '${goal.id}')" title="Move to ${type === 'personal' ? 'Professional' : 'Personal'}">${type === 'personal' ? '→' : '←'}</button>
                         <input type="checkbox" ${goal.completed ? 'checked' : ''}
                                onchange="toggleItem('${type}', '${goal.id}')">
                         <span class="item-text" onclick="toggleDeleteButton(event)" ondblclick="editItem('${type}', '${goal.id}', this)" title="Click to show delete">${linkifyText(goal.text)}</span>
