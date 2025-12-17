@@ -1938,7 +1938,10 @@
         <div class="daily-habits">
             <div class="daily-habits-header">
                 <h3 class="daily-habits-title">Daily Habits <span id="habits-progress" style="background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%); color: var(--primary-dark); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-left: 6px;">0/9</span></h3>
-                <span class="daily-habits-date" id="habits-date">Today</span>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button onclick="testNudgePopup()" style="background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 600;" title="Test nudge notification">🔔 Test Nudge</button>
+                    <span class="daily-habits-date" id="habits-date">Today</span>
+                </div>
             </div>
             <div class="habits-grid" role="group" aria-label="Daily habits tracker">
                 <button class="habit-btn" onclick="toggleHabit('icefacial')" id="habit-icefacial" aria-label="Ice Facial daily habit">
@@ -7505,6 +7508,261 @@
                 }
             }, 60000);
         });
+
+        // ===== NUDGE NOTIFICATION SYSTEM =====
+        let nudgeSettings = {
+            enabled: true,
+            interval: 60, // Check every 60 minutes
+            times: ['09:00', '14:00', '18:00', '21:00'], // Scheduled nudge times
+            showPopup: true,
+            lastNudge: null
+        };
+
+        // Load nudge settings
+        function loadNudgeSettings() {
+            const stored = localStorage.getItem('nudgeSettings');
+            if (stored) {
+                try {
+                    nudgeSettings = { ...nudgeSettings, ...JSON.parse(stored) };
+                } catch (e) {
+                    console.error('Error loading nudge settings:', e);
+                }
+            }
+        }
+
+        // Save nudge settings
+        function saveNudgeSettings() {
+            localStorage.setItem('nudgeSettings', JSON.stringify(nudgeSettings));
+        }
+
+        // Get incomplete items
+        function getIncompleteItems() {
+            const today = getTodayDate();
+            const incomplete = {
+                habits: [],
+                personalGoals: [],
+                professionalGoals: [],
+                water: 0
+            };
+
+            // Check habits
+            if (dailyHabits[today]) {
+                HABITS.forEach(habit => {
+                    if (!dailyHabits[today][habit]) {
+                        incomplete.habits.push(habit);
+                    }
+                });
+            } else {
+                incomplete.habits = [...HABITS];
+            }
+
+            // Check goals
+            incomplete.personalGoals = personalGoals.filter(g => !g.completed).length;
+            incomplete.professionalGoals = professionalGoals.filter(g => !g.completed).length;
+
+            // Check water
+            const todayWater = getTodayDateWater();
+            if (waterData[todayWater]) {
+                incomplete.water = 8 - waterData[todayWater].glasses;
+            } else {
+                incomplete.water = 8;
+            }
+
+            return incomplete;
+        }
+
+        // Show nudge popup
+        function showNudgePopup() {
+            if (!nudgeSettings.showPopup) return;
+
+            const incomplete = getIncompleteItems();
+            const totalIncomplete = incomplete.habits.length + incomplete.personalGoals + incomplete.professionalGoals;
+
+            if (totalIncomplete === 0 && incomplete.water <= 0) {
+                return; // Everything completed
+            }
+
+            // Create popup HTML
+            let popupHTML = `
+                <div id="nudge-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.3s;">
+                    <div style="background: white; padding: 30px; border-radius: 16px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.3s;">
+                        <h2 style="margin: 0 0 20px 0; color: #1a1a1a; font-size: 24px; text-align: center;">⏰ Time to Complete Your Tasks!</h2>
+            `;
+
+            if (incomplete.habits.length > 0) {
+                popupHTML += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 16px; color: #4F46E5; margin-bottom: 10px;">📋 Incomplete Daily Habits (${incomplete.habits.length}/9)</h3>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            ${incomplete.habits.map(h => `<li style="padding: 8px 12px; background: #f3f4f6; margin-bottom: 6px; border-radius: 6px; font-size: 14px;">✓ ${h}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (incomplete.personalGoals > 0 || incomplete.professionalGoals > 0) {
+                popupHTML += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 16px; color: #4F46E5; margin-bottom: 10px;">🎯 Incomplete Goals</h3>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            ${incomplete.personalGoals > 0 ? `<li style="padding: 8px 12px; background: #f3f4f6; margin-bottom: 6px; border-radius: 6px; font-size: 14px;">Personal: ${incomplete.personalGoals} remaining</li>` : ''}
+                            ${incomplete.professionalGoals > 0 ? `<li style="padding: 8px 12px; background: #f3f4f6; margin-bottom: 6px; border-radius: 6px; font-size: 14px;">Professional: ${incomplete.professionalGoals} remaining</li>` : ''}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            if (incomplete.water > 0) {
+                popupHTML += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 16px; color: #4F46E5; margin-bottom: 10px;">💧 Water Tracker</h3>
+                        <p style="padding: 8px 12px; background: #f3f4f6; border-radius: 6px; font-size: 14px; margin: 0;">${incomplete.water} glasses remaining</p>
+                    </div>
+                `;
+            }
+
+            popupHTML += `
+                        <div style="display: flex; gap: 10px; margin-top: 25px;">
+                            <button onclick="closeNudgePopup()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s;">Got it! Let's do this!</button>
+                            <button onclick="snoozeNudge()" style="padding: 12px 20px; background: #f3f4f6; color: #666; border: none; border-radius: 8px; font-size: 14px; cursor: pointer;">Snooze 30m</button>
+                        </div>
+                    </div>
+                </div>
+                <style>
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideUp {
+                        from { transform: translateY(30px); opacity: 0; }
+                        to { transform: translateY(0); opacity: 1; }
+                    }
+                </style>
+            `;
+
+            // Remove existing popup if any
+            const existing = document.getElementById('nudge-overlay');
+            if (existing) existing.remove();
+
+            // Add popup to body
+            document.body.insertAdjacentHTML('beforeend', popupHTML);
+
+            // Send browser notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('📋 Task Reminder', {
+                    body: `You have ${totalIncomplete} incomplete tasks today!`,
+                    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%234F46E5"/><text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-size="60" fill="white" font-weight="bold">✓</text></svg>',
+                    requireInteraction: true
+                });
+            }
+
+            // Update last nudge time
+            nudgeSettings.lastNudge = new Date().toISOString();
+            saveNudgeSettings();
+        }
+
+        // Close nudge popup
+        function closeNudgePopup() {
+            const overlay = document.getElementById('nudge-overlay');
+            if (overlay) {
+                overlay.style.animation = 'fadeOut 0.3s';
+                setTimeout(() => overlay.remove(), 300);
+            }
+        }
+
+        // Snooze nudge
+        function snoozeNudge() {
+            nudgeSettings.lastNudge = new Date(Date.now() + 30 * 60 * 1000).toISOString(); // Snooze for 30 mins
+            saveNudgeSettings();
+            closeNudgePopup();
+        }
+
+        // Check if it's time for scheduled nudge
+        function checkScheduledNudge() {
+            if (!nudgeSettings.enabled) return;
+
+            const now = new Date();
+            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            // Check if current time matches any scheduled time
+            if (nudgeSettings.times.includes(currentTime)) {
+                // Check if we haven't nudged in the last 55 minutes
+                if (!nudgeSettings.lastNudge ||
+                    (Date.now() - new Date(nudgeSettings.lastNudge).getTime() > 55 * 60 * 1000)) {
+                    showNudgePopup();
+                }
+            }
+        }
+
+        // Check nudges periodically
+        function checkPeriodicNudge() {
+            if (!nudgeSettings.enabled) return;
+
+            // If interval nudging is enabled and enough time has passed
+            if (nudgeSettings.lastNudge) {
+                const timeSinceLastNudge = Date.now() - new Date(nudgeSettings.lastNudge).getTime();
+                const intervalMs = nudgeSettings.interval * 60 * 1000;
+
+                if (timeSinceLastNudge > intervalMs) {
+                    showNudgePopup();
+                }
+            } else {
+                // First nudge
+                showNudgePopup();
+            }
+        }
+
+        // Toggle nudge settings
+        function toggleNudges(enable) {
+            nudgeSettings.enabled = enable;
+            saveNudgeSettings();
+
+            if (enable) {
+                alert('✓ Nudge notifications enabled!\n\nYou will receive reminders at:\n• ' + nudgeSettings.times.join('\n• ') + '\n\nAnd every ' + nudgeSettings.interval + ' minutes');
+            } else {
+                alert('✓ Nudge notifications disabled');
+            }
+        }
+
+        // Test nudge popup (for user testing)
+        function testNudgePopup() {
+            showNudgePopup();
+        }
+
+        // Initialize nudge system
+        function initNudgeSystem() {
+            loadNudgeSettings();
+
+            // Request notification permission
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        console.log('✓ Notification permission granted');
+                    }
+                });
+            }
+
+            // Check scheduled nudges every minute
+            setInterval(checkScheduledNudge, 60000);
+
+            // Check periodic nudges every 15 minutes
+            setInterval(checkPeriodicNudge, 15 * 60 * 1000);
+
+            // Initial check after 2 minutes
+            setTimeout(() => {
+                if (nudgeSettings.enabled) {
+                    checkPeriodicNudge();
+                }
+            }, 2 * 60 * 1000);
+
+            console.log('✓ Nudge system initialized');
+            console.log('  - Scheduled times:', nudgeSettings.times);
+            console.log('  - Check interval:', nudgeSettings.interval, 'minutes');
+            console.log('  - Status:', nudgeSettings.enabled ? 'ENABLED' : 'DISABLED');
+        }
+
+        // Start nudge system on page load
+        window.addEventListener('load', initNudgeSystem);
     </script>
 </body>
 </html>
